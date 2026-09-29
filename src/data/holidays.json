@@ -1,0 +1,51 @@
+[
+  {
+    "id": "national-day-2026",
+    "name": "国庆节",
+    "date": "10-01",
+    "type": "holiday",
+    "desc": "国庆假期 (10月1日~10月7日)"
+  },
+  {
+    "id": "mid-autumn-2026",
+    "name": "中秋节",
+    "date": "09-25",
+    "type": "holiday",
+    "desc": "中秋佳节 (农历八月十五)"
+  },
+  {
+    "id": "new-year-2027",
+    "name": "元旦",
+    "date": "01-01",
+    "type": "holiday",
+    "desc": "新年元旦放假"
+  },
+  {
+    "id": "spring-festival-2027",
+    "name": "春节",
+    "date": "02-06",
+    "type": "holiday",
+    "desc": "农历丁未年春节"
+  },
+  {
+    "id": "qingming-2027",
+    "name": "清明节",
+    "date": "04-05",
+    "type": "holiday",
+    "desc": "清明追思假期"
+  },
+  {
+    "id": "labor-day-2027",
+    "name": "劳动节",
+    "date": "05-01",
+    "type": "holiday",
+    "desc": "五一国际劳动节"
+  },
+  {
+    "id": "dragon-boat-2027",
+    "name": "端午节",
+    "date": "06-09",
+    "type": "holiday",
+    "desc": "端午安康 (农历五月初五)"
+  }
+]

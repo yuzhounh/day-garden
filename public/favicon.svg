@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bloomGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="petalGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34d399" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.7" />
+    </linearGradient>
+  </defs>
+  <!-- Background soft circle -->
+  <circle cx="50" cy="50" r="46" fill="#f0fdf4" stroke="#a7f3d0" stroke-width="2" />
+  
+  <!-- Flower Petals / Sprout Shape -->
+  <path d="M50 20 C65 35 75 55 50 82 C25 55 35 35 50 20 Z" fill="url(#bloomGrad)" />
+  <path d="M50 35 C60 45 68 58 50 75 C32 58 40 45 50 35 Z" fill="url(#petalGrad)" />
+  <circle cx="50" cy="48" r="4" fill="#fef08a" />
+</svg>
