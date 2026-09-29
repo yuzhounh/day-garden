@@ -5,7 +5,8 @@ import rawEvidence from '../data/evidence-guide.json'
 import rawPoetry from '../data/poetry-curated.json'
 import rawHealthTips from '../data/health-tips.json'
 
-const STORAGE_KEY = 'daybloom_user_preferences_v1'
+const STORAGE_KEY = 'daygarden_user_preferences_v1'
+const LEGACY_STORAGE_KEY = 'daybloom_user_preferences_v1'
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'auto',
@@ -51,7 +52,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
 
 export function loadUserPreferences(): UserPreferences {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY)
     if (!raw) return { ...DEFAULT_PREFERENCES }
     const parsed = JSON.parse(raw)
     return {

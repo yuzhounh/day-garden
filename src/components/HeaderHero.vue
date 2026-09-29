@@ -51,7 +51,7 @@ function selectCity(c: CityOption) {
       <div class="flex items-center gap-3">
         <span class="inline-flex items-center gap-1.5 text-xs font-medium tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
           <Sparkles class="w-3 h-3" />
-          DayBloom
+          Day Garden
         </span>
         <span class="text-sm font-semibold text-slate-500 dark:text-slate-400">
           {{ calendarInfo.termSummary }}

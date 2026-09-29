@@ -72,7 +72,7 @@ async function handleTestNotification() {
   const granted = await requestNotificationPermission()
   if (granted) {
     notificationStatus.value = 'success'
-    sendDesktopNotification('DayBloom 生日提前预警', '🎂 妈妈生日还有 12 天 · 建议提前准备礼物')
+    sendDesktopNotification('Day Garden 生日提前预警', '🎂 妈妈生日还有 12 天 · 建议提前准备礼物')
   } else {
     notificationStatus.value = 'denied'
   }
@@ -82,7 +82,7 @@ function exportData() {
   const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(props.preferences, null, 2))
   const dlAnchorElem = document.createElement('a')
   dlAnchorElem.setAttribute('href', dataStr)
-  dlAnchorElem.setAttribute('download', `daybloom-backup-${new Date().toISOString().slice(0, 10)}.json`)
+  dlAnchorElem.setAttribute('download', `day-garden-backup-${new Date().toISOString().slice(0, 10)}.json`)
   dlAnchorElem.click()
 }
 
@@ -112,7 +112,7 @@ function importData(e: Event) {
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
         <div class="flex items-center gap-2">
           <Sliders class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          <h3 class="text-base font-medium text-slate-900 dark:text-white">DayBloom 偏好与生活记事</h3>
+          <h3 class="text-base font-medium text-slate-900 dark:text-white">Day Garden 偏好与生活记事</h3>
         </div>
         <button
           @click="emit('close')"

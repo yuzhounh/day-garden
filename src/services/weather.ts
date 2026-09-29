@@ -69,7 +69,7 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
 
     // 缓存数据到 localStorage
     try {
-      localStorage.setItem('daybloom_weather_cache', JSON.stringify({ city: city.name, list, timestamp: Date.now() }))
+      localStorage.setItem('daygarden_weather_cache', JSON.stringify({ city: city.name, list, timestamp: Date.now() }))
     } catch {
       // ignore
     }
@@ -79,7 +79,7 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
     console.warn('Weather fetch failed, trying local fallback:', err)
     // 尝试读取本地缓存
     try {
-      const cached = localStorage.getItem('daybloom_weather_cache')
+      const cached = localStorage.getItem('daygarden_weather_cache') || localStorage.getItem('daybloom_weather_cache')
       if (cached) {
         const parsed = JSON.parse(cached)
         return parsed.list

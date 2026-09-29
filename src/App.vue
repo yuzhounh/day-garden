@@ -105,10 +105,10 @@ function checkBirthdayAlerts() {
 
   if (todayEvents.length > 0) {
     const ev = todayEvents[0]
-    sendDesktopNotification('DayBloom 生日祝福', `🎂 今天是【${ev.title}】，别忘了送上祝福！`)
+    sendDesktopNotification('Day Garden 生日祝福', `🎂 今天是【${ev.title}】，别忘了送上祝福！`)
   } else if (urgentEvents.length > 0) {
     const ev = urgentEvents[0]
-    sendDesktopNotification('DayBloom 日程预警', `⏰【${ev.title}】还有 ${ev.daysLeft} 天，记得确认准备情况。`)
+    sendDesktopNotification('Day Garden 日程预警', `⏰【${ev.title}】还有 ${ev.daysLeft} 天，记得确认准备情况。`)
   }
 }
 
@@ -193,7 +193,7 @@ onMounted(() => {
     <!-- Footer -->
     <footer class="w-full py-6 text-center text-xs text-slate-400 select-none">
       <div class="flex items-center justify-center gap-2">
-        <span>DayBloom</span>
+        <span>Day Garden</span>
         <span>·</span>
         <span>低干扰个人生活主页</span>
         <span>·</span>
