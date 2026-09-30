@@ -369,6 +369,16 @@
 .calendar-upcoming-row > .full-width {
   grid-column: 1 / -1;
 }
+.two-column-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+  align-items: stretch;
+}
+.two-column-cards-grid > * {
+  width: 100%;
+}
 .dashboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 .dashboard-card { border-radius: 22px; padding: 24px 26px 0; min-width: 0; display: flex; flex-direction: column; transition: box-shadow .25s; }
 .dashboard-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 16px 36px -16px rgba(0, 0, 0, 0.08); }
@@ -721,6 +731,351 @@
 .account-backup { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; justify-content: space-between; border-top: 1px solid var(--line); margin-top: 24px; padding-top: 17px; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: rgba(110, 133, 104, .25); border-radius: 6px; }
+/* 名人名言卡片 */
+.quote-card {
+  min-height: 290px;
+}
+.quote-body {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 8px 0 14px;
+}
+.quote-symbol {
+  color: var(--accent);
+  opacity: 0.3;
+  margin-bottom: 6px;
+}
+.quote-text {
+  font-size: 18.5px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-bottom: 12px;
+  letter-spacing: 0.3px;
+  font-family: serif;
+}
+.quote-author-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.quote-author {
+  font-weight: 600;
+  color: var(--ink);
+}
+.quote-source {
+  color: var(--muted);
+  font-size: 12px;
+}
+.quote-insight {
+  background: rgba(140, 175, 155, 0.08);
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin-bottom: 16px;
+  border-left: 3px solid var(--accent);
+}
+.dark .quote-insight {
+  background: rgba(140, 175, 155, 0.12);
+}
+.full-quote-modal {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+.modal-quote-text {
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink);
+  font-family: serif;
+  margin-bottom: 10px;
+}
+.modal-credit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.quote-library-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.quote-item-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-align: left;
+  transition: all 0.2s;
+  cursor: pointer;
+  width: 100%;
+}
+.quote-item-button:hover {
+  border-color: var(--accent);
+  background: rgba(140, 175, 155, 0.06);
+}
+.quote-item-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 6px;
+  font-family: serif;
+}
+.quote-item-author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* 华夏胜景卡片 */
+.attractions-card {
+  min-height: 290px;
+}
+.attraction-stats-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+.stats-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.stat-pill.visited {
+  background: rgba(46, 125, 85, 0.1);
+  color: #2e7d55;
+}
+.dark .stat-pill.visited {
+  background: rgba(46, 125, 85, 0.25);
+  color: #5cc995;
+}
+.stat-pill.wishlist {
+  background: rgba(224, 110, 80, 0.1);
+  color: #d15632;
+}
+.dark .stat-pill.wishlist {
+  background: rgba(224, 110, 80, 0.22);
+  color: #f68d6f;
+}
+.stat-pill.unvisited {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+.progress-track-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #10b981);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.progress-percent-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attraction-featured-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  flex: 1;
+  margin-bottom: 12px;
+}
+.spot-mini-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: border-color 0.2s;
+}
+.spot-mini-row:hover {
+  border-color: var(--accent);
+}
+.spot-mini-info {
+  min-width: 0;
+  flex: 1;
+}
+.spot-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.spot-location-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.spot-highlight-text {
+  font-size: 11.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.spot-actions-group {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.status-btn {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.status-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.status-btn.visited.active {
+  background: #2e7d55;
+  color: #fff;
+  border-color: #2e7d55;
+}
+.status-btn.wishlist.active {
+  background: #e06e50;
+  color: #fff;
+  border-color: #e06e50;
+}
+.status-btn.unvisited.active {
+  background: var(--line);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.footer-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.modal-search-row {
+  margin-bottom: 12px;
+}
+.search-input-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.attraction-search-input {
+  border: none;
+  background: transparent;
+  font-size: 12.5px;
+  color: var(--ink);
+  outline: none;
+  width: 100%;
+}
+.attraction-modal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 480px;
+  overflow-y: auto;
+  margin-top: 14px;
+}
+.modal-spot-card {
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.modal-spot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.modal-spot-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.modal-spot-meta h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.modal-spot-desc {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.modal-spot-sub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.modal-spot-quote {
+  font-style: italic;
+  color: var(--accent);
+}
+
 @keyframes appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes breathe { from { opacity: .35; } to { opacity: .8; } }
 @media (min-width: 1400px) { .garden-shell { padding-top: 10px; } .hero-intro { padding-top: 36px; padding-bottom: 40px; } }
@@ -731,6 +1086,7 @@
   .weather-panel { grid-template-columns: 190px minmax(0, 1fr); gap: 16px; padding: 20px; }
   .forecast-heading small { display: none; }
   .calendar-upcoming-row { grid-template-columns: 1fr; gap: 16px; }
+  .two-column-cards-grid { grid-template-columns: 1fr; gap: 16px; }
   .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
   .poetry-body blockquote { font-size: 24px; letter-spacing: 1px; }
   .poetry-reading { align-items: flex-start; flex-direction: column; gap: 7px; }

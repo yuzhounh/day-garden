@@ -176,6 +176,16 @@ function importData(e: Event) {
             </label>
 
             <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">积极励志 · 名人名言</span>
+              <input type="checkbox" :checked="preferences.modules.inspirationalQuote ?? true" @change="toggleModule('inspirationalQuote')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            </label>
+
+            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">中国最值得去的旅游景点</span>
+              <input type="checkbox" :checked="preferences.modules.chinaAttractions ?? true" @change="toggleModule('chinaAttractions')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            </label>
+
+            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
               <span class="text-xs font-medium text-slate-800 dark:text-slate-200">底部健康微提醒</span>
               <input type="checkbox" :checked="preferences.modules.healthTip" @change="toggleModule('healthTip')" class="rounded text-emerald-600 focus:ring-emerald-500" />
             </label>

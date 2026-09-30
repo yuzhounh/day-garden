@@ -1,9 +1,10 @@
-import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip } from '../types'
+import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip, InspirationalQuote } from '../types'
 import { DEFAULT_CITIES } from './weather'
 import rawSeasons from '../data/seasons-bloom.json'
 import rawEvidence from '../data/evidence-guide.json'
 import rawPoetry from '../data/poetry-curated.json'
 import rawHealthTips from '../data/health-tips.json'
+import rawQuotes from '../data/inspirational-quotes.json'
 
 const STORAGE_KEY = 'daygarden_user_preferences_v1'
 const LEGACY_STORAGE_KEY = 'daybloom_user_preferences_v1'
@@ -18,8 +19,11 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     seasonal: true,
     evidence: true,
     dailyPoetry: true,
+    inspirationalQuote: true,
+    chinaAttractions: true,
     healthTip: true,
   },
+  attractionStatus: {},
   customEvents: [
     {
       id: 'mom-birthday',
@@ -138,5 +142,14 @@ export function getTodayPoetry(date: Date = new Date()): CuratedPoetry {
 export function getTodayHealthTip(date: Date = new Date()): HealthTip {
   const list = rawHealthTips as HealthTip[]
   const idx = getDailyIndex(list.length, 3, date)
+  return list[idx]
+}
+
+/**
+ * 获取今日名人励志名言
+ */
+export function getTodayQuote(date: Date = new Date()): InspirationalQuote {
+  const list = rawQuotes as InspirationalQuote[]
+  const idx = getDailyIndex(list.length, 67, date)
   return list[idx]
 }

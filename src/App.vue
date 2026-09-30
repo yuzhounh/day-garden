@@ -8,18 +8,21 @@ import UpcomingTimeline from './components/UpcomingTimeline.vue'
 import SeasonalCard from './components/SeasonalCard.vue'
 import EvidenceCard from './components/EvidenceCard.vue'
 import DailyPageCard from './components/DailyPageCard.vue'
+import InspirationalQuoteCard from './components/InspirationalQuoteCard.vue'
+import ChinaAttractionsCard from './components/ChinaAttractionsCard.vue'
 import HealthTipBar from './components/HealthTipBar.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import AccountModal from './components/AccountModal.vue'
 import { initializeSync, refreshCloud, account, syncCustomEvents } from './services/sync'
-import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide, LifeEvent } from './types'
+import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide, LifeEvent, InspirationalQuote, AttractionStatusType } from './types'
 import { fetch7DayWeather } from './services/weather'
 import { getUpcomingEvents, sendDesktopNotification } from './services/calendar'
-import { loadUserPreferences, saveUserPreferences, getTodaySeasonBloom, getTodayEvidenceGuide, getTodayPoetry, getTodayHealthTip } from './services/storage'
+import { loadUserPreferences, saveUserPreferences, getTodaySeasonBloom, getTodayEvidenceGuide, getTodayPoetry, getTodayHealthTip, getTodayQuote } from './services/storage'
 import { localDateKey } from './services/day'
 import rawPoetry from './data/poetry-curated.json'
 import rawHealthTips from './data/health-tips.json'
 import rawEvidence from './data/evidence-guide.json'
+import rawQuotes from './data/inspirational-quotes.json'
 
 const prefs = ref<UserPreferences>(loadUserPreferences(account.user?.id))
 
@@ -38,6 +41,7 @@ const seasonBloom = ref(getTodaySeasonBloom())
 const evidenceGuide = ref(getTodayEvidenceGuide())
 const currentPoetry = ref<CuratedPoetry>(getTodayPoetry())
 const currentHealthTip = ref<HealthTip>(getTodayHealthTip())
+const currentQuote = ref<InspirationalQuote>(getTodayQuote())
 const upcomingEvents = computed(() => {
   void dateKey.value
   return getUpcomingEvents(prefs.value.customEvents, 30)
@@ -89,6 +93,17 @@ function handleNextGuide() {
   const list = rawEvidence as EvidenceGuide[]
   evidenceGuide.value = list[(list.findIndex(g => g.id === evidenceGuide.value.id) + 1) % list.length]
 }
+function handleNextQuote() {
+  const list = rawQuotes as InspirationalQuote[]
+  currentQuote.value = list[(list.findIndex(q => q.id === currentQuote.value.id) + 1) % list.length]
+}
+function handleUpdateAttractionStatus(newMap: Record<string, AttractionStatusType>) {
+  prefs.value = {
+    ...prefs.value,
+    attractionStatus: newMap,
+  }
+  saveUserPreferences(prefs.value, account.user?.id)
+}
 function openSettings(tab: typeof settingsTab.value = 'modules') { settingsTab.value = tab; showSettings.value = true }
 function checkBirthdayAlerts() {
   if (!prefs.value.notificationEnabled) return
@@ -103,6 +118,7 @@ function syncDate() {
   evidenceGuide.value = getTodayEvidenceGuide()
   currentPoetry.value = getTodayPoetry()
   currentHealthTip.value = getTodayHealthTip()
+  currentQuote.value = getTodayQuote()
   loadWeather()
   checkBirthdayAlerts()
 }
@@ -152,31 +168,46 @@ onUnmounted(() => {
         </div>
         <WeatherTimeline v-if="prefs.modules.weather" :days="weatherDays" :loading="weatherLoading" :city="prefs.selectedCity.name" />
 
-        <!-- 日历卡片 与 纪念日卡片并列区域 -->
-        <section
-          v-if="(prefs.modules.calendar ?? true) || prefs.modules.upcoming"
-          class="calendar-upcoming-row"
-          aria-label="月历与纪念日"
-        >
+        <!-- 中间卡片网格：除最顶部天气与最底部好好照顾自己外，其余卡片均占页面宽度的一半（两列排布） -->
+        <section class="two-column-cards-grid" aria-label="核心生活卡片">
           <MonthCalendarCard
             v-if="prefs.modules.calendar ?? true"
             :events="prefs.customEvents"
-            :class="{ 'full-width': !prefs.modules.upcoming }"
           />
           <UpcomingTimeline
             v-if="prefs.modules.upcoming"
             :events="upcomingEvents"
-            :class="{ 'full-width': !(prefs.modules.calendar ?? true) }"
             @add-event="openSettings('events')"
+          />
+          <DailyPageCard
+            v-if="prefs.modules.dailyPoetry"
+            :poetry="currentPoetry"
+            @next-poetry="handleNextPoetry"
+            @select-poetry="currentPoetry = $event"
+          />
+          <InspirationalQuoteCard
+            v-if="prefs.modules.inspirationalQuote ?? true"
+            :quote="currentQuote"
+            @next-quote="handleNextQuote"
+            @select-quote="currentQuote = $event"
+          />
+          <SeasonalCard
+            v-if="prefs.modules.seasonal"
+            :bloom="seasonBloom"
+          />
+          <EvidenceCard
+            v-if="prefs.modules.evidence"
+            :guide="evidenceGuide"
+            @next-guide="handleNextGuide"
+          />
+          <ChinaAttractionsCard
+            v-if="prefs.modules.chinaAttractions ?? true"
+            :status-map="prefs.attractionStatus"
+            @update:status-map="handleUpdateAttractionStatus"
           />
         </section>
 
-        <!-- 文化日常三列网格：诗词名句、物候花信、生活有方 -->
-        <div class="dashboard-grid">
-          <DailyPageCard v-if="prefs.modules.dailyPoetry" :poetry="currentPoetry" @next-poetry="handleNextPoetry" @select-poetry="currentPoetry = $event" />
-          <SeasonalCard v-if="prefs.modules.seasonal" :bloom="seasonBloom" />
-          <EvidenceCard v-if="prefs.modules.evidence" :guide="evidenceGuide" @next-guide="handleNextGuide" />
-        </div>
+        <!-- 最下面：好好照顾自己卡片（全宽） -->
         <HealthTipBar v-if="prefs.modules.healthTip" :tip="currentHealthTip" :date-key="dateKey" @next-tip="handleNextTip" />
         <div v-if="!Object.values(prefs.modules).some(Boolean)" class="glass-panel empty-dashboard"><Sprout :size="32" /><h2>花园留白，随你安排。</h2><button class="soft-button" @click="openSettings()">选择想看的内容</button></div>
       </main>

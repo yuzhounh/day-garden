@@ -1,0 +1,222 @@
+[
+  {
+    "id": "spot-gugong",
+    "name": "故宫博物院",
+    "province": "北京",
+    "city": "东城区",
+    "category": "cultural",
+    "level": "世界文化遗产 · 5A",
+    "highlight": "六百年明清紫禁城，红墙金瓦间见证华夏营造技艺与历史厚重。",
+    "bestSeason": "秋季（老北京金秋时节最佳）",
+    "quote": "白沟春水绿，紫禁晓霞红。"
+  },
+  {
+    "id": "spot-mogaoku",
+    "name": "莫高窟",
+    "province": "甘肃",
+    "city": "敦煌",
+    "category": "cultural",
+    "level": "世界文化遗产 · 5A",
+    "highlight": "千年丝绸之路的璀璨结晶，七百余窟泥塑彩画与飞天艺术宝库。",
+    "bestSeason": "5—10月（大漠长风天高气爽）",
+    "quote": "敦者，大也；煌者，盛也。"
+  },
+  {
+    "id": "spot-budala",
+    "name": "布达拉宫",
+    "province": "西藏",
+    "city": "拉萨",
+    "category": "cultural",
+    "level": "世界文化遗产 · 5A",
+    "highlight": "世界上海拔最高的古代宫堡建筑群，红白交映的雪域信仰圣殿。",
+    "bestSeason": "4—10月（阳光充足含氧量较高）",
+    "quote": "住进布达拉宫，我是雪域最大的王。"
+  },
+  {
+    "id": "spot-jiuzhaigou",
+    "name": "九寨沟",
+    "province": "四川",
+    "city": "阿坝",
+    "category": "natural",
+    "level": "世界自然遗产 · 5A",
+    "highlight": "人间仙境童话世界，五花海、诺日朗瀑布与五彩斑斓的钙华翠海。",
+    "bestSeason": "9—11月（深秋彩林倒映五彩碧水）",
+    "quote": "九寨归来不看水，人间瑶池在此间。"
+  },
+  {
+    "id": "spot-zhangjiajie",
+    "name": "张家界森林公园",
+    "province": "湖南",
+    "city": "张家界",
+    "category": "natural",
+    "level": "世界自然遗产 · 5A",
+    "highlight": "三千奇峰拔地而起，电影阿凡达哈利路亚悬浮山的原型乾坤柱。",
+    "bestSeason": "4—10月（云雾缭绕宛若仙山神境）",
+    "quote": "人生不到张家界，百岁何能叫老翁。"
+  },
+  {
+    "id": "spot-huangshan",
+    "name": "黄山风景区",
+    "province": "安徽",
+    "city": "黄山",
+    "category": "natural",
+    "level": "双重世界遗产 · 5A",
+    "highlight": "天下第一奇山，以奇松、怪石、云海、温泉、冬雪五绝冠绝天下。",
+    "bestSeason": "四季皆宜（春览花，夏避暑，秋赏枫，冬观雪）",
+    "quote": "五岳归来不看山，黄山归来不看岳。"
+  },
+  {
+    "id": "spot-lijiang-river",
+    "name": "桂林漓江",
+    "province": "广西",
+    "city": "桂林",
+    "category": "natural",
+    "level": "国家重点风景名胜 · 5A",
+    "highlight": "百里水墨画廊，泛舟碧波之上，两岸奇峰倒影，宛若游走于中国山水画卷。",
+    "bestSeason": "4—10月（烟雨漓江最具诗意）",
+    "quote": "桂林山水甲天下，玉碧罗青意可人。"
+  },
+  {
+    "id": "spot-daocheng",
+    "name": "稻城亚丁",
+    "province": "四川",
+    "city": "甘孜",
+    "category": "natural",
+    "level": "国家级自然保护区 · 5A",
+    "highlight": "蓝色星球上的最后一片净土，仙乃日、央迈勇、夏诺多吉三座神山圣湖。",
+    "bestSeason": "9—10月（金黄草甸与纯净雪峰共舞）",
+    "quote": "水蓝色的星球上，最后一片纯净的家园。"
+  },
+  {
+    "id": "spot-yulong-lijiang",
+    "name": "丽江古城与玉龙雪山",
+    "province": "云南",
+    "city": "丽江",
+    "category": "cultural",
+    "level": "世界文化遗产 · 5A",
+    "highlight": "纳西木府小桥流水人家，远眺终年积雪的十三峰银龙日照金山。",
+    "bestSeason": "四季皆宜（冬春晴朗见雪峰概率高）",
+    "quote": "玉龙傲立云霄外，古道茶马绕石阶。"
+  },
+  {
+    "id": "spot-xihu",
+    "name": "杭州西湖",
+    "province": "浙江",
+    "city": "杭州",
+    "category": "cultural",
+    "level": "世界文化遗产 · 5A",
+    "highlight": "苏堤春晓、断桥残雪，文人墨客两千年来沉淀的极致江南山水美学。",
+    "bestSeason": "春秋两季（春风拂柳，秋月荷香）",
+    "quote": "欲把西湖比西子，淡妆浓抹总相宜。"
+  },
+  {
+    "id": "spot-bingmayong",
+    "name": "秦始皇陵兵马俑",
+    "province": "陕西",
+    "city": "西安",
+    "category": "historical",
+    "level": "世界文化遗产 · 5A",
+    "highlight": "世界第八大奇迹，浩瀚军阵千人千面，重现两千年前大秦帝国的雄浑气魄。",
+    "bestSeason": "四季皆宜（室内恒温展厅）",
+    "quote": "秦王扫六合，虎视何雄哉。"
+  },
+  {
+    "id": "spot-taishan",
+    "name": "泰山风景名胜区",
+    "province": "山东",
+    "city": "泰安",
+    "category": "natural",
+    "level": "双重世界遗产 · 5A",
+    "highlight": "五岳独尊，历代帝王封禅朝圣之地，南天门与日观峰日出云海壮美绝伦。",
+    "bestSeason": "5—11月（登高远眺云海日出）",
+    "quote": "会当凌绝顶，一览众山小。"
+  },
+  {
+    "id": "spot-hulunbuir",
+    "name": "呼伦贝尔大草原",
+    "province": "内蒙古",
+    "city": "呼伦贝尔",
+    "category": "natural",
+    "level": "国家重点生态区 · 5A",
+    "highlight": "中国最美的无垠草原，莫尔格勒河九曲十八弯，骏马牛羊奔腾绿浪之间。",
+    "bestSeason": "6—8月（水草丰美，温度舒适宜人）",
+    "quote": "天苍苍，野茫茫，风吹草低见牛羊。"
+  },
+  {
+    "id": "spot-kanasi",
+    "name": "喀纳斯湖风景区",
+    "province": "新疆",
+    "city": "阿勒泰",
+    "category": "natural",
+    "level": "国家级自然保护区 · 5A",
+    "highlight": "神的花园，图瓦村落木屋，月亮湾与神仙湾在晨雾与云杉林中静静流淌。",
+    "bestSeason": "6月花海或9月秋金（北疆秋景天花板）",
+    "quote": "人间净土喀纳斯，神仙留恋忘归程。"
+  },
+  {
+    "id": "spot-gulangyu",
+    "name": "鼓浪屿",
+    "province": "福建",
+    "city": "厦门",
+    "category": "cultural",
+    "level": "世界文化遗产 · 5A",
+    "highlight": "海上花园与钢琴之岛，日光岩俯瞰琴岛红顶别墅与碧海蓝天。",
+    "bestSeason": "3—5月、10—12月（避开盛夏酷暑）",
+    "quote": "海浪伴琴声，红砖绿树间。"
+  },
+  {
+    "id": "spot-changbaishan",
+    "name": "长白山天池",
+    "province": "吉林",
+    "city": "延边",
+    "category": "natural",
+    "level": "国家级自然保护区 · 5A",
+    "highlight": "十六座奇峰环绕的高山火山天池，水光湛蓝深邃，如镶嵌在云端的一面宝镜。",
+    "bestSeason": "7—8月（天池开冰，视野最清晰）",
+    "quote": "千年积雪万年松，直上人间第一峰。"
+  },
+  {
+    "id": "spot-yueyaquan",
+    "name": "鸣沙山月牙泉",
+    "province": "甘肃",
+    "city": "敦煌",
+    "category": "natural",
+    "level": "国家级风景名胜 · 5A",
+    "highlight": "塞外奇观，千百年来狂风吹沙不掩泉，碧水如弯月映照塞外黄沙与驼铃。",
+    "bestSeason": "5—10月（夕阳西下看金色沙丘与驼队）",
+    "quote": "沙泉共处千百年，月映清流万古存。"
+  },
+  {
+    "id": "spot-hukou",
+    "name": "黄河壶口瀑布",
+    "province": "山西/陕西",
+    "city": "临汾/延安",
+    "category": "natural",
+    "level": "国家地质公园 · 5A",
+    "highlight": "母亲河在晋陕大峡谷收窄如壶口，滔滔浊浪倾泻而下，声若奔雷，气吞山河。",
+    "bestSeason": "4—5月（春汛桃花汛）或9—11月（秋汛水势浩大）",
+    "quote": "黄河之水天上来，奔流到海不复回。"
+  },
+  {
+    "id": "spot-wuzhen",
+    "name": "乌镇古镇",
+    "province": "浙江",
+    "city": "嘉兴",
+    "category": "cultural",
+    "level": "世界遗产预备名录 · 5A",
+    "highlight": "江南水乡最后的老枕水人家，摇橹船划开晨雾，木心美术馆临水沉思。",
+    "bestSeason": "3—5月（春水碧于天，画船听雨眠）",
+    "quote": "来过，便不曾离开。"
+  },
+  {
+    "id": "spot-everest",
+    "name": "珠峰大本营",
+    "province": "西藏",
+    "city": "日喀则",
+    "category": "natural",
+    "level": "国家级自然保护区",
+    "highlight": "世界第三极世界之巅，海拔5200米近距离仰望8848.86米雪山金顶与银河星海。",
+    "bestSeason": "4—5月、9—10月（能见度高，雨季前后的黄金季）",
+    "quote": "仰止极巅云汉近，心怀宇宙自从容。"
+  }
+]

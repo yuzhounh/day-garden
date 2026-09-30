@@ -78,6 +78,29 @@ export interface HealthTip {
   sourceUrl: string
 }
 
+export interface InspirationalQuote {
+  id: string
+  quote: string
+  author: string
+  source?: string
+  tag: string
+  insight: string
+}
+
+export interface ChinaAttraction {
+  id: string
+  name: string
+  province: string
+  city: string
+  category: 'natural' | 'cultural' | 'historical'
+  level: string
+  highlight: string
+  bestSeason: string
+  quote: string
+}
+
+export type AttractionStatusType = 'visited' | 'wishlist' | 'unvisited'
+
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'auto'
   selectedCity: CityOption
@@ -88,9 +111,12 @@ export interface UserPreferences {
     seasonal: boolean
     evidence: boolean
     dailyPoetry: boolean
+    inspirationalQuote?: boolean
+    chinaAttractions?: boolean
     healthTip: boolean
   }
   customEvents: LifeEvent[]
+  attractionStatus?: Record<string, AttractionStatusType>
   notificationEnabled: boolean
 }
 
