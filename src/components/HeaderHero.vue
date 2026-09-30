@@ -296,14 +296,21 @@ onUnmounted(() => {
         <p class="eyebrow"><span class="status-dot"></span> A LITTLE SPACE FOR EVERYDAY LIFE</p>
         <h1>{{ greeting }}</h1>
         <p class="hero-description">感受四时流转，照顾日常，也收藏一点诗意。</p>
-        <div class="season-note"><Sprout :size="14" /><span>{{ calendar.termSummary }}</span></div>
       </div>
 
-      <div class="date-card glass-panel" aria-label="今日日期">
-        <span>{{ now.getFullYear() }} / {{ String(now.getMonth() + 1).padStart(2, '0') }}</span>
-        <strong>{{ String(now.getDate()).padStart(2, '0') }}</strong>
-        <span>{{ calendar.dayOfWeek }}</span>
-        <div>农历 {{ calendar.lunarMonthStr }}{{ calendar.lunarDayStr }}</div>
+      <div class="date-card glass-panel" aria-label="今日日期与节气时序">
+        <div class="date-card-primary">
+          <span class="date-solar">{{ calendar.solarDateStr }}</span>
+          <span class="date-weekday">{{ calendar.dayOfWeek }}</span>
+        </div>
+        <div class="date-card-secondary">
+          <span class="lunar-tag">农历</span>
+          <span class="lunar-val">{{ calendar.lunarYearStr }} · {{ calendar.lunarMonthStr }}{{ calendar.lunarDayStr }}</span>
+        </div>
+        <div class="date-card-term">
+          <Sprout :size="14" class="term-icon" />
+          <span>{{ calendar.termSummary }}</span>
+        </div>
       </div>
     </div>
   </header>

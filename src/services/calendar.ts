@@ -10,6 +10,7 @@ export interface TodayCalendarInfo {
   solarTerm: string
   ganzhiYear: string
   zodiac: string
+  lunarYearStr: string
   termSummary: string
 }
 
@@ -20,8 +21,8 @@ export function getTodayCalendarInfo(date: Date = new Date()): TodayCalendarInfo
   const lunar = solar.getLunar()
 
   const year = date.getFullYear()
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
-  const day = date.getDate().toString().padStart(2, '0')
+  const month = date.getMonth() + 1
+  const day = date.getDate()
   const solarDateStr = `${year}年${month}月${day}日`
   const dayOfWeek = WEEK_NAMES[date.getDay()]
 
@@ -29,6 +30,7 @@ export function getTodayCalendarInfo(date: Date = new Date()): TodayCalendarInfo
   const lunarDayStr = lunar.getDayInChinese()
   const ganzhiYear = lunar.getYearInGanZhi() + '年'
   const zodiac = lunar.getYearShengXiao()
+  const lunarYearStr = `${lunar.getYearInGanZhi()}${zodiac}年`
 
   // 节气
   const prevJieQi = lunar.getPrevJieQi()
@@ -56,6 +58,7 @@ export function getTodayCalendarInfo(date: Date = new Date()): TodayCalendarInfo
     solarTerm,
     ganzhiYear,
     zodiac,
+    lunarYearStr,
     termSummary,
   }
 }
