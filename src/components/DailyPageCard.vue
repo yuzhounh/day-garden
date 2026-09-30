@@ -40,7 +40,7 @@ function selectPoem(poem: CuratedPoetry) { emit('select-poetry', poem); showLibr
     </div>
     <div class="poetry-reading"><p>{{ poetry.reading || poetry.mood }}</p><span class="pill lavender">{{ poetry.season === '通' ? '常读' : poetry.season + '日' }} · {{ poetry.mood }}</span></div>
     <footer class="card-footer">
-      <button class="text-button" @click="showLibrary = true"><BookOpen :size="14" />诗词小集 <span class="muted">{{ poems.length }} 篇</span></button>
+      <button class="text-button" @click="showLibrary = true"><BookOpen :size="14" />诗词小集</button>
       <div class="inline-actions">
         <button class="icon-button small" :aria-label="isSaved ? '取消收藏诗词' : '收藏诗词'" :aria-pressed="isSaved" @click="toggleSave()"><Check v-if="isSaved" :size="15" /><Bookmark v-else :size="15" /></button>
         <button class="text-button" @click="showFull = true">读全篇<ArrowUpRight :size="14" /></button>
