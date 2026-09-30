@@ -21,9 +21,10 @@ check(first.headers.get('set-cookie').includes('HttpOnly') && first.headers.get(
 const cookie = first.cookie
 check((await request('/api/poetry/dumu-shanxing', { method: 'PUT', cookie })).status === 200, 'Poetry can be saved')
 check((await request('/api/habits/2026-09-30/move', { method: 'PUT', cookie })).status === 200, 'Daily habit can be saved')
+check((await request('/api/events', { method: 'POST', cookie, data: { id: 'evt-test-1', title: '测试生日', date: '2010-08-28', isLunar: true } })).status === 200, 'Custom event can be saved')
 check((await request('/api/habits/2026-09-30/move', { method: 'PUT', cookie })).status === 200, 'Repeated writes are idempotent')
 let state = await request('/api/state', { cookie })
-check(state.value.savedPoetry.includes('dumu-shanxing') && state.value.dailyActions['2026-09-30'].length === 1, 'Saved state is persistent and deduplicated')
+check(state.value.savedPoetry.includes('dumu-shanxing') && state.value.dailyActions['2026-09-30'].length === 1 && state.value.customEvents.some(e => e.id === 'evt-test-1'), 'Saved state is persistent and deduplicated')
 check((await request('/api/habits/2026-02-30/move', { method: 'PUT', cookie })).status === 400, 'Invalid calendar dates are rejected')
 check((await request('/api/poetry/nonexistent', { method: 'PUT', cookie })).status === 400, 'Unknown poem IDs are rejected')
 const second = await request('/api/register', { method: 'POST', data: { username: 'test_b_' + suffix, password } })

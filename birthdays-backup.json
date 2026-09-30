@@ -1,0 +1,129 @@
+{
+  "theme": "auto",
+  "selectedCity": {
+    "name": "杭州",
+    "province": "浙江",
+    "lat": 30.2741,
+    "lon": 120.1551
+  },
+  "modules": {
+    "weather": true,
+    "calendar": true,
+    "upcoming": true,
+    "seasonal": true,
+    "evidence": true,
+    "dailyPoetry": true,
+    "healthTip": true
+  },
+  "customEvents": [
+    {
+      "id": "bday-wang-leyao",
+      "title": "王乐遥生日",
+      "date": "2010-08-28",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "16岁生日 (农历八月廿八)"
+    },
+    {
+      "id": "bday-zhou-ming",
+      "title": "周明生日",
+      "date": "1978-09-23",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "48岁生日 (农历九月廿三)"
+    },
+    {
+      "id": "bday-wang-qingying",
+      "title": "王青应生日",
+      "date": "1992-11-04",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "34岁生日 (农历冬月初四)"
+    },
+    {
+      "id": "bday-zhou-zixin",
+      "title": "周子信生日",
+      "date": "2003-11-16",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "23岁生日 (农历冬月十六)"
+    },
+    {
+      "id": "bday-wang-weiwei",
+      "title": "王伟伟生日",
+      "date": "1982-11-18",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "44岁生日 (农历冬月十八)"
+    },
+    {
+      "id": "bday-xie-xiao",
+      "title": "谢晓生日",
+      "date": "1990-11-28",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "36岁生日 (农历冬月廿八)"
+    },
+    {
+      "id": "bday-wang-kailun",
+      "title": "王开伦生日",
+      "date": "1957-01-21",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "长辈",
+      "giftAdvice": "70岁生日 (农历正月廿一)"
+    },
+    {
+      "id": "bday-wang-jing",
+      "title": "王敬生日",
+      "date": "1989-02-07",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "38岁生日 (农历二月初七)"
+    },
+    {
+      "id": "bday-wang-juan",
+      "title": "王娟生日",
+      "date": "1981-02-19",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "46岁生日 (农历二月十九)"
+    },
+    {
+      "id": "bday-wang-weijuan",
+      "title": "王伟娟生日",
+      "date": "1987-04-17",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "40岁生日 (农历四月十七)"
+    },
+    {
+      "id": "bday-wang-xiaojuan",
+      "title": "王晓娟生日",
+      "date": "1985-06-05",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "42岁生日 (农历六月初五)"
+    },
+    {
+      "id": "bday-zhao-wensu",
+      "title": "赵文素生日",
+      "date": "1958-08-17",
+      "isLunar": true,
+      "type": "birthday",
+      "role": "长辈",
+      "giftAdvice": "69岁生日 (农历八月十七)"
+    }
+  ],
+  "notificationEnabled": false
+}

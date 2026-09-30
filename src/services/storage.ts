@@ -51,25 +51,36 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   notificationEnabled: false,
 }
 
-export function loadUserPreferences(): UserPreferences {
+export function getPreferencesKey(userId?: string | null): string {
+  if (userId) return `daygarden_user_prefs_${userId}`
+  return 'daygarden_guest_preferences_v1'
+}
+
+export function loadUserPreferences(userId?: string | null): UserPreferences {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY)
-    if (!raw) return { ...DEFAULT_PREFERENCES }
+    const key = getPreferencesKey(userId)
+    let raw = localStorage.getItem(key)
+    if (!raw && !userId) {
+      raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY)
+    }
+    if (!raw) return { ...DEFAULT_PREFERENCES, customEvents: [...DEFAULT_PREFERENCES.customEvents] }
     const parsed = JSON.parse(raw)
     return {
       ...DEFAULT_PREFERENCES,
       ...parsed,
       modules: { ...DEFAULT_PREFERENCES.modules, ...parsed.modules },
+      customEvents: Array.isArray(parsed.customEvents) ? parsed.customEvents : [...DEFAULT_PREFERENCES.customEvents],
     }
   } catch (e) {
     console.warn('Failed to parse preferences:', e)
-    return { ...DEFAULT_PREFERENCES }
+    return { ...DEFAULT_PREFERENCES, customEvents: [...DEFAULT_PREFERENCES.customEvents] }
   }
 }
 
-export function saveUserPreferences(prefs: UserPreferences) {
+export function saveUserPreferences(prefs: UserPreferences, userId?: string | null) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs))
+    const key = getPreferencesKey(userId)
+    localStorage.setItem(key, JSON.stringify(prefs))
   } catch (e) {
     console.error('Failed to save preferences:', e)
   }

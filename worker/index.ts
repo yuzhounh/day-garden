@@ -639,16 +639,104 @@ async function api(request: Request, env: Env): Promise<Response> {
 
   // 13. State fetch
   if (path === '/api/state' && request.method === 'GET') {
-    const [saved, actions] = await Promise.all([
+    const [saved, actions, events] = await Promise.all([
       env.DB.prepare('SELECT poem_id FROM saved_poetry WHERE user_id = ?').bind(user.id).all<{ poem_id: string }>(),
       env.DB.prepare('SELECT date, action_id FROM daily_actions WHERE user_id = ? ORDER BY date DESC LIMIT 1098').bind(user.id).all<{ date: string; action_id: string }>(),
+      env.DB.prepare('SELECT id, title, date, is_lunar, type, role, gift_advice FROM custom_events WHERE user_id = ? ORDER BY created_at ASC').bind(user.id).all<{ id: string; title: string; date: string; is_lunar: number; type: string; role?: string; gift_advice?: string }>(),
     ])
     const dailyActions: Record<string, string[]> = {}
     for (const action of actions.results) (dailyActions[action.date] ||= []).push(action.action_id)
-    return json({ savedPoetry: saved.results.map(row => row.poem_id), dailyActions })
+    const customEvents = (events.results || []).map(e => ({
+      id: e.id,
+      title: e.title,
+      date: e.date,
+      isLunar: Boolean(e.is_lunar),
+      type: e.type,
+      role: e.role || undefined,
+      giftAdvice: e.gift_advice || undefined,
+    }))
+    return json({ savedPoetry: saved.results.map(row => row.poem_id), dailyActions, customEvents })
   }
 
-  // 14. Poetry favorite toggle
+  // 14. Custom events sync and mutations
+  if (path === '/api/events' && request.method === 'PUT') {
+    const data = await body(request)
+    const list = Array.isArray(data.events) ? data.events : []
+    const stmts: D1PreparedStatement[] = [
+      env.DB.prepare('DELETE FROM custom_events WHERE user_id = ?').bind(user.id),
+    ]
+    const now = Date.now()
+    for (const item of list) {
+      const ev = item as Record<string, unknown>
+      if (!ev || typeof ev.id !== 'string' || typeof ev.title !== 'string' || typeof ev.date !== 'string') continue
+      const role = typeof ev.role === 'string' ? ev.role.slice(0, 32) : null
+      const giftAdvice = typeof ev.giftAdvice === 'string' ? ev.giftAdvice.slice(0, 128) : null
+      stmts.push(
+        env.DB.prepare('INSERT INTO custom_events(id, user_id, title, date, is_lunar, type, role, gift_advice, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+          .bind(
+            ev.id,
+            user.id,
+            ev.title.slice(0, 64),
+            ev.date.slice(0, 32),
+            ev.isLunar ? 1 : 0,
+            typeof ev.type === 'string' ? ev.type : 'birthday',
+            role,
+            giftAdvice,
+            now
+          )
+      )
+    }
+    if (stmts.length > 0) {
+      await env.DB.batch(stmts)
+    }
+    return json({ ok: true })
+  }
+
+  if (path === '/api/events' && request.method === 'POST') {
+    const ev = await body(request)
+    const id = typeof ev.id === 'string' ? ev.id : ''
+    const title = typeof ev.title === 'string' ? ev.title : ''
+    const date = typeof ev.date === 'string' ? ev.date : ''
+    const isLunar = Boolean(ev.isLunar)
+    const type = typeof ev.type === 'string' ? ev.type : 'birthday'
+    const role = typeof ev.role === 'string' ? ev.role.slice(0, 32) : null
+    const giftAdvice = typeof ev.giftAdvice === 'string' ? ev.giftAdvice.slice(0, 128) : null
+
+    if (!id || !title || !date) {
+      throw new ApiError(400, '事件数据不完整。')
+    }
+    await env.DB.prepare(`
+      INSERT INTO custom_events(id, user_id, title, date, is_lunar, type, role, gift_advice, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(user_id, id) DO UPDATE SET
+        title = excluded.title,
+        date = excluded.date,
+        is_lunar = excluded.is_lunar,
+        type = excluded.type,
+        role = excluded.role,
+        gift_advice = excluded.gift_advice
+    `).bind(
+      id,
+      user.id,
+      title.slice(0, 64),
+      date.slice(0, 32),
+      isLunar ? 1 : 0,
+      type,
+      role,
+      giftAdvice,
+      Date.now()
+    ).run()
+    return json({ ok: true })
+  }
+
+  const singleEventMatch = path.match(/^\/api\/events\/([a-zA-Z0-9_-]+)$/)
+  if (singleEventMatch && request.method === 'DELETE') {
+    const id = singleEventMatch[1]!
+    await env.DB.prepare('DELETE FROM custom_events WHERE user_id = ? AND id = ?').bind(user.id, id).run()
+    return json({ ok: true })
+  }
+
+  // 15. Poetry favorite toggle
   const poemMatch = path.match(/^\/api\/poetry\/([a-z0-9-]+)$/)
   if (poemMatch && ['PUT', 'DELETE'].includes(request.method)) {
     const id = poemMatch[1]!
@@ -657,7 +745,7 @@ async function api(request: Request, env: Env): Promise<Response> {
     return json({ ok: true })
   }
 
-  // 15. Daily habit toggle
+  // 16. Daily habit toggle
   const habitMatch = path.match(/^\/api\/habits\/(20\d{2}-\d{2}-\d{2})\/([a-z]+)$/)
   if (habitMatch && ['PUT', 'DELETE'].includes(request.method)) {
     const date = habitMatch[1]!, id = habitMatch[2]!

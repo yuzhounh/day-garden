@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { LayoutGrid, Flower2, Heart, Sprout } from 'lucide-vue-next'
 import HeaderHero from './components/HeaderHero.vue'
 import WeatherTimeline from './components/WeatherTimeline.vue'
@@ -11,8 +11,8 @@ import DailyPageCard from './components/DailyPageCard.vue'
 import HealthTipBar from './components/HealthTipBar.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import AccountModal from './components/AccountModal.vue'
-import { initializeSync, refreshCloud } from './services/sync'
-import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide } from './types'
+import { initializeSync, refreshCloud, account, syncCustomEvents } from './services/sync'
+import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide, LifeEvent } from './types'
 import { fetch7DayWeather } from './services/weather'
 import { getUpcomingEvents, sendDesktopNotification } from './services/calendar'
 import { loadUserPreferences, saveUserPreferences, getTodaySeasonBloom, getTodayEvidenceGuide, getTodayPoetry, getTodayHealthTip } from './services/storage'
@@ -21,7 +21,12 @@ import rawPoetry from './data/poetry-curated.json'
 import rawHealthTips from './data/health-tips.json'
 import rawEvidence from './data/evidence-guide.json'
 
-const prefs = ref<UserPreferences>(loadUserPreferences())
+const prefs = ref<UserPreferences>(loadUserPreferences(account.user?.id))
+
+watch(() => account.user?.id, (userId) => {
+  prefs.value = loadUserPreferences(userId)
+})
+
 const weatherDays = ref<WeatherDay[]>([])
 const weatherLoading = ref(false)
 const showSettings = ref(false)
@@ -43,19 +48,22 @@ function applyTheme(theme: UserPreferences['theme']) {
 function toggleTheme() {
   prefs.value.theme = document.documentElement.classList.contains('dark') ? 'light' : 'dark'
   applyTheme(prefs.value.theme)
-  saveUserPreferences(prefs.value)
+  saveUserPreferences(prefs.value, account.user?.id)
 }
 function handleCityChange(city: CityOption) {
   prefs.value.selectedCity = city
-  saveUserPreferences(prefs.value)
+  saveUserPreferences(prefs.value, account.user?.id)
   loadWeather()
 }
 function handleUpdatePreferences(newPrefs: UserPreferences) {
   const cityChanged = newPrefs.selectedCity.name !== prefs.value.selectedCity.name
   prefs.value = newPrefs
-  saveUserPreferences(newPrefs)
+  saveUserPreferences(newPrefs, account.user?.id)
   applyTheme(newPrefs.theme)
   if (cityChanged) loadWeather()
+  if (account.user) {
+    void syncCustomEvents(newPrefs.customEvents)
+  }
 }
 let weatherRequest = 0
 async function loadWeather() {
@@ -101,6 +109,12 @@ function syncDate() {
 function handleSystemTheme() { if (prefs.value.theme === 'auto') applyTheme('auto') }
 function handleVisibility() { syncDate(); if (!document.hidden) void refreshCloud() }
 function handleOnline() { void refreshCloud() }
+function handlePrefsSynced(e: Event) {
+  const custom = e as CustomEvent<{ userId: string; customEvents: LifeEvent[] }>
+  if (account.user?.id === custom.detail.userId) {
+    prefs.value.customEvents = custom.detail.customEvents
+  }
+}
 let dayTimer: number | undefined
 onMounted(() => {
   applyTheme(prefs.value.theme)
@@ -111,12 +125,14 @@ onMounted(() => {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', handleSystemTheme)
   document.addEventListener('visibilitychange', handleVisibility)
   window.addEventListener('online', handleOnline)
+  window.addEventListener('daygarden:prefs-synced', handlePrefsSynced)
 })
 onUnmounted(() => {
   clearInterval(dayTimer)
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleSystemTheme)
   document.removeEventListener('visibilitychange', handleVisibility)
   window.removeEventListener('online', handleOnline)
+  window.removeEventListener('daygarden:prefs-synced', handlePrefsSynced)
 })
 </script>
 

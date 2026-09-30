@@ -1,6 +1,7 @@
 import { reactive, ref } from 'vue'
-import type { User } from '../types'
+import type { User, LifeEvent } from '../types'
 import { localDateKey } from './day'
+import { loadUserPreferences, saveUserPreferences } from './storage'
 import poems from '../data/poetry-curated.json'
 
 interface Mutation { id: string; path: string; method: 'PUT' | 'DELETE' }
@@ -155,7 +156,7 @@ export async function refreshCloud() {
   const userId = account.user.id
   const currentRevision = revision
   try {
-    const data = await api<GardenData>('/api/state')
+    const data = await api<GardenData & { customEvents?: LifeEvent[] }>('/api/state')
     if (account.user?.id !== userId || revision !== currentRevision || pending.length) return
     const parsed = parseData(data)
     savedPoetryIds.value = parsed.savedPoetry
@@ -163,10 +164,26 @@ export async function refreshCloud() {
     account.status = 'synced'
     account.error = ''
     persist()
+
+    if (Array.isArray(data.customEvents) && data.customEvents.length > 0) {
+      const userPrefs = loadUserPreferences(userId)
+      userPrefs.customEvents = data.customEvents
+      saveUserPreferences(userPrefs, userId)
+      window.dispatchEvent(new CustomEvent('daygarden:prefs-synced', { detail: { userId, customEvents: data.customEvents } }))
+    }
   } catch {
     if (account.user?.id !== userId) return
     account.status = 'offline'
     account.error = '暂时无法读取云端，当前内容仍保存在本机。'
+  }
+}
+
+export async function syncCustomEvents(events: LifeEvent[]): Promise<void> {
+  if (!account.user) return
+  try {
+    await api('/api/events', 'PUT', { events })
+  } catch (err) {
+    console.warn('Failed to sync custom events to cloud:', err)
   }
 }
 

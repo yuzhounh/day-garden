@@ -78,10 +78,13 @@ export function calculateNextEventDate(
   const parts = eventDateStr.split('-')
   let m = 0
   let d = 0
+  let birthYear: number | undefined
   if (parts.length === 2) {
     m = parseInt(parts[0], 10)
     d = parseInt(parts[1], 10)
   } else if (parts.length === 3) {
+    const y = parseInt(parts[0], 10)
+    if (!Number.isNaN(y) && y > 1900) birthYear = y
     m = parseInt(parts[1], 10)
     d = parseInt(parts[2], 10)
   }
@@ -100,7 +103,9 @@ export function calculateNextEventDate(
 
     const diffMs = targetDate.getTime() - baseDate.getTime()
     const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
-    const nextDateStr = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日 (农历${m}月${d})`
+    const turningAge = birthYear ? targetSolar.getLunar().getYear() - birthYear : undefined
+    const ageStr = turningAge ? ` · ${turningAge}岁` : ''
+    const nextDateStr = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日 (农历${m}月${d}${ageStr})`
     return { daysLeft, nextDateStr }
   } else {
     // 公历
@@ -114,7 +119,9 @@ export function calculateNextEventDate(
 
     const diffMs = targetDate.getTime() - baseDate.getTime()
     const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
-    const nextDateStr = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
+    const turningAge = birthYear ? targetDate.getFullYear() - birthYear : undefined
+    const ageStr = turningAge ? ` · ${turningAge}岁` : ''
+    const nextDateStr = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日${ageStr}`
     return { daysLeft, nextDateStr }
   }
 }
