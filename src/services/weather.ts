@@ -56,22 +56,34 @@ export async function searchCities(query: string): Promise<CityOption[]> {
   const q = query.trim()
   if (!q) return []
   const qLower = q.toLowerCase()
+  const cleanQ = q.replace(/市$/, '')
 
-  // 1. 本地国内全量城市库匹配（包含市、地区、著名旅游县市）
+  // 1. 本地国内全量城市库精确与模糊匹配（优先权威地级市）
   const allKnown = rawCities as Array<CityOption & { pinyin?: string }>
   const localMatches = allKnown.filter(c => {
     return (
+      c.name === q ||
+      c.name === cleanQ ||
       c.name.includes(q) ||
+      (q.length >= 2 && q.includes(c.name)) ||
       c.province.includes(q) ||
       (c.pinyin && (c.pinyin.startsWith(qLower) || c.pinyin.includes(qLower)))
     )
+  }).sort((a, b) => {
+    // 优先名称完全匹配
+    const aExact = a.name === q || a.name === cleanQ
+    const bExact = b.name === q || b.name === cleanQ
+    if (aExact && !bExact) return -1
+    if (!aExact && bExact) return 1
+    return 0
   }).map(({ name, province, lat, lon }) => ({ name, province, lat, lon }))
 
-  if (localMatches.length >= 6) {
+  // 若本地权威城市库已有匹配结果，优先直接返回（避免第三方地图API模糊村镇导致省份混淆）
+  if (localMatches.length > 0) {
     return localMatches.slice(0, 10)
   }
 
-  // 2. 结合 Open-Meteo 全球地理位置检索（覆盖区县、街道与全球国际城市）
+  // 2. 结合 Open-Meteo 全球地理位置检索（覆盖海外国际城市与小众地点）
   try {
     const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=zh&format=json`
     const res = await fetch(url, { signal: AbortSignal.timeout(4000) })

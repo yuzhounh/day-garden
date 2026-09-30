@@ -28,6 +28,251 @@
     "pinyin": "chongqing"
   },
   {
+    "name": "郑州",
+    "province": "河南",
+    "lat": 34.757,
+    "lon": 113.6654,
+    "pinyin": "zhengzhou"
+  },
+  {
+    "name": "开封",
+    "province": "河南",
+    "lat": 34.7972,
+    "lon": 114.3076,
+    "pinyin": "kaifeng"
+  },
+  {
+    "name": "洛阳",
+    "province": "河南",
+    "lat": 34.6181,
+    "lon": 112.454,
+    "pinyin": "luoyang"
+  },
+  {
+    "name": "平顶山",
+    "province": "河南",
+    "lat": 33.7661,
+    "lon": 113.1928,
+    "pinyin": "pingdingshan"
+  },
+  {
+    "name": "安阳",
+    "province": "河南",
+    "lat": 36.0992,
+    "lon": 114.3924,
+    "pinyin": "anyang"
+  },
+  {
+    "name": "鹤壁",
+    "province": "河南",
+    "lat": 35.7482,
+    "lon": 114.2978,
+    "pinyin": "hebi"
+  },
+  {
+    "name": "新乡",
+    "province": "河南",
+    "lat": 35.303,
+    "lon": 113.9268,
+    "pinyin": "xinxiang"
+  },
+  {
+    "name": "焦作",
+    "province": "河南",
+    "lat": 35.2159,
+    "lon": 113.2418,
+    "pinyin": "jiaozuo"
+  },
+  {
+    "name": "濮阳",
+    "province": "河南",
+    "lat": 35.7619,
+    "lon": 115.0292,
+    "pinyin": "puyang"
+  },
+  {
+    "name": "许昌",
+    "province": "河南",
+    "lat": 34.0355,
+    "lon": 113.8526,
+    "pinyin": "xuchang"
+  },
+  {
+    "name": "漯河",
+    "province": "河南",
+    "lat": 33.5814,
+    "lon": 114.0165,
+    "pinyin": "luohe"
+  },
+  {
+    "name": "三门峡",
+    "province": "河南",
+    "lat": 34.7733,
+    "lon": 111.1941,
+    "pinyin": "sanmenxia"
+  },
+  {
+    "name": "南阳",
+    "province": "河南",
+    "lat": 32.9908,
+    "lon": 112.5283,
+    "pinyin": "nanyang"
+  },
+  {
+    "name": "商丘",
+    "province": "河南",
+    "lat": 34.4141,
+    "lon": 115.6564,
+    "pinyin": "shangqiu"
+  },
+  {
+    "name": "信阳",
+    "province": "河南",
+    "lat": 32.1228,
+    "lon": 114.0656,
+    "pinyin": "xinyang"
+  },
+  {
+    "name": "周口",
+    "province": "河南",
+    "lat": 33.6254,
+    "lon": 114.6497,
+    "pinyin": "zhoukou"
+  },
+  {
+    "name": "驻马店",
+    "province": "河南",
+    "lat": 32.9774,
+    "lon": 114.0247,
+    "pinyin": "zhumadian"
+  },
+  {
+    "name": "济源",
+    "province": "河南",
+    "lat": 35.0904,
+    "lon": 112.59,
+    "pinyin": "jiyuan"
+  },
+  {
+    "name": "济南",
+    "province": "山东",
+    "lat": 36.6512,
+    "lon": 117.1201,
+    "pinyin": "jinan"
+  },
+  {
+    "name": "青岛",
+    "province": "山东",
+    "lat": 36.0671,
+    "lon": 120.3826,
+    "pinyin": "qingdao"
+  },
+  {
+    "name": "淄博",
+    "province": "山东",
+    "lat": 36.8135,
+    "lon": 118.0549,
+    "pinyin": "zibo"
+  },
+  {
+    "name": "枣庄",
+    "province": "山东",
+    "lat": 34.8105,
+    "lon": 117.3237,
+    "pinyin": "zaozhuang"
+  },
+  {
+    "name": "东营",
+    "province": "山东",
+    "lat": 37.4353,
+    "lon": 118.6747,
+    "pinyin": "dongying"
+  },
+  {
+    "name": "烟台",
+    "province": "山东",
+    "lat": 37.4638,
+    "lon": 121.4479,
+    "pinyin": "yantai"
+  },
+  {
+    "name": "潍坊",
+    "province": "山东",
+    "lat": 36.7068,
+    "lon": 119.1618,
+    "pinyin": "weifang"
+  },
+  {
+    "name": "济宁",
+    "province": "山东",
+    "lat": 35.4149,
+    "lon": 116.5872,
+    "pinyin": "jining"
+  },
+  {
+    "name": "泰安",
+    "province": "山东",
+    "lat": 36.1944,
+    "lon": 117.0876,
+    "pinyin": "taian"
+  },
+  {
+    "name": "威海",
+    "province": "山东",
+    "lat": 37.5131,
+    "lon": 122.1205,
+    "pinyin": "weihai"
+  },
+  {
+    "name": "日照",
+    "province": "山东",
+    "lat": 35.4164,
+    "lon": 119.5269,
+    "pinyin": "rizhao"
+  },
+  {
+    "name": "临沂",
+    "province": "山东",
+    "lat": 35.1047,
+    "lon": 118.3564,
+    "pinyin": "linyi"
+  },
+  {
+    "name": "德州",
+    "province": "山东",
+    "lat": 37.4358,
+    "lon": 116.3575,
+    "pinyin": "dezhou"
+  },
+  {
+    "name": "聊城",
+    "province": "山东",
+    "lat": 36.456,
+    "lon": 115.9854,
+    "pinyin": "liaocheng"
+  },
+  {
+    "name": "滨州",
+    "province": "山东",
+    "lat": 37.3835,
+    "lon": 117.9708,
+    "pinyin": "binzhou"
+  },
+  {
+    "name": "菏泽",
+    "province": "山东",
+    "lat": 35.2338,
+    "lon": 115.4807,
+    "pinyin": "heze"
+  },
+  {
+    "name": "曲阜",
+    "province": "山东",
+    "lat": 35.5807,
+    "lon": 116.9865,
+    "pinyin": "qufu"
+  },
+  {
     "name": "杭州",
     "province": "浙江",
     "lat": 30.2741,
@@ -49,13 +294,6 @@
     "pinyin": "wenzhou"
   },
   {
-    "name": "绍兴",
-    "province": "浙江",
-    "lat": 30.0024,
-    "lon": 120.5822,
-    "pinyin": "shaoxing"
-  },
-  {
     "name": "嘉兴",
     "province": "浙江",
     "lat": 30.7454,
@@ -68,6 +306,13 @@
     "lat": 30.8943,
     "lon": 120.0868,
     "pinyin": "huzhou"
+  },
+  {
+    "name": "绍兴",
+    "province": "浙江",
+    "lat": 30.0024,
+    "lon": 120.5822,
+    "pinyin": "shaoxing"
   },
   {
     "name": "金华",
@@ -107,30 +352,16 @@
   {
     "name": "义乌",
     "province": "浙江",
-    "lat": 29.3069,
-    "lon": 120.0754,
+    "lat": 29.3151,
+    "lon": 120.0768,
     "pinyin": "yiwu"
   },
   {
-    "name": "乌镇",
+    "name": "诸暨",
     "province": "浙江",
-    "lat": 30.7416,
-    "lon": 120.4856,
-    "pinyin": "wuzhen"
-  },
-  {
-    "name": "莫干山",
-    "province": "浙江",
-    "lat": 30.6033,
-    "lon": 119.8644,
-    "pinyin": "moganshan"
-  },
-  {
-    "name": "普陀山",
-    "province": "浙江",
-    "lat": 29.9828,
-    "lon": 122.3842,
-    "pinyin": "putuoshan"
+    "lat": 29.7136,
+    "lon": 120.2319,
+    "pinyin": "zhuji"
   },
   {
     "name": "南京",
@@ -140,13 +371,6 @@
     "pinyin": "nanjing"
   },
   {
-    "name": "苏州",
-    "province": "江苏",
-    "lat": 31.299,
-    "lon": 120.5853,
-    "pinyin": "suzhou"
-  },
-  {
     "name": "无锡",
     "province": "江苏",
     "lat": 31.4912,
@@ -154,11 +378,53 @@
     "pinyin": "wuxi"
   },
   {
+    "name": "徐州",
+    "province": "江苏",
+    "lat": 34.2048,
+    "lon": 117.2841,
+    "pinyin": "xuzhou"
+  },
+  {
     "name": "常州",
     "province": "江苏",
     "lat": 31.8112,
-    "lon": 119.9741,
+    "lon": 119.974,
     "pinyin": "changzhou"
+  },
+  {
+    "name": "苏州",
+    "province": "江苏",
+    "lat": 31.299,
+    "lon": 120.5853,
+    "pinyin": "suzhou"
+  },
+  {
+    "name": "南通",
+    "province": "江苏",
+    "lat": 31.9802,
+    "lon": 120.8943,
+    "pinyin": "nantong"
+  },
+  {
+    "name": "连云港",
+    "province": "江苏",
+    "lat": 34.5967,
+    "lon": 119.2216,
+    "pinyin": "lianyungang"
+  },
+  {
+    "name": "淮安",
+    "province": "江苏",
+    "lat": 33.5511,
+    "lon": 119.0153,
+    "pinyin": "huaian"
+  },
+  {
+    "name": "盐城",
+    "province": "江苏",
+    "lat": 33.3474,
+    "lon": 120.1636,
+    "pinyin": "yancheng"
   },
   {
     "name": "扬州",
@@ -175,32 +441,11 @@
     "pinyin": "zhenjiang"
   },
   {
-    "name": "南通",
-    "province": "江苏",
-    "lat": 31.9802,
-    "lon": 120.8943,
-    "pinyin": "nantong"
-  },
-  {
     "name": "泰州",
     "province": "江苏",
     "lat": 32.4555,
     "lon": 119.9229,
     "pinyin": "taizhou"
-  },
-  {
-    "name": "盐城",
-    "province": "江苏",
-    "lat": 33.3474,
-    "lon": 120.1636,
-    "pinyin": "yancheng"
-  },
-  {
-    "name": "淮安",
-    "province": "江苏",
-    "lat": 33.5511,
-    "lon": 119.0356,
-    "pinyin": "huaian"
   },
   {
     "name": "宿迁",
@@ -210,25 +455,18 @@
     "pinyin": "suqian"
   },
   {
-    "name": "徐州",
-    "province": "江苏",
-    "lat": 34.2048,
-    "lon": 117.2841,
-    "pinyin": "xuzhou"
-  },
-  {
-    "name": "连云港",
-    "province": "江苏",
-    "lat": 34.5967,
-    "lon": 119.2216,
-    "pinyin": "lianyungang"
-  },
-  {
     "name": "昆山",
     "province": "江苏",
     "lat": 31.3846,
     "lon": 120.9807,
     "pinyin": "kunshan"
+  },
+  {
+    "name": "江阴",
+    "province": "江苏",
+    "lat": 31.9111,
+    "lon": 120.2852,
+    "pinyin": "jiangyin"
   },
   {
     "name": "广州",
@@ -252,34 +490,6 @@
     "pinyin": "zhuhai"
   },
   {
-    "name": "佛山",
-    "province": "广东",
-    "lat": 23.0218,
-    "lon": 113.1214,
-    "pinyin": "foshan"
-  },
-  {
-    "name": "东莞",
-    "province": "广东",
-    "lat": 23.0205,
-    "lon": 113.7518,
-    "pinyin": "dongguan"
-  },
-  {
-    "name": "中山",
-    "province": "广东",
-    "lat": 22.5176,
-    "lon": 113.3928,
-    "pinyin": "zhongshan"
-  },
-  {
-    "name": "惠州",
-    "province": "广东",
-    "lat": 23.1118,
-    "lon": 114.4162,
-    "pinyin": "huizhou"
-  },
-  {
     "name": "汕头",
     "province": "广东",
     "lat": 23.3541,
@@ -287,11 +497,18 @@
     "pinyin": "shantou"
   },
   {
-    "name": "江门",
+    "name": "佛山",
     "province": "广东",
-    "lat": 22.5787,
-    "lon": 113.0815,
-    "pinyin": "jiangmen"
+    "lat": 23.0218,
+    "lon": 113.1214,
+    "pinyin": "foshan"
+  },
+  {
+    "name": "韶关",
+    "province": "广东",
+    "lat": 24.8104,
+    "lon": 113.5975,
+    "pinyin": "shaoguan"
   },
   {
     "name": "湛江",
@@ -303,9 +520,58 @@
   {
     "name": "肇庆",
     "province": "广东",
-    "lat": 23.0472,
-    "lon": 112.4651,
+    "lat": 23.0515,
+    "lon": 112.4725,
     "pinyin": "zhaoqing"
+  },
+  {
+    "name": "江门",
+    "province": "广东",
+    "lat": 22.5787,
+    "lon": 113.0815,
+    "pinyin": "jiangmen"
+  },
+  {
+    "name": "茂名",
+    "province": "广东",
+    "lat": 21.663,
+    "lon": 110.9255,
+    "pinyin": "maoming"
+  },
+  {
+    "name": "惠州",
+    "province": "广东",
+    "lat": 23.1118,
+    "lon": 114.4162,
+    "pinyin": "huizhou"
+  },
+  {
+    "name": "梅州",
+    "province": "广东",
+    "lat": 24.2886,
+    "lon": 116.1225,
+    "pinyin": "meizhou"
+  },
+  {
+    "name": "汕尾",
+    "province": "广东",
+    "lat": 22.7862,
+    "lon": 115.3753,
+    "pinyin": "shanwei"
+  },
+  {
+    "name": "河源",
+    "province": "广东",
+    "lat": 23.7437,
+    "lon": 114.7006,
+    "pinyin": "heyuan"
+  },
+  {
+    "name": "阳江",
+    "province": "广东",
+    "lat": 21.8569,
+    "lon": 111.9827,
+    "pinyin": "yangjiang"
   },
   {
     "name": "清远",
@@ -315,137 +581,39 @@
     "pinyin": "qingyuan"
   },
   {
+    "name": "东莞",
+    "province": "广东",
+    "lat": 23.0207,
+    "lon": 113.7518,
+    "pinyin": "dongguan"
+  },
+  {
+    "name": "中山",
+    "province": "广东",
+    "lat": 22.5175,
+    "lon": 113.3928,
+    "pinyin": "zhongshan"
+  },
+  {
     "name": "潮州",
     "province": "广东",
-    "lat": 23.6569,
+    "lat": 23.6617,
     "lon": 116.6226,
     "pinyin": "chaozhou"
   },
   {
     "name": "揭阳",
     "province": "广东",
-    "lat": 23.5499,
+    "lat": 23.5497,
     "lon": 116.3729,
     "pinyin": "jieyang"
   },
   {
-    "name": "梅州",
+    "name": "云浮",
     "province": "广东",
-    "lat": 24.2886,
-    "lon": 116.1176,
-    "pinyin": "meizhou"
-  },
-  {
-    "name": "成都",
-    "province": "四川",
-    "lat": 30.5728,
-    "lon": 104.0668,
-    "pinyin": "chengdu"
-  },
-  {
-    "name": "绵阳",
-    "province": "四川",
-    "lat": 31.4675,
-    "lon": 104.6791,
-    "pinyin": "mianyang"
-  },
-  {
-    "name": "德阳",
-    "province": "四川",
-    "lat": 31.1269,
-    "lon": 104.3987,
-    "pinyin": "deyang"
-  },
-  {
-    "name": "南充",
-    "province": "四川",
-    "lat": 30.7952,
-    "lon": 106.0848,
-    "pinyin": "nanchong"
-  },
-  {
-    "name": "宜宾",
-    "province": "四川",
-    "lat": 28.7519,
-    "lon": 104.6432,
-    "pinyin": "yibin"
-  },
-  {
-    "name": "泸州",
-    "province": "四川",
-    "lat": 28.8718,
-    "lon": 105.4423,
-    "pinyin": "luzhou"
-  },
-  {
-    "name": "乐山",
-    "province": "四川",
-    "lat": 29.5521,
-    "lon": 103.7657,
-    "pinyin": "leshan"
-  },
-  {
-    "name": "峨眉山",
-    "province": "四川",
-    "lat": 29.6011,
-    "lon": 103.4844,
-    "pinyin": "emeishan"
-  },
-  {
-    "name": "自贡",
-    "province": "四川",
-    "lat": 29.3392,
-    "lon": 104.7784,
-    "pinyin": "zigong"
-  },
-  {
-    "name": "攀枝花",
-    "province": "四川",
-    "lat": 26.5823,
-    "lon": 101.7186,
-    "pinyin": "panzhihua"
-  },
-  {
-    "name": "广元",
-    "province": "四川",
-    "lat": 32.4354,
-    "lon": 105.8434,
-    "pinyin": "guangyuan"
-  },
-  {
-    "name": "达州",
-    "province": "四川",
-    "lat": 31.2096,
-    "lon": 107.468,
-    "pinyin": "dazhou"
-  },
-  {
-    "name": "西昌",
-    "province": "四川",
-    "lat": 27.8938,
-    "lon": 102.2641,
-    "pinyin": "xichang"
-  },
-  {
-    "name": "九寨沟",
-    "province": "四川",
-    "lat": 33.26,
-    "lon": 103.9186,
-    "pinyin": "jiuzhaigou"
-  },
-  {
-    "name": "康定",
-    "province": "四川",
-    "lat": 30.0495,
-    "lon": 101.9625,
-    "pinyin": "kangding"
-  },
-  {
-    "name": "稻城亚丁",
-    "province": "四川",
-    "lat": 28.4419,
-    "lon": 100.34,
-    "pinyin": "daocheng"
+    "lat": 22.9298,
+    "lon": 112.0444,
+    "pinyin": "yunfu"
   },
   {
     "name": "武汉",
@@ -455,18 +623,53 @@
     "pinyin": "wuhan"
   },
   {
+    "name": "黄石",
+    "province": "湖北",
+    "lat": 30.2201,
+    "lon": 115.0385,
+    "pinyin": "huangshi"
+  },
+  {
+    "name": "十堰",
+    "province": "湖北",
+    "lat": 32.647,
+    "lon": 110.798,
+    "pinyin": "shiyan"
+  },
+  {
     "name": "宜昌",
     "province": "湖北",
-    "lat": 30.6919,
+    "lat": 30.692,
     "lon": 111.2865,
     "pinyin": "yichang"
   },
   {
     "name": "襄阳",
     "province": "湖北",
-    "lat": 32.0089,
+    "lat": 32.0087,
     "lon": 112.1224,
     "pinyin": "xiangyang"
+  },
+  {
+    "name": "鄂州",
+    "province": "湖北",
+    "lat": 30.3918,
+    "lon": 114.8949,
+    "pinyin": "ezhou"
+  },
+  {
+    "name": "荆门",
+    "province": "湖北",
+    "lat": 31.0354,
+    "lon": 112.1994,
+    "pinyin": "jingmen"
+  },
+  {
+    "name": "孝感",
+    "province": "湖北",
+    "lat": 30.9264,
+    "lon": 113.9171,
+    "pinyin": "xiaogan"
   },
   {
     "name": "荆州",
@@ -479,29 +682,29 @@
     "name": "黄冈",
     "province": "湖北",
     "lat": 30.4534,
-    "lon": 114.8724,
+    "lon": 114.8723,
     "pinyin": "huanggang"
   },
   {
-    "name": "十堰",
+    "name": "咸宁",
     "province": "湖北",
-    "lat": 32.647,
-    "lon": 110.798,
-    "pinyin": "shiyan"
+    "lat": 29.8415,
+    "lon": 114.3224,
+    "pinyin": "xianning"
+  },
+  {
+    "name": "随州",
+    "province": "湖北",
+    "lat": 31.6904,
+    "lon": 113.3826,
+    "pinyin": "suizhou"
   },
   {
     "name": "恩施",
     "province": "湖北",
-    "lat": 30.2952,
-    "lon": 109.4883,
+    "lat": 30.295,
+    "lon": 109.4794,
     "pinyin": "enshi"
-  },
-  {
-    "name": "神农架",
-    "province": "湖北",
-    "lat": 31.7444,
-    "lon": 110.6714,
-    "pinyin": "shennongjia"
   },
   {
     "name": "长沙",
@@ -521,7 +724,7 @@
     "name": "湘潭",
     "province": "湖南",
     "lat": 27.8297,
-    "lon": 112.9441,
+    "lon": 112.944,
     "pinyin": "xiangtan"
   },
   {
@@ -532,10 +735,17 @@
     "pinyin": "hengyang"
   },
   {
+    "name": "邵阳",
+    "province": "湖南",
+    "lat": 27.2389,
+    "lon": 111.4678,
+    "pinyin": "shaoyang"
+  },
+  {
     "name": "岳阳",
     "province": "湖南",
-    "lat": 29.3569,
-    "lon": 113.1289,
+    "lat": 29.3567,
+    "lon": 113.1292,
     "pinyin": "yueyang"
   },
   {
@@ -548,9 +758,16 @@
   {
     "name": "张家界",
     "province": "湖南",
-    "lat": 29.1171,
+    "lat": 29.117,
     "lon": 110.4792,
     "pinyin": "zhangjiajie"
+  },
+  {
+    "name": "益阳",
+    "province": "湖南",
+    "lat": 28.5543,
+    "lon": 112.3551,
+    "pinyin": "yiyang"
   },
   {
     "name": "郴州",
@@ -560,88 +777,179 @@
     "pinyin": "chenzhou"
   },
   {
-    "name": "凤凰",
+    "name": "永州",
     "province": "湖南",
-    "lat": 27.9497,
-    "lon": 109.6015,
-    "pinyin": "fenghuang"
+    "lat": 26.4204,
+    "lon": 111.6135,
+    "pinyin": "yongzhou"
   },
   {
-    "name": "济南",
-    "province": "山东",
-    "lat": 36.6512,
-    "lon": 117.1201,
-    "pinyin": "jinan"
+    "name": "怀化",
+    "province": "湖南",
+    "lat": 27.5601,
+    "lon": 109.9985,
+    "pinyin": "huaihua"
   },
   {
-    "name": "青岛",
-    "province": "山东",
-    "lat": 36.0671,
-    "lon": 120.3826,
-    "pinyin": "qingdao"
+    "name": "娄底",
+    "province": "湖南",
+    "lat": 27.7019,
+    "lon": 111.9964,
+    "pinyin": "loudi"
   },
   {
-    "name": "烟台",
-    "province": "山东",
-    "lat": 37.4638,
-    "lon": 121.4479,
-    "pinyin": "yantai"
+    "name": "湘西",
+    "province": "湖南",
+    "lat": 28.3117,
+    "lon": 109.7389,
+    "pinyin": "xiangxi"
   },
   {
-    "name": "威海",
-    "province": "山东",
-    "lat": 37.5131,
-    "lon": 122.1204,
-    "pinyin": "weihai"
+    "name": "成都",
+    "province": "四川",
+    "lat": 30.5728,
+    "lon": 104.0668,
+    "pinyin": "chengdu"
   },
   {
-    "name": "潍坊",
-    "province": "山东",
-    "lat": 36.7068,
-    "lon": 119.1618,
-    "pinyin": "weifang"
+    "name": "自贡",
+    "province": "四川",
+    "lat": 29.3392,
+    "lon": 104.7784,
+    "pinyin": "zigong"
   },
   {
-    "name": "淄博",
-    "province": "山东",
-    "lat": 36.8135,
-    "lon": 118.0549,
-    "pinyin": "zibo"
+    "name": "攀枝花",
+    "province": "四川",
+    "lat": 26.5823,
+    "lon": 101.7186,
+    "pinyin": "panzhihua"
   },
   {
-    "name": "泰安",
-    "province": "山东",
-    "lat": 36.1943,
-    "lon": 117.0875,
-    "pinyin": "taian"
+    "name": "泸州",
+    "province": "四川",
+    "lat": 28.8718,
+    "lon": 105.4423,
+    "pinyin": "luzhou"
   },
   {
-    "name": "临沂",
-    "province": "山东",
-    "lat": 35.1047,
-    "lon": 118.3564,
-    "pinyin": "linyi"
+    "name": "德阳",
+    "province": "四川",
+    "lat": 31.127,
+    "lon": 104.3986,
+    "pinyin": "deyang"
   },
   {
-    "name": "济宁",
-    "province": "山东",
-    "lat": 35.4149,
-    "lon": 116.5872,
-    "pinyin": "jining"
+    "name": "绵阳",
+    "province": "四川",
+    "lat": 31.4675,
+    "lon": 104.6791,
+    "pinyin": "mianyang"
   },
   {
-    "name": "日照",
-    "province": "山东",
-    "lat": 35.4164,
-    "lon": 119.5269,
-    "pinyin": "rizhao"
+    "name": "广元",
+    "province": "四川",
+    "lat": 32.4354,
+    "lon": 105.8434,
+    "pinyin": "guangyuan"
   },
   {
-    "name": "曲阜",
-    "province": "山东",
-    "lat": 35.5807,
-    "lon": 116.9866,
-    "pinyin": "qufu"
+    "name": "遂宁",
+    "province": "四川",
+    "lat": 30.5328,
+    "lon": 105.5929,
+    "pinyin": "suining"
+  },
+  {
+    "name": "内江",
+    "province": "四川",
+    "lat": 29.5802,
+    "lon": 105.0584,
+    "pinyin": "neijiang"
+  },
+  {
+    "name": "乐山",
+    "province": "四川",
+    "lat": 29.5521,
+    "lon": 103.7656,
+    "pinyin": "leshan"
+  },
+  {
+    "name": "南充",
+    "province": "四川",
+    "lat": 30.7953,
+    "lon": 106.1107,
+    "pinyin": "nanchong"
+  },
+  {
+    "name": "眉山",
+    "province": "四川",
+    "lat": 30.0756,
+    "lon": 103.8485,
+    "pinyin": "meishan"
+  },
+  {
+    "name": "宜宾",
+    "province": "四川",
+    "lat": 28.7518,
+    "lon": 104.6432,
+    "pinyin": "yibin"
+  },
+  {
+    "name": "广安",
+    "province": "四川",
+    "lat": 30.4561,
+    "lon": 106.6334,
+    "pinyin": "guangan"
+  },
+  {
+    "name": "达州",
+    "province": "四川",
+    "lat": 31.2096,
+    "lon": 107.468,
+    "pinyin": "dazhou"
+  },
+  {
+    "name": "雅安",
+    "province": "四川",
+    "lat": 29.9803,
+    "lon": 102.9998,
+    "pinyin": "yaan"
+  },
+  {
+    "name": "巴中",
+    "province": "四川",
+    "lat": 31.8591,
+    "lon": 106.7474,
+    "pinyin": "bazhong"
+  },
+  {
+    "name": "资阳",
+    "province": "四川",
+    "lat": 30.129,
+    "lon": 104.6276,
+    "pinyin": "ziyang"
+  },
+  {
+    "name": "阿坝",
+    "province": "四川",
+    "lat": 31.9,
+    "lon": 102.2214,
+    "pinyin": "aba"
+  },
+  {
+    "name": "甘孜",
+    "province": "四川",
+    "lat": 30.0495,
+    "lon": 101.9626,
+    "pinyin": "ganzi"
+  },
+  {
+    "name": "凉山",
+    "province": "四川",
+    "lat": 27.8864,
+    "lon": 102.2671,
+    "pinyin": "liangshan"
   },
   {
     "name": "西安",
@@ -651,11 +959,11 @@
     "pinyin": "xian"
   },
   {
-    "name": "咸阳",
+    "name": "铜川",
     "province": "陕西",
-    "lat": 34.3296,
-    "lon": 108.7089,
-    "pinyin": "xianyang"
+    "lat": 34.8969,
+    "lon": 108.9451,
+    "pinyin": "tongchuan"
   },
   {
     "name": "宝鸡",
@@ -665,6 +973,20 @@
     "pinyin": "baoji"
   },
   {
+    "name": "咸阳",
+    "province": "陕西",
+    "lat": 34.3296,
+    "lon": 108.709,
+    "pinyin": "xianyang"
+  },
+  {
+    "name": "渭南",
+    "province": "陕西",
+    "lat": 34.4994,
+    "lon": 109.5098,
+    "pinyin": "weinan"
+  },
+  {
     "name": "延安",
     "province": "陕西",
     "lat": 36.5854,
@@ -672,228 +994,32 @@
     "pinyin": "yanan"
   },
   {
-    "name": "榆林",
-    "province": "陕西",
-    "lat": 38.2853,
-    "lon": 109.7347,
-    "pinyin": "yulin"
-  },
-  {
     "name": "汉中",
     "province": "陕西",
     "lat": 33.0677,
-    "lon": 107.0286,
+    "lon": 107.0236,
     "pinyin": "hanzhong"
+  },
+  {
+    "name": "榆林",
+    "province": "陕西",
+    "lat": 38.2853,
+    "lon": 109.7346,
+    "pinyin": "yulin"
   },
   {
     "name": "安康",
     "province": "陕西",
-    "lat": 32.6853,
+    "lat": 32.6848,
     "lon": 109.0293,
     "pinyin": "ankang"
   },
   {
-    "name": "福州",
-    "province": "福建",
-    "lat": 26.0745,
-    "lon": 119.2965,
-    "pinyin": "fuzhou"
-  },
-  {
-    "name": "厦门",
-    "province": "福建",
-    "lat": 24.4798,
-    "lon": 118.0894,
-    "pinyin": "xiamen"
-  },
-  {
-    "name": "泉州",
-    "province": "福建",
-    "lat": 24.8741,
-    "lon": 118.6757,
-    "pinyin": "quanzhou"
-  },
-  {
-    "name": "漳州",
-    "province": "福建",
-    "lat": 24.5129,
-    "lon": 117.6474,
-    "pinyin": "zhangzhou"
-  },
-  {
-    "name": "武夷山",
-    "province": "福建",
-    "lat": 27.7554,
-    "lon": 118.0354,
-    "pinyin": "wuyishan"
-  },
-  {
-    "name": "三明",
-    "province": "福建",
-    "lat": 26.2634,
-    "lon": 117.6387,
-    "pinyin": "sanming"
-  },
-  {
-    "name": "宁德",
-    "province": "福建",
-    "lat": 26.6657,
-    "lon": 119.5479,
-    "pinyin": "ningde"
-  },
-  {
-    "name": "龙岩",
-    "province": "福建",
-    "lat": 25.0751,
-    "lon": 117.0179,
-    "pinyin": "longyan"
-  },
-  {
-    "name": "昆明",
-    "province": "云南",
-    "lat": 25.0406,
-    "lon": 102.7123,
-    "pinyin": "kunming"
-  },
-  {
-    "name": "大理",
-    "province": "云南",
-    "lat": 25.6065,
-    "lon": 100.2676,
-    "pinyin": "dali"
-  },
-  {
-    "name": "丽江",
-    "province": "云南",
-    "lat": 26.8721,
-    "lon": 100.2297,
-    "pinyin": "lijiang"
-  },
-  {
-    "name": "西双版纳",
-    "province": "云南",
-    "lat": 22.0017,
-    "lon": 100.7979,
-    "pinyin": "xishuangbanna"
-  },
-  {
-    "name": "香格里拉",
-    "province": "云南",
-    "lat": 27.8252,
-    "lon": 99.7075,
-    "pinyin": "xianggelila"
-  },
-  {
-    "name": "腾冲",
-    "province": "云南",
-    "lat": 25.0254,
-    "lon": 98.4907,
-    "pinyin": "tengchong"
-  },
-  {
-    "name": "曲靖",
-    "province": "云南",
-    "lat": 25.49,
-    "lon": 103.7962,
-    "pinyin": "qujing"
-  },
-  {
-    "name": "玉溪",
-    "province": "云南",
-    "lat": 24.352,
-    "lon": 102.5465,
-    "pinyin": "yuxi"
-  },
-  {
-    "name": "贵阳",
-    "province": "贵州",
-    "lat": 26.647,
-    "lon": 106.6302,
-    "pinyin": "guiyang"
-  },
-  {
-    "name": "遵义",
-    "province": "贵州",
-    "lat": 27.7257,
-    "lon": 106.9274,
-    "pinyin": "zunyi"
-  },
-  {
-    "name": "安顺",
-    "province": "贵州",
-    "lat": 26.2531,
-    "lon": 105.9476,
-    "pinyin": "anshun"
-  },
-  {
-    "name": "荔波",
-    "province": "贵州",
-    "lat": 25.4124,
-    "lon": 107.886,
-    "pinyin": "libo"
-  },
-  {
-    "name": "铜仁",
-    "province": "贵州",
-    "lat": 27.7183,
-    "lon": 109.1896,
-    "pinyin": "tongren"
-  },
-  {
-    "name": "凯里",
-    "province": "贵州",
-    "lat": 26.5668,
-    "lon": 107.9813,
-    "pinyin": "kaili"
-  },
-  {
-    "name": "郑州",
-    "province": "河南",
-    "lat": 34.757,
-    "lon": 113.6654,
-    "pinyin": "zhengzhou"
-  },
-  {
-    "name": "洛阳",
-    "province": "河南",
-    "lat": 34.6185,
-    "lon": 112.454,
-    "pinyin": "luoyang"
-  },
-  {
-    "name": "开封",
-    "province": "河南",
-    "lat": 34.7972,
-    "lon": 114.3075,
-    "pinyin": "kaifeng"
-  },
-  {
-    "name": "南阳",
-    "province": "河南",
-    "lat": 32.9908,
-    "lon": 112.5283,
-    "pinyin": "nanyang"
-  },
-  {
-    "name": "新乡",
-    "province": "河南",
-    "lat": 35.3036,
-    "lon": 113.9268,
-    "pinyin": "xinxiang"
-  },
-  {
-    "name": "焦作",
-    "province": "河南",
-    "lat": 35.2159,
-    "lon": 113.2418,
-    "pinyin": "jiaozuo"
-  },
-  {
-    "name": "安阳",
-    "province": "河南",
-    "lat": 36.0975,
-    "lon": 114.3924,
-    "pinyin": "anyang"
+    "name": "商洛",
+    "province": "陕西",
+    "lat": 33.8703,
+    "lon": 109.9405,
+    "pinyin": "shangluo"
   },
   {
     "name": "石家庄",
@@ -913,8 +1039,22 @@
     "name": "秦皇岛",
     "province": "河北",
     "lat": 39.9354,
-    "lon": 119.5999,
+    "lon": 119.5998,
     "pinyin": "qinhuangdao"
+  },
+  {
+    "name": "邯郸",
+    "province": "河北",
+    "lat": 36.6256,
+    "lon": 114.4907,
+    "pinyin": "handan"
+  },
+  {
+    "name": "邢台",
+    "province": "河北",
+    "lat": 37.0706,
+    "lon": 114.5048,
+    "pinyin": "xingtai"
   },
   {
     "name": "保定",
@@ -926,16 +1066,23 @@
   {
     "name": "张家口",
     "province": "河北",
-    "lat": 40.8245,
-    "lon": 114.8863,
+    "lat": 40.7684,
+    "lon": 114.8864,
     "pinyin": "zhangjiakou"
   },
   {
     "name": "承德",
     "province": "河北",
-    "lat": 40.9762,
-    "lon": 117.9627,
+    "lat": 40.9547,
+    "lon": 117.9628,
     "pinyin": "chengde"
+  },
+  {
+    "name": "沧州",
+    "province": "河北",
+    "lat": 38.3045,
+    "lon": 116.8388,
+    "pinyin": "cangzhou"
   },
   {
     "name": "廊坊",
@@ -945,11 +1092,88 @@
     "pinyin": "langfang"
   },
   {
-    "name": "雄安",
+    "name": "衡水",
     "province": "河北",
-    "lat": 38.995,
-    "lon": 115.986,
-    "pinyin": "xiongan"
+    "lat": 37.7322,
+    "lon": 115.6703,
+    "pinyin": "hengshui"
+  },
+  {
+    "name": "太原",
+    "province": "山西",
+    "lat": 37.8706,
+    "lon": 112.5489,
+    "pinyin": "taiyuan"
+  },
+  {
+    "name": "大同",
+    "province": "山西",
+    "lat": 40.0768,
+    "lon": 113.3001,
+    "pinyin": "datong"
+  },
+  {
+    "name": "阳泉",
+    "province": "山西",
+    "lat": 37.8572,
+    "lon": 113.5805,
+    "pinyin": "yangquan"
+  },
+  {
+    "name": "长治",
+    "province": "山西",
+    "lat": 35.2104,
+    "lon": 113.1163,
+    "pinyin": "changzhi"
+  },
+  {
+    "name": "晋城",
+    "province": "山西",
+    "lat": 35.4975,
+    "lon": 112.8513,
+    "pinyin": "jincheng"
+  },
+  {
+    "name": "朔州",
+    "province": "山西",
+    "lat": 39.3312,
+    "lon": 112.4334,
+    "pinyin": "shuozhou"
+  },
+  {
+    "name": "晋中",
+    "province": "山西",
+    "lat": 37.687,
+    "lon": 112.7527,
+    "pinyin": "jinzhong"
+  },
+  {
+    "name": "运城",
+    "province": "山西",
+    "lat": 35.0264,
+    "lon": 111.0069,
+    "pinyin": "yuncheng"
+  },
+  {
+    "name": "忻州",
+    "province": "山西",
+    "lat": 38.4166,
+    "lon": 112.7335,
+    "pinyin": "xinzhou"
+  },
+  {
+    "name": "临汾",
+    "province": "山西",
+    "lat": 36.088,
+    "lon": 111.518,
+    "pinyin": "linfen"
+  },
+  {
+    "name": "吕梁",
+    "province": "山西",
+    "lat": 37.5244,
+    "lon": 111.1344,
+    "pinyin": "lvliang"
   },
   {
     "name": "合肥",
@@ -966,13 +1190,6 @@
     "pinyin": "wuhu"
   },
   {
-    "name": "黄山",
-    "province": "安徽",
-    "lat": 29.7147,
-    "lon": 118.3375,
-    "pinyin": "huangshan"
-  },
-  {
     "name": "蚌埠",
     "province": "安徽",
     "lat": 32.9163,
@@ -980,25 +1197,165 @@
     "pinyin": "bengbu"
   },
   {
+    "name": "淮南",
+    "province": "安徽",
+    "lat": 32.6255,
+    "lon": 116.9999,
+    "pinyin": "huainan"
+  },
+  {
+    "name": "马鞍山",
+    "province": "安徽",
+    "lat": 31.6702,
+    "lon": 118.5079,
+    "pinyin": "maanshan"
+  },
+  {
+    "name": "淮北",
+    "province": "安徽",
+    "lat": 33.9558,
+    "lon": 116.7946,
+    "pinyin": "huaibei"
+  },
+  {
+    "name": "铜陵",
+    "province": "安徽",
+    "lat": 30.9455,
+    "lon": 117.8166,
+    "pinyin": "tongling"
+  },
+  {
     "name": "安庆",
     "province": "安徽",
-    "lat": 30.5255,
-    "lon": 117.0573,
+    "lat": 30.5434,
+    "lon": 117.0587,
     "pinyin": "anqing"
+  },
+  {
+    "name": "黄山",
+    "province": "安徽",
+    "lat": 29.7147,
+    "lon": 118.3375,
+    "pinyin": "huangshan"
+  },
+  {
+    "name": "滁州",
+    "province": "安徽",
+    "lat": 32.2995,
+    "lon": 118.3162,
+    "pinyin": "chuzhou"
   },
   {
     "name": "阜阳",
     "province": "安徽",
     "lat": 32.8901,
-    "lon": 115.8142,
+    "lon": 115.8197,
     "pinyin": "fuyang"
+  },
+  {
+    "name": "宿州",
+    "province": "安徽",
+    "lat": 33.6457,
+    "lon": 116.9841,
+    "pinyin": "suzhou"
+  },
+  {
+    "name": "六安",
+    "province": "安徽",
+    "lat": 31.7346,
+    "lon": 116.5077,
+    "pinyin": "luan"
+  },
+  {
+    "name": "亳州",
+    "province": "安徽",
+    "lat": 33.8446,
+    "lon": 115.7787,
+    "pinyin": "bozhou"
   },
   {
     "name": "池州",
     "province": "安徽",
     "lat": 30.6648,
-    "lon": 117.4916,
+    "lon": 117.4891,
     "pinyin": "chizhou"
+  },
+  {
+    "name": "宣城",
+    "province": "安徽",
+    "lat": 30.9407,
+    "lon": 118.7588,
+    "pinyin": "xuancheng"
+  },
+  {
+    "name": "福州",
+    "province": "福建",
+    "lat": 26.0745,
+    "lon": 119.2965,
+    "pinyin": "fuzhou"
+  },
+  {
+    "name": "厦门",
+    "province": "福建",
+    "lat": 24.4798,
+    "lon": 118.0894,
+    "pinyin": "xiamen"
+  },
+  {
+    "name": "莆田",
+    "province": "福建",
+    "lat": 25.454,
+    "lon": 119.0078,
+    "pinyin": "putian"
+  },
+  {
+    "name": "三明",
+    "province": "福建",
+    "lat": 26.2634,
+    "lon": 117.6387,
+    "pinyin": "sanming"
+  },
+  {
+    "name": "泉州",
+    "province": "福建",
+    "lat": 24.9088,
+    "lon": 118.5894,
+    "pinyin": "quanzhou"
+  },
+  {
+    "name": "漳州",
+    "province": "福建",
+    "lat": 24.513,
+    "lon": 117.6475,
+    "pinyin": "zhangzhou"
+  },
+  {
+    "name": "南平",
+    "province": "福建",
+    "lat": 26.6436,
+    "lon": 118.1777,
+    "pinyin": "nanping"
+  },
+  {
+    "name": "龙岩",
+    "province": "福建",
+    "lat": 25.0751,
+    "lon": 117.0179,
+    "pinyin": "longyan"
+  },
+  {
+    "name": "宁德",
+    "province": "福建",
+    "lat": 26.6657,
+    "lon": 119.5271,
+    "pinyin": "ningde"
+  },
+  {
+    "name": "武夷山",
+    "province": "福建",
+    "lat": 27.7554,
+    "lon": 118.0357,
+    "pinyin": "wuyishan"
   },
   {
     "name": "南昌",
@@ -1008,6 +1365,20 @@
     "pinyin": "nanchang"
   },
   {
+    "name": "景德镇",
+    "province": "江西",
+    "lat": 29.2928,
+    "lon": 117.2078,
+    "pinyin": "jingdezhen"
+  },
+  {
+    "name": "萍乡",
+    "province": "江西",
+    "lat": 27.6229,
+    "lon": 113.8546,
+    "pinyin": "pingxiang"
+  },
+  {
     "name": "九江",
     "province": "江西",
     "lat": 29.7051,
@@ -1015,10 +1386,24 @@
     "pinyin": "jiujiang"
   },
   {
+    "name": "新余",
+    "province": "江西",
+    "lat": 27.8174,
+    "lon": 114.9308,
+    "pinyin": "xinyu"
+  },
+  {
+    "name": "鹰潭",
+    "province": "江西",
+    "lat": 28.26,
+    "lon": 117.0338,
+    "pinyin": "yingtan"
+  },
+  {
     "name": "赣州",
     "province": "江西",
     "lat": 25.8318,
-    "lon": 114.9359,
+    "lon": 114.9334,
     "pinyin": "ganzhou"
   },
   {
@@ -1029,32 +1414,354 @@
     "pinyin": "jian"
   },
   {
-    "name": "景德镇",
+    "name": "宜春",
     "province": "江西",
-    "lat": 29.2947,
-    "lon": 117.2079,
-    "pinyin": "jingdezhen"
+    "lat": 27.8043,
+    "lon": 114.3911,
+    "pinyin": "yichun"
+  },
+  {
+    "name": "抚州",
+    "province": "江西",
+    "lat": 27.9491,
+    "lon": 116.3584,
+    "pinyin": "fuzhou"
   },
   {
     "name": "上饶",
     "province": "江西",
-    "lat": 28.4547,
+    "lat": 28.4532,
     "lon": 117.9436,
     "pinyin": "shangrao"
   },
   {
-    "name": "婺源",
-    "province": "江西",
-    "lat": 29.2483,
-    "lon": 117.8611,
-    "pinyin": "wuyuan"
+    "name": "昆明",
+    "province": "云南",
+    "lat": 25.0406,
+    "lon": 102.7123,
+    "pinyin": "kunming"
   },
   {
-    "name": "庐山",
-    "province": "江西",
-    "lat": 29.567,
-    "lon": 115.986,
-    "pinyin": "lushan"
+    "name": "曲靖",
+    "province": "云南",
+    "lat": 25.49,
+    "lon": 103.7962,
+    "pinyin": "qujing"
+  },
+  {
+    "name": "玉溪",
+    "province": "云南",
+    "lat": 24.352,
+    "lon": 102.5465,
+    "pinyin": "yuxi"
+  },
+  {
+    "name": "保山",
+    "province": "云南",
+    "lat": 25.1121,
+    "lon": 102.839,
+    "pinyin": "baoshan"
+  },
+  {
+    "name": "昭通",
+    "province": "云南",
+    "lat": 27.3369,
+    "lon": 103.7172,
+    "pinyin": "zhaotong"
+  },
+  {
+    "name": "丽江",
+    "province": "云南",
+    "lat": 26.855,
+    "lon": 100.2257,
+    "pinyin": "lijiang"
+  },
+  {
+    "name": "普洱",
+    "province": "云南",
+    "lat": 22.7871,
+    "lon": 100.9723,
+    "pinyin": "puer"
+  },
+  {
+    "name": "临沧",
+    "province": "云南",
+    "lat": 23.8865,
+    "lon": 100.0869,
+    "pinyin": "lincang"
+  },
+  {
+    "name": "楚雄",
+    "province": "云南",
+    "lat": 25.0456,
+    "lon": 101.546,
+    "pinyin": "chuxiong"
+  },
+  {
+    "name": "红河",
+    "province": "云南",
+    "lat": 23.3668,
+    "lon": 103.3842,
+    "pinyin": "honghe"
+  },
+  {
+    "name": "文山",
+    "province": "云南",
+    "lat": 23.3692,
+    "lon": 104.2443,
+    "pinyin": "wenshan"
+  },
+  {
+    "name": "西双版纳",
+    "province": "云南",
+    "lat": 22.0017,
+    "lon": 100.7979,
+    "pinyin": "xishuangbanna"
+  },
+  {
+    "name": "大理",
+    "province": "云南",
+    "lat": 25.6065,
+    "lon": 100.2676,
+    "pinyin": "dali"
+  },
+  {
+    "name": "德宏",
+    "province": "云南",
+    "lat": 24.4367,
+    "lon": 98.5784,
+    "pinyin": "dehong"
+  },
+  {
+    "name": "怒江",
+    "province": "云南",
+    "lat": 25.8509,
+    "lon": 98.8543,
+    "pinyin": "nujiang"
+  },
+  {
+    "name": "迪庆",
+    "province": "云南",
+    "lat": 27.8189,
+    "lon": 99.7078,
+    "pinyin": "diqing"
+  },
+  {
+    "name": "香格里拉",
+    "province": "云南",
+    "lat": 27.8251,
+    "lon": 99.7071,
+    "pinyin": "xianggelila"
+  },
+  {
+    "name": "贵阳",
+    "province": "贵州",
+    "lat": 26.6477,
+    "lon": 106.6302,
+    "pinyin": "guiyang"
+  },
+  {
+    "name": "六盘水",
+    "province": "贵州",
+    "lat": 26.5846,
+    "lon": 104.8304,
+    "pinyin": "liupanshui"
+  },
+  {
+    "name": "遵义",
+    "province": "贵州",
+    "lat": 27.7257,
+    "lon": 106.9274,
+    "pinyin": "zunyi"
+  },
+  {
+    "name": "安顺",
+    "province": "贵州",
+    "lat": 26.2531,
+    "lon": 105.9462,
+    "pinyin": "anshun"
+  },
+  {
+    "name": "毕节",
+    "province": "贵州",
+    "lat": 27.3017,
+    "lon": 105.285,
+    "pinyin": "bijie"
+  },
+  {
+    "name": "铜仁",
+    "province": "贵州",
+    "lat": 27.7183,
+    "lon": 109.1915,
+    "pinyin": "tongren"
+  },
+  {
+    "name": "黔西南",
+    "province": "贵州",
+    "lat": 25.0881,
+    "lon": 104.8979,
+    "pinyin": "qianxinan"
+  },
+  {
+    "name": "黔东南",
+    "province": "贵州",
+    "lat": 26.5833,
+    "lon": 107.9775,
+    "pinyin": "qiandongnan"
+  },
+  {
+    "name": "黔南",
+    "province": "贵州",
+    "lat": 26.2582,
+    "lon": 107.5171,
+    "pinyin": "qiannan"
+  },
+  {
+    "name": "南宁",
+    "province": "广西",
+    "lat": 22.817,
+    "lon": 108.3665,
+    "pinyin": "nanning"
+  },
+  {
+    "name": "柳州",
+    "province": "广西",
+    "lat": 24.3255,
+    "lon": 109.416,
+    "pinyin": "liuzhou"
+  },
+  {
+    "name": "桂林",
+    "province": "广西",
+    "lat": 25.2736,
+    "lon": 110.2902,
+    "pinyin": "guilin"
+  },
+  {
+    "name": "梧州",
+    "province": "广西",
+    "lat": 23.477,
+    "lon": 111.2791,
+    "pinyin": "wuzhou"
+  },
+  {
+    "name": "北海",
+    "province": "广西",
+    "lat": 21.4813,
+    "lon": 109.1193,
+    "pinyin": "beihai"
+  },
+  {
+    "name": "防城港",
+    "province": "广西",
+    "lat": 21.6868,
+    "lon": 108.354,
+    "pinyin": "fangchenggang"
+  },
+  {
+    "name": "钦州",
+    "province": "广西",
+    "lat": 21.9623,
+    "lon": 108.6242,
+    "pinyin": "qinzhou"
+  },
+  {
+    "name": "贵港",
+    "province": "广西",
+    "lat": 23.0936,
+    "lon": 109.6021,
+    "pinyin": "guigang"
+  },
+  {
+    "name": "玉林",
+    "province": "广西",
+    "lat": 22.6369,
+    "lon": 110.1544,
+    "pinyin": "yulin"
+  },
+  {
+    "name": "百色",
+    "province": "广西",
+    "lat": 23.9015,
+    "lon": 106.6163,
+    "pinyin": "baise"
+  },
+  {
+    "name": "贺州",
+    "province": "广西",
+    "lat": 24.4036,
+    "lon": 111.5521,
+    "pinyin": "hezhou"
+  },
+  {
+    "name": "河池",
+    "province": "广西",
+    "lat": 24.6958,
+    "lon": 108.0621,
+    "pinyin": "hechi"
+  },
+  {
+    "name": "来宾",
+    "province": "广西",
+    "lat": 23.7337,
+    "lon": 109.2298,
+    "pinyin": "laibin"
+  },
+  {
+    "name": "崇左",
+    "province": "广西",
+    "lat": 22.4041,
+    "lon": 107.3539,
+    "pinyin": "chongzuo"
+  },
+  {
+    "name": "阳朔",
+    "province": "广西",
+    "lat": 24.7788,
+    "lon": 110.4939,
+    "pinyin": "yangshuo"
+  },
+  {
+    "name": "海口",
+    "province": "海南",
+    "lat": 20.044,
+    "lon": 110.1999,
+    "pinyin": "haikou"
+  },
+  {
+    "name": "三亚",
+    "province": "海南",
+    "lat": 18.2528,
+    "lon": 109.5119,
+    "pinyin": "sanya"
+  },
+  {
+    "name": "儋州",
+    "province": "海南",
+    "lat": 19.5204,
+    "lon": 109.5768,
+    "pinyin": "danzhou"
+  },
+  {
+    "name": "三沙",
+    "province": "海南",
+    "lat": 16.8378,
+    "lon": 112.3394,
+    "pinyin": "sansha"
+  },
+  {
+    "name": "琼海",
+    "province": "海南",
+    "lat": 19.246,
+    "lon": 110.4668,
+    "pinyin": "qionghai"
+  },
+  {
+    "name": "万宁",
+    "province": "海南",
+    "lat": 18.7962,
+    "lon": 110.3888,
+    "pinyin": "wanning"
   },
   {
     "name": "沈阳",
@@ -1078,10 +1785,24 @@
     "pinyin": "anshan"
   },
   {
+    "name": "抚顺",
+    "province": "辽宁",
+    "lat": 41.8778,
+    "lon": 123.9573,
+    "pinyin": "fushun"
+  },
+  {
+    "name": "本溪",
+    "province": "辽宁",
+    "lat": 41.2941,
+    "lon": 123.7664,
+    "pinyin": "benxi"
+  },
+  {
     "name": "丹东",
     "province": "辽宁",
     "lat": 40.129,
-    "lon": 124.3758,
+    "lon": 124.3831,
     "pinyin": "dandong"
   },
   {
@@ -1092,6 +1813,55 @@
     "pinyin": "jinzhou"
   },
   {
+    "name": "营口",
+    "province": "辽宁",
+    "lat": 40.6669,
+    "lon": 122.2351,
+    "pinyin": "yingkou"
+  },
+  {
+    "name": "阜新",
+    "province": "辽宁",
+    "lat": 42.0216,
+    "lon": 121.649,
+    "pinyin": "fuxin"
+  },
+  {
+    "name": "辽阳",
+    "province": "辽宁",
+    "lat": 41.2694,
+    "lon": 123.1731,
+    "pinyin": "liaoyang"
+  },
+  {
+    "name": "盘锦",
+    "province": "辽宁",
+    "lat": 41.1244,
+    "lon": 122.0707,
+    "pinyin": "panjin"
+  },
+  {
+    "name": "铁岭",
+    "province": "辽宁",
+    "lat": 42.2906,
+    "lon": 123.8443,
+    "pinyin": "tieling"
+  },
+  {
+    "name": "朝阳",
+    "province": "辽宁",
+    "lat": 41.5761,
+    "lon": 120.4512,
+    "pinyin": "chaoyang"
+  },
+  {
+    "name": "葫芦岛",
+    "province": "辽宁",
+    "lat": 40.711,
+    "lon": 120.8369,
+    "pinyin": "huludao"
+  },
+  {
     "name": "长春",
     "province": "吉林",
     "lat": 43.8171,
@@ -1099,38 +1869,66 @@
     "pinyin": "changchun"
   },
   {
-    "name": "吉林市",
+    "name": "吉林",
     "province": "吉林",
     "lat": 43.8378,
     "lon": 126.5496,
     "pinyin": "jilin"
   },
   {
-    "name": "延吉",
+    "name": "四平",
     "province": "吉林",
-    "lat": 42.9075,
-    "lon": 129.5139,
-    "pinyin": "yanji"
+    "lat": 43.1664,
+    "lon": 124.3504,
+    "pinyin": "siping"
+  },
+  {
+    "name": "辽源",
+    "province": "吉林",
+    "lat": 42.8995,
+    "lon": 125.1266,
+    "pinyin": "liaoyuan"
   },
   {
     "name": "通化",
     "province": "吉林",
-    "lat": 41.7285,
-    "lon": 125.9397,
+    "lat": 41.7284,
+    "lon": 125.9365,
     "pinyin": "tonghua"
   },
   {
-    "name": "长白山",
+    "name": "白山",
     "province": "吉林",
-    "lat": 42.0,
-    "lon": 128.05,
-    "pinyin": "changbaishan"
+    "lat": 41.9386,
+    "lon": 126.4194,
+    "pinyin": "baishan"
+  },
+  {
+    "name": "松原",
+    "province": "吉林",
+    "lat": 45.1418,
+    "lon": 124.8252,
+    "pinyin": "songyuan"
+  },
+  {
+    "name": "白城",
+    "province": "吉林",
+    "lat": 45.619,
+    "lon": 122.8385,
+    "pinyin": "baicheng"
+  },
+  {
+    "name": "延边",
+    "province": "吉林",
+    "lat": 42.9026,
+    "lon": 129.5089,
+    "pinyin": "yanbian"
   },
   {
     "name": "哈尔滨",
     "province": "黑龙江",
     "lat": 45.8038,
-    "lon": 126.535,
+    "lon": 126.5349,
     "pinyin": "haerbin"
   },
   {
@@ -1141,129 +1939,94 @@
     "pinyin": "qiqihaer"
   },
   {
-    "name": "牡丹江",
+    "name": "鸡西",
     "province": "黑龙江",
-    "lat": 44.5519,
-    "lon": 129.6332,
-    "pinyin": "mudanjiang"
+    "lat": 45.3,
+    "lon": 130.9693,
+    "pinyin": "jixi"
+  },
+  {
+    "name": "鹤岗",
+    "province": "黑龙江",
+    "lat": 47.332,
+    "lon": 130.2774,
+    "pinyin": "hegang"
+  },
+  {
+    "name": "双鸭山",
+    "province": "黑龙江",
+    "lat": 46.6434,
+    "lon": 131.1578,
+    "pinyin": "shuangyashan"
   },
   {
     "name": "大庆",
     "province": "黑龙江",
-    "lat": 46.5878,
-    "lon": 125.1037,
+    "lat": 46.5907,
+    "lon": 125.1127,
     "pinyin": "daqing"
+  },
+  {
+    "name": "伊春",
+    "province": "黑龙江",
+    "lat": 47.728,
+    "lon": 128.8994,
+    "pinyin": "yichun"
+  },
+  {
+    "name": "佳木斯",
+    "province": "黑龙江",
+    "lat": 46.7999,
+    "lon": 130.3188,
+    "pinyin": "jiamusi"
+  },
+  {
+    "name": "七台河",
+    "province": "黑龙江",
+    "lat": 45.7712,
+    "lon": 131.0031,
+    "pinyin": "qitaihe"
+  },
+  {
+    "name": "牡丹江",
+    "province": "黑龙江",
+    "lat": 44.5818,
+    "lon": 129.6332,
+    "pinyin": "mudanjiang"
+  },
+  {
+    "name": "黑河",
+    "province": "黑龙江",
+    "lat": 50.2449,
+    "lon": 127.5285,
+    "pinyin": "heihe"
+  },
+  {
+    "name": "绥化",
+    "province": "黑龙江",
+    "lat": 46.6374,
+    "lon": 126.9929,
+    "pinyin": "suihua"
+  },
+  {
+    "name": "大兴安岭",
+    "province": "黑龙江",
+    "lat": 52.3352,
+    "lon": 124.7115,
+    "pinyin": "daxinganling"
   },
   {
     "name": "漠河",
     "province": "黑龙江",
-    "lat": 52.9723,
-    "lon": 122.5377,
+    "lat": 52.9721,
+    "lon": 122.5375,
     "pinyin": "mohe"
-  },
-  {
-    "name": "太原",
-    "province": "山西",
-    "lat": 37.8706,
-    "lon": 112.5489,
-    "pinyin": "taiyuan"
-  },
-  {
-    "name": "大同",
-    "province": "山西",
-    "lat": 40.0768,
-    "lon": 113.3001,
-    "pinyin": "datong"
-  },
-  {
-    "name": "平遥",
-    "province": "山西",
-    "lat": 37.1891,
-    "lon": 112.1755,
-    "pinyin": "pingyao"
-  },
-  {
-    "name": "运城",
-    "province": "山西",
-    "lat": 35.0264,
-    "lon": 111.007,
-    "pinyin": "yuncheng"
-  },
-  {
-    "name": "晋中",
-    "province": "山西",
-    "lat": 37.6964,
-    "lon": 112.7527,
-    "pinyin": "jinzhong"
-  },
-  {
-    "name": "南宁",
-    "province": "广西",
-    "lat": 22.817,
-    "lon": 108.3665,
-    "pinyin": "nanning"
-  },
-  {
-    "name": "桂林",
-    "province": "广西",
-    "lat": 25.2736,
-    "lon": 110.2902,
-    "pinyin": "guilin"
-  },
-  {
-    "name": "柳州",
-    "province": "广西",
-    "lat": 24.3255,
-    "lon": 109.4286,
-    "pinyin": "liuzhou"
-  },
-  {
-    "name": "北海",
-    "province": "广西",
-    "lat": 21.4812,
-    "lon": 109.1193,
-    "pinyin": "beihai"
-  },
-  {
-    "name": "阳朔",
-    "province": "广西",
-    "lat": 24.7797,
-    "lon": 110.495,
-    "pinyin": "yangshuo"
-  },
-  {
-    "name": "海口",
-    "province": "海南",
-    "lat": 20.044,
-    "lon": 110.1999,
-    "pinyin": "haikou"
-  },
-  {
-    "name": "三亚",
-    "province": "海南",
-    "lat": 18.2528,
-    "lon": 109.5119,
-    "pinyin": "sanya"
-  },
-  {
-    "name": "万宁",
-    "province": "海南",
-    "lat": 18.7962,
-    "lon": 110.3888,
-    "pinyin": "wanning"
-  },
-  {
-    "name": "琼海",
-    "province": "海南",
-    "lat": 19.2586,
-    "lon": 110.4665,
-    "pinyin": "qionghai"
   },
   {
     "name": "呼和浩特",
     "province": "内蒙古",
-    "lat": 40.8427,
-    "lon": 111.7511,
+    "lat": 40.8423,
+    "lon": 111.7519,
     "pinyin": "huhehaote"
   },
   {
@@ -1274,11 +2037,11 @@
     "pinyin": "baotou"
   },
   {
-    "name": "呼伦贝尔",
+    "name": "乌海",
     "province": "内蒙古",
-    "lat": 49.2116,
-    "lon": 119.7658,
-    "pinyin": "hulunbeier"
+    "lat": 39.6546,
+    "lon": 106.8256,
+    "pinyin": "wuhai"
   },
   {
     "name": "赤峰",
@@ -1288,11 +2051,60 @@
     "pinyin": "chifeng"
   },
   {
-    "name": "满洲里",
+    "name": "通辽",
     "province": "内蒙古",
-    "lat": 49.5978,
-    "lon": 117.4452,
-    "pinyin": "manzhouli"
+    "lat": 43.6138,
+    "lon": 122.2631,
+    "pinyin": "tongliao"
+  },
+  {
+    "name": "鄂尔多斯",
+    "province": "内蒙古",
+    "lat": 39.6083,
+    "lon": 109.7813,
+    "pinyin": "eerduosi"
+  },
+  {
+    "name": "呼伦贝尔",
+    "province": "内蒙古",
+    "lat": 49.2123,
+    "lon": 119.754,
+    "pinyin": "hulunbeier"
+  },
+  {
+    "name": "巴彦淖尔",
+    "province": "内蒙古",
+    "lat": 40.7574,
+    "lon": 107.4169,
+    "pinyin": "bayannaoer"
+  },
+  {
+    "name": "乌兰察布",
+    "province": "内蒙古",
+    "lat": 41.0304,
+    "lon": 113.1145,
+    "pinyin": "wulanchabu"
+  },
+  {
+    "name": "兴安盟",
+    "province": "内蒙古",
+    "lat": 46.0763,
+    "lon": 122.0703,
+    "pinyin": "xinganmeng"
+  },
+  {
+    "name": "锡林郭勒",
+    "province": "内蒙古",
+    "lat": 43.9334,
+    "lon": 116.0922,
+    "pinyin": "xilinguole"
+  },
+  {
+    "name": "阿拉善",
+    "province": "内蒙古",
+    "lat": 38.8519,
+    "lon": 105.7064,
+    "pinyin": "alashan"
   },
   {
     "name": "兰州",
@@ -1302,18 +2114,53 @@
     "pinyin": "lanzhou"
   },
   {
-    "name": "敦煌",
+    "name": "嘉峪关",
     "province": "甘肃",
-    "lat": 40.1421,
-    "lon": 94.662,
-    "pinyin": "dunhuang"
+    "lat": 39.7731,
+    "lon": 98.2891,
+    "pinyin": "jiayuguan"
+  },
+  {
+    "name": "金昌",
+    "province": "甘肃",
+    "lat": 38.5142,
+    "lon": 102.1878,
+    "pinyin": "jinchang"
+  },
+  {
+    "name": "白银",
+    "province": "甘肃",
+    "lat": 36.5456,
+    "lon": 104.1736,
+    "pinyin": "baiyin"
+  },
+  {
+    "name": "天水",
+    "province": "甘肃",
+    "lat": 34.5785,
+    "lon": 105.7249,
+    "pinyin": "tianshui"
+  },
+  {
+    "name": "武威",
+    "province": "甘肃",
+    "lat": 37.9254,
+    "lon": 102.6379,
+    "pinyin": "wuwei"
   },
   {
     "name": "张掖",
     "province": "甘肃",
     "lat": 38.9259,
-    "lon": 100.4498,
+    "lon": 100.4555,
     "pinyin": "zhangye"
+  },
+  {
+    "name": "平凉",
+    "province": "甘肃",
+    "lat": 35.5393,
+    "lon": 106.6651,
+    "pinyin": "pingliang"
   },
   {
     "name": "酒泉",
@@ -1323,32 +2170,109 @@
     "pinyin": "jiuquan"
   },
   {
-    "name": "天水",
+    "name": "庆阳",
     "province": "甘肃",
-    "lat": 34.5809,
-    "lon": 105.7249,
-    "pinyin": "tianshui"
+    "lat": 35.7307,
+    "lon": 107.6384,
+    "pinyin": "qingyang"
+  },
+  {
+    "name": "定西",
+    "province": "甘肃",
+    "lat": 35.5806,
+    "lon": 104.6263,
+    "pinyin": "dingxi"
+  },
+  {
+    "name": "陇南",
+    "province": "甘肃",
+    "lat": 33.3997,
+    "lon": 104.9212,
+    "pinyin": "longnan"
+  },
+  {
+    "name": "临夏",
+    "province": "甘肃",
+    "lat": 35.6012,
+    "lon": 103.2105,
+    "pinyin": "linxia"
+  },
+  {
+    "name": "甘南",
+    "province": "甘肃",
+    "lat": 34.9864,
+    "lon": 102.9113,
+    "pinyin": "gannan"
+  },
+  {
+    "name": "敦煌",
+    "province": "甘肃",
+    "lat": 40.1421,
+    "lon": 94.662,
+    "pinyin": "dunhuang"
   },
   {
     "name": "西宁",
     "province": "青海",
-    "lat": 36.6171,
-    "lon": 101.7782,
+    "lat": 36.6209,
+    "lon": 101.7801,
     "pinyin": "xining"
+  },
+  {
+    "name": "海东",
+    "province": "青海",
+    "lat": 36.5029,
+    "lon": 102.1033,
+    "pinyin": "haidong"
+  },
+  {
+    "name": "海北",
+    "province": "青海",
+    "lat": 36.9544,
+    "lon": 100.901,
+    "pinyin": "haibei"
+  },
+  {
+    "name": "黄南",
+    "province": "青海",
+    "lat": 35.5177,
+    "lon": 102.0152,
+    "pinyin": "huangnan"
+  },
+  {
+    "name": "海南",
+    "province": "青海",
+    "lat": 36.2804,
+    "lon": 100.6195,
+    "pinyin": "hainan"
+  },
+  {
+    "name": "果洛",
+    "province": "青海",
+    "lat": 34.4736,
+    "lon": 100.2445,
+    "pinyin": "guoluo"
+  },
+  {
+    "name": "玉树",
+    "province": "青海",
+    "lat": 33.0062,
+    "lon": 97.0085,
+    "pinyin": "yushu"
+  },
+  {
+    "name": "海西",
+    "province": "青海",
+    "lat": 37.3741,
+    "lon": 97.3708,
+    "pinyin": "haixi"
   },
   {
     "name": "格尔木",
     "province": "青海",
-    "lat": 36.4024,
+    "lat": 36.4022,
     "lon": 94.9033,
     "pinyin": "geermu"
-  },
-  {
-    "name": "青海湖",
-    "province": "青海",
-    "lat": 36.885,
-    "lon": 100.18,
-    "pinyin": "qinghaihu"
   },
   {
     "name": "银川",
@@ -1356,6 +2280,27 @@
     "lat": 38.4872,
     "lon": 106.2309,
     "pinyin": "yinchuan"
+  },
+  {
+    "name": "石嘴山",
+    "province": "宁夏",
+    "lat": 39.0133,
+    "lon": 106.3762,
+    "pinyin": "shizuishan"
+  },
+  {
+    "name": "吴忠",
+    "province": "宁夏",
+    "lat": 37.9862,
+    "lon": 106.1983,
+    "pinyin": "wuzhong"
+  },
+  {
+    "name": "固原",
+    "province": "宁夏",
+    "lat": 36.0046,
+    "lon": 106.2852,
+    "pinyin": "guyuan"
   },
   {
     "name": "中卫",
@@ -1372,18 +2317,11 @@
     "pinyin": "wulumuqi"
   },
   {
-    "name": "喀什",
+    "name": "克拉玛依",
     "province": "新疆",
-    "lat": 39.4677,
-    "lon": 75.9898,
-    "pinyin": "kashi"
-  },
-  {
-    "name": "伊犁",
-    "province": "新疆",
-    "lat": 43.9219,
-    "lon": 81.3301,
-    "pinyin": "yili"
+    "lat": 45.5799,
+    "lon": 84.8893,
+    "pinyin": "kelamayi"
   },
   {
     "name": "吐鲁番",
@@ -1393,9 +2331,79 @@
     "pinyin": "tulufan"
   },
   {
+    "name": "哈密",
+    "province": "新疆",
+    "lat": 42.8185,
+    "lon": 93.5152,
+    "pinyin": "hami"
+  },
+  {
+    "name": "昌吉",
+    "province": "新疆",
+    "lat": 44.0146,
+    "lon": 87.304,
+    "pinyin": "changji"
+  },
+  {
+    "name": "博尔塔拉",
+    "province": "新疆",
+    "lat": 44.9056,
+    "lon": 82.0664,
+    "pinyin": "boertala"
+  },
+  {
+    "name": "巴音郭楞",
+    "province": "新疆",
+    "lat": 41.7641,
+    "lon": 86.1453,
+    "pinyin": "bayinguoleng"
+  },
+  {
+    "name": "阿克苏",
+    "province": "新疆",
+    "lat": 41.1675,
+    "lon": 80.2634,
+    "pinyin": "akesu"
+  },
+  {
+    "name": "克孜勒苏",
+    "province": "新疆",
+    "lat": 39.7148,
+    "lon": 76.1683,
+    "pinyin": "kezilesu"
+  },
+  {
+    "name": "喀什",
+    "province": "新疆",
+    "lat": 39.4677,
+    "lon": 75.9898,
+    "pinyin": "kashi"
+  },
+  {
+    "name": "和田",
+    "province": "新疆",
+    "lat": 37.1121,
+    "lon": 79.9222,
+    "pinyin": "hetian"
+  },
+  {
+    "name": "伊犁",
+    "province": "新疆",
+    "lat": 43.9217,
+    "lon": 81.3179,
+    "pinyin": "yili"
+  },
+  {
+    "name": "塔城",
+    "province": "新疆",
+    "lat": 46.7463,
+    "lon": 82.9857,
+    "pinyin": "tacheng"
+  },
+  {
     "name": "阿勒泰",
     "province": "新疆",
-    "lat": 47.8484,
+    "lat": 47.8449,
     "lon": 88.1396,
     "pinyin": "aletai"
   },
@@ -1407,6 +2415,20 @@
     "pinyin": "lasa"
   },
   {
+    "name": "日喀则",
+    "province": "西藏",
+    "lat": 29.2675,
+    "lon": 88.8804,
+    "pinyin": "rikaze"
+  },
+  {
+    "name": "昌都",
+    "province": "西藏",
+    "lat": 31.1408,
+    "lon": 97.1785,
+    "pinyin": "changdu"
+  },
+  {
     "name": "林芝",
     "province": "西藏",
     "lat": 29.6491,
@@ -1414,11 +2436,25 @@
     "pinyin": "linzhi"
   },
   {
-    "name": "日喀则",
+    "name": "山南",
     "province": "西藏",
-    "lat": 29.2675,
-    "lon": 88.8804,
-    "pinyin": "rikaze"
+    "lat": 29.237,
+    "lon": 91.7662,
+    "pinyin": "shannan"
+  },
+  {
+    "name": "那曲",
+    "province": "西藏",
+    "lat": 31.476,
+    "lon": 92.0574,
+    "pinyin": "naqu"
+  },
+  {
+    "name": "阿里",
+    "province": "西藏",
+    "lat": 32.5011,
+    "lon": 80.1055,
+    "pinyin": "ali"
   },
   {
     "name": "香港",
@@ -1447,5 +2483,19 @@
     "lat": 22.6273,
     "lon": 120.3014,
     "pinyin": "gaoxiong"
+  },
+  {
+    "name": "台中",
+    "province": "台湾",
+    "lat": 24.1477,
+    "lon": 120.6736,
+    "pinyin": "taizhong"
+  },
+  {
+    "name": "花莲",
+    "province": "台湾",
+    "lat": 23.9871,
+    "lon": 121.6015,
+    "pinyin": "hualian"
   }
 ]
