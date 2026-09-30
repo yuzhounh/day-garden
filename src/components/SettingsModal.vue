@@ -151,6 +151,11 @@ function importData(e: Event) {
             </label>
 
             <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">月历与休班节气</span>
+              <input type="checkbox" :checked="preferences.modules.calendar ?? true" @change="toggleModule('calendar')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            </label>
+
+            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
               <span class="text-xs font-medium text-slate-800 dark:text-slate-200">节日与重要纪念日</span>
               <input type="checkbox" :checked="preferences.modules.upcoming" @change="toggleModule('upcoming')" class="rounded text-emerald-600 focus:ring-emerald-500" />
             </label>

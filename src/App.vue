@@ -3,6 +3,7 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { LayoutGrid, Flower2, Heart, Sprout } from 'lucide-vue-next'
 import HeaderHero from './components/HeaderHero.vue'
 import WeatherTimeline from './components/WeatherTimeline.vue'
+import MonthCalendarCard from './components/MonthCalendarCard.vue'
 import UpcomingTimeline from './components/UpcomingTimeline.vue'
 import SeasonalCard from './components/SeasonalCard.vue'
 import EvidenceCard from './components/EvidenceCard.vue'
@@ -134,10 +135,30 @@ onUnmounted(() => {
           <span class="dashboard-caption"><span class="status-dot"></span>一天一页，慢慢生长</span>
         </div>
         <WeatherTimeline v-if="prefs.modules.weather" :days="weatherDays" :loading="weatherLoading" :city="prefs.selectedCity.name" />
+
+        <!-- 日历卡片 与 纪念日卡片并列区域 -->
+        <section
+          v-if="(prefs.modules.calendar ?? true) || prefs.modules.upcoming"
+          class="calendar-upcoming-row"
+          aria-label="月历与纪念日"
+        >
+          <MonthCalendarCard
+            v-if="prefs.modules.calendar ?? true"
+            :events="prefs.customEvents"
+            :class="{ 'full-width': !prefs.modules.upcoming }"
+          />
+          <UpcomingTimeline
+            v-if="prefs.modules.upcoming"
+            :events="upcomingEvents"
+            :class="{ 'full-width': !(prefs.modules.calendar ?? true) }"
+            @add-event="openSettings('events')"
+          />
+        </section>
+
+        <!-- 文化日常三列网格：诗词名句、物候花信、生活有方 -->
         <div class="dashboard-grid">
           <DailyPageCard v-if="prefs.modules.dailyPoetry" :poetry="currentPoetry" @next-poetry="handleNextPoetry" @select-poetry="currentPoetry = $event" />
           <SeasonalCard v-if="prefs.modules.seasonal" :bloom="seasonBloom" />
-          <UpcomingTimeline v-if="prefs.modules.upcoming" :events="upcomingEvents" @add-event="openSettings('events')" />
           <EvidenceCard v-if="prefs.modules.evidence" :guide="evidenceGuide" @next-guide="handleNextGuide" />
         </div>
         <HealthTipBar v-if="prefs.modules.healthTip" :tip="currentHealthTip" :date-key="dateKey" @next-tip="handleNextTip" />

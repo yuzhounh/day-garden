@@ -13,6 +13,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   selectedCity: DEFAULT_CITIES[4], // 默认杭州（或可根据需要切换）
   modules: {
     weather: true,
+    calendar: true,
     upcoming: true,
     seasonal: true,
     evidence: true,

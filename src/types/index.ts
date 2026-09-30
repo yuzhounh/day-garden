@@ -83,6 +83,7 @@ export interface UserPreferences {
   selectedCity: CityOption
   modules: {
     weather: boolean
+    calendar?: boolean
     upcoming: boolean
     seasonal: boolean
     evidence: boolean
