@@ -57,30 +57,31 @@ function handleMock(provider: 'google' = 'google') {
     <!-- 登录后账户概览 -->
     <template v-if="account.user">
       <div class="account-summary">
-        <div class="account-user-card">
-          <img
-            v-if="account.user.avatarUrl"
-            :src="account.user.avatarUrl"
-            class="user-avatar-img"
-            alt="用户头像"
-            referrerpolicy="no-referrer"
-          />
-          <div v-else class="user-avatar-fallback">
-            <UserIcon :size="22" />
-          </div>
-          <div class="account-meta">
-            <strong>{{ account.user.displayName || account.user.username }}</strong>
-            <small>用户名：@{{ account.user.username }}</small>
-            <div class="account-tag-row">
-              <span class="pill sage">
-                <Check :size="12" />{{ account.status === 'synced' ? '已同步' : account.status === 'syncing' ? '同步中' : '本机已保存' }}
-              </span>
-              <span v-if="hasGoogle" class="pill lavender">Google 绑定</span>
+        <div class="account-summary-main">
+          <div class="account-user-card">
+            <img
+              v-if="account.user.avatarUrl"
+              :src="account.user.avatarUrl"
+              class="user-avatar-img"
+              alt="用户头像"
+              referrerpolicy="no-referrer"
+            />
+            <div v-else class="user-avatar-fallback">
+              <UserIcon :size="22" />
+            </div>
+            <div class="account-meta">
+              <strong>{{ account.user.displayName || account.user.username }}</strong>
+              <small>用户名：@{{ account.user.username }}</small>
+              <div class="account-tag-row">
+                <span class="pill sage">
+                  <Check :size="12" />{{ account.status === 'synced' ? '已同步' : account.status === 'syncing' ? '同步中' : '本机已保存' }}
+                </span>
+                <span v-if="hasGoogle" class="pill lavender">Google 绑定</span>
+              </div>
             </div>
           </div>
+          <p>{{ message }}</p>
         </div>
-
-        <p>{{ message }}</p>
 
         <div class="account-actions">
           <button class="soft-button" :disabled="account.busy || account.status === 'syncing'" @click="refreshCloud()">
