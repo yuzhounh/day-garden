@@ -148,5 +148,135 @@
     "source": "Sleep Research Society",
     "details": "脚部温热促进手足末梢血管扩张，帮助身体核心温度在入睡后自然散降，从而促成更迅速的入睡过程与深睡持续时间。",
     "sourceUrl": "https://academic.oup.com/sleep"
+  },
+  {
+    "id": "caffeine-curfew",
+    "title": "给咖啡因设置一段安全半衰期",
+    "category": "能量管理",
+    "coreAction": "午后 14:00 后减少浓茶与咖啡摄入，留出至少 6-8 小时代谢窗口。",
+    "roi": "深度睡眠比例提升 · 神经系统降噪",
+    "source": "Sleep Medicine Reviews · 咖啡因与昼夜节律",
+    "details": "咖啡因在人体内的半衰期平均为 5—7 小时。虽然傍晚喝咖啡可能不影响入睡，但会显著阻断腺苷受体，削弱后半夜深睡眠（慢波睡眠）的时长与修复质量。",
+    "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/24235903/"
+  },
+  {
+    "id": "nsdr-recovery",
+    "title": "15 分钟非睡眠深度休息（NSDR）",
+    "category": "脑力重置",
+    "coreAction": "午后或疲倦时，平躺或舒适靠坐，闭目进行 15 分钟腹式深呼吸与全身扫描。",
+    "roi": "前额叶神经递质恢复 · 快速回血",
+    "source": "Stanford Medicine · 休伯曼神经生物学实验室",
+    "details": "NSDR（Non-Sleep Deep Rest）能将脑电波引导至近乎深度睡眠的 Theta 波段，加速大脑恢复多巴胺水平，缓解决策疲劳，且不会产生午睡过久的昏沉感。",
+    "sourceUrl": "https://hubermanlab.com/neural-network/"
+  },
+  {
+    "id": "sit-stand-ratio",
+    "title": "坐立交替：找到身体的省力比率",
+    "category": "脊柱工效",
+    "coreAction": "每坐 45—50 分钟，起身站立办公或伸展活动 10—15 分钟。",
+    "roi": "减轻腰椎间盘压力 · 改善下肢循环",
+    "source": "Cornell University Ergonomics Web",
+    "details": "持续久坐会使腰椎间盘承受比站立多 40% 的静水压。研究表明，“坐 45 分钟 + 站 15 分钟”的动态循环能最大化消除静脉淤血与肌肉僵硬，保持高效专注。",
+    "sourceUrl": "https://ergo.human.cornell.edu/"
+  },
+  {
+    "id": "micro-habits-two-minutes",
+    "title": "两分钟法则：让好习惯无痛生根",
+    "category": "行为科学",
+    "coreAction": "建立任何新习惯时，先将门槛压缩到 2 分钟以内完成（如读 1 页书、做 3 个深蹲）。",
+    "roi": "消除启动阻力 · 建立身份认同",
+    "source": "James Clear · 原子习惯研究",
+    "details": "习惯养成的第一步不是做得有多好，而是持续性地“现身”。一旦门槛极低，心理阻抗就会降至零；当身体进入状态后，往往会自然而然地继续延长。",
+    "sourceUrl": "https://jamesclear.com/atomic-habits"
+  },
+  {
+    "id": "pre-sleep-warm-shower",
+    "title": "睡前温水足浴，借降温诱导深睡",
+    "category": "睡眠微环境",
+    "coreAction": "就寝前 60—90 分钟，用 40℃ 左右温水沐浴或泡脚 15 分钟。",
+    "roi": "加速入睡潜伏期 · 提升深睡时长",
+    "source": "Sleep Medicine Reviews · 身体被动加温效应",
+    "details": "温水沐浴会显著扩张手脚等末梢毛细血管，将体内热量带到体表散发，随之带来体内核心体温 0.5-1℃ 的快速自然回落，完美模拟大脑天然的入眠降温机制。",
+    "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/31102877/"
+  },
+  {
+    "id": "post-meal-walk",
+    "title": "餐后漫步十分钟，平复血糖尖峰",
+    "category": "代谢健康",
+    "coreAction": "正餐后 15—30 分钟内，起身进行 10—15 分钟轻松散步。",
+    "roi": "非胰岛素依赖葡萄糖摄取 · 消除餐后嗜睡",
+    "source": "Sports Medicine · 餐后步行的代谢效益",
+    "details": "餐后轻量步行促使骨骼肌收缩，激活细胞膜上的 GLUT4 转运蛋白直接吸收葡萄糖，可使餐后血糖尖峰降低 17—26%，同时防止胰岛素大起大落带来的饭后困倦。",
+    "sourceUrl": "https://link.springer.com/article/10.1007/s40279-022-01650-9"
+  },
+  {
+    "id": "magnesium-relaxation",
+    "title": "绿叶与坚果中的安睡矿物质",
+    "category": "日常营养",
+    "coreAction": "日常保证一把坚果（杏仁、南瓜籽）或一盘深绿叶蔬菜的摄入。",
+    "roi": "舒缓神经肌肉紧绷 · 强化 GABA 传导",
+    "source": "Harvard T.H. Chan School of Public Health",
+    "details": "镁是人体 300 多种酶反应的必需辅因子。充足的镁能结合并促进 GABA（γ-氨基丁酸）神经递质受体，帮助肌肉解除持续痉挛状态，减少夜间抽筋与磨牙。",
+    "sourceUrl": "https://www.hsph.harvard.edu/nutritionsource/magnesium/"
+  },
+  {
+    "id": "evening-blue-light",
+    "title": "日落之后，把光线调得柔和一些",
+    "category": "视觉卫生",
+    "coreAction": "晚间将室内顶灯换成低位暖色光源，手机与电脑调成夜间温和色温。",
+    "roi": "免受 480nm 蓝光压制 · 保护睡眠开关",
+    "source": "PNAS · 蓝光对人造光周期影响",
+    "details": "晚间视网膜接触高色温蓝光会直接抑制松果体合成褪黑素，使生物钟误以为仍是正午。换成暖黄光源能向大脑发出“安全进入黑夜”的平稳过渡信号。",
+    "sourceUrl": "https://www.pnas.org/doi/10.1073/pnas.1418490112"
+  },
+  {
+    "id": "protein-distribution",
+    "title": "优质蛋白质，均摊在每一餐",
+    "category": "抗衰与肌力",
+    "coreAction": "每餐摄入相当于掌心大小的蛋白质（鸡蛋、鱼虾、豆制品或瘦肉）。",
+    "roi": "全天饱腹感稳定 · 持续肌肉蛋白质合成",
+    "source": "Journal of Nutrition · 膳食蛋白分布模式",
+    "details": "相比于把一天蛋白质集中在晚餐一顿暴饮，将每餐蛋白保持在 20—30g 能够最优化刺激肌纤维蛋白质合成（MPS），并平稳提供神经递质原料（如色氨酸、酪氨酸）。",
+    "sourceUrl": "https://academic.oup.com/jn/article/144/6/876/4574488"
+  },
+  {
+    "id": "nature-sounds-recovery",
+    "title": "倾听自然音律，给大脑做个深呼吸",
+    "category": "心理减压",
+    "coreAction": "感到注意力涣散时，闭目聆听流水、林风或雨声 5—10 分钟。",
+    "roi": "注意力恢复理论 · 减轻定向注意疲劳",
+    "source": "PNAS · 自然声景对心理生理的影响",
+    "details": "环境心理学中的“注意力恢复理论”（ART）表明，自然声音具有“柔性吸引力”（Soft Fascination），能让高度紧绷的顶叶-额叶注意力网络得到休息，降低交感神经兴奋。",
+    "sourceUrl": "https://www.pnas.org/doi/10.1073/pnas.2013097118"
+  },
+  {
+    "id": "hydration-rhythm",
+    "title": "规律小口啜饮，别等口渴才大口灌水",
+    "category": "水合状态",
+    "coreAction": "案头放一杯温水，每隔 1—1.5 小时小口啜饮 100—150ml。",
+    "roi": "维持血容量充盈 · 预防午后疲劳与头痛",
+    "source": "Mayo Clinic · 水合机制与认知表现",
+    "details": "当感到口渴时，身体通常已经脱水 1—2%，这足以使认知反应速度和情绪专注力下降。均速小口饮水能确保水分平稳被细胞吸收利用，避免迅速经肾脏排空。",
+    "sourceUrl": "https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/water/art-20044256"
+  },
+  {
+    "id": "cold-water-dive-reflex",
+    "title": "冷水拂面：唤醒“潜水反射”重归平静",
+    "category": "即时情绪调节",
+    "coreAction": "突发烦躁或心跳急促时，用冷水轻轻泼洗面部及眼周 15—20 秒。",
+    "roi": "哺乳动物潜水反射 · 迷走神经降心率",
+    "source": "Physiology & Behavior · 潜水反射在心率调节中的作用",
+    "details": "三叉神经与迷走神经受面部低温刺激，会触发与生俱来的“哺乳动物潜水反射”，在数秒钟内促使副交感神经迅速兴奋，平稳心率，带来即时内省与平静。",
+    "sourceUrl": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3768102/"
+  },
+  {
+    "id": "strength-micro-dose",
+    "title": "低门槛抗阻：自重深蹲也能改变骨骼肌",
+    "category": "力量基石",
+    "coreAction": "在烧水或微波炉加热间隙，做 10—15 次平稳缓慢的徒手深蹲。",
+    "roi": "刺激大肌群肌糖原分解 · 促进下肢淋巴回流",
+    "source": "British Journal of Sports Medicine",
+    "details": "深蹲调动了人体最大的臀腿肌群。哪怕每次仅 1 分钟的“零食化运动”（Exercise Snacks），全天累积下来也能显著改善胰岛素敏感性，并促进骨骼肌释放肌细胞因子。",
+    "sourceUrl": "https://bjsm.bmj.com/content/54/13/774"
   }
 ]

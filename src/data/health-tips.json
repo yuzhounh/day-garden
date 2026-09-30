@@ -152,5 +152,159 @@
     "tip": "允许自己今天有小小的偷懒与留白，对自己的每一点进步心怀宽容。",
     "source": "APA · 心理自我关怀",
     "sourceUrl": "https://www.apa.org"
+  },
+  {
+    "id": "neck-stretch-gentle",
+    "tag": "颈椎",
+    "tip": "慢慢向左转头停顿5秒，再向右转停顿5秒。动作轻柔，给颈侧斜角肌一点放松的空间。",
+    "source": "Mayo Clinic · 颈部柔韧性指导",
+    "sourceUrl": "https://www.mayoclinic.org/healthy-lifestyle/adult-health/multimedia/neck-stretches/sls-20076634"
+  },
+  {
+    "id": "breathe-belly-3times",
+    "tag": "呼吸",
+    "tip": "用鼻子缓缓深吸气让腹部隆起，再用嘴唇轻微慢吐气。做3次深呼吸，心率就会平复下来。",
+    "source": "Harvard Health · 放松反应",
+    "sourceUrl": "https://www.health.harvard.edu/mind-and-mood/relaxation-techniques-breath-control-helps-quell-errant-stress-response"
+  },
+  {
+    "id": "wrist-prayer-stretch",
+    "tag": "手腕",
+    "tip": "双手在胸前合十，手掌慢慢下压至手腕微酸。打字久了，给正中神经一点减压。",
+    "source": "AAOS · 腕管保护",
+    "sourceUrl": "https://orthoinfo.aaos.org/en/diseases--conditions/carpal-tunnel-syndrome/"
+  },
+  {
+    "id": "shoulder-blade-pinch",
+    "tag": "肩背",
+    "tip": "双肩向上耸起然后向后沉，感受两侧肩胛骨微微向中间靠拢。消退圆肩含胸的沉重感。",
+    "source": "Cleveland Clinic · 姿态矫正",
+    "sourceUrl": "https://health.clevelandclinic.org/how-to-fix-poor-posture/"
+  },
+  {
+    "id": "drink-warm-water",
+    "tag": "水润",
+    "tip": "现在喝一口温开水，小口慢咽。湿润干燥的喉咙，也唤醒微循环。",
+    "source": "WHO · 健康水合建议",
+    "sourceUrl": "https://www.who.int/water_sanitation_health/"
+  },
+  {
+    "id": "ankle-pumps",
+    "tag": "下肢",
+    "tip": "双脚平放地面，反复勾起脚尖再踮起脚跟10次。小腿肌肉收缩就像第二心脏，促进静脉回流。",
+    "source": "AHA · 下肢静脉健康",
+    "sourceUrl": "https://www.heart.org/en/health-topics/venous-thromboembolism"
+  },
+  {
+    "id": "palming-eyes",
+    "tag": "温眼",
+    "tip": "双手掌心快速摩擦发热，轻轻虚扣在闭合的双眼上。在黑暗与微温中，让睫状肌彻底松弛。",
+    "source": "AAO · 视疲劳缓解法",
+    "sourceUrl": "https://www.aao.org/eye-health/tips-prevention/computer-usage"
+  },
+  {
+    "id": "chin-tuck",
+    "tag": "仪态",
+    "tip": "水平向后微收下巴，像要挤出双下巴一样保持3秒。帮助纠正低头看手机带来的头部前倾。",
+    "source": "Spine-health · 颈椎力学",
+    "sourceUrl": "https://www.spine-health.com/wellness/ergonomics/chin-tuck-exercise"
+  },
+  {
+    "id": "yawn-and-stretch",
+    "tag": "舒展",
+    "tip": "站起来伸一个大大的懒腰，双手尽量向天花板延展。让紧绷了一上午的肋间肌彻底打开。",
+    "source": "Sleep Foundation · 身体活动",
+    "sourceUrl": "https://www.sleepfoundation.org/physical-health"
+  },
+  {
+    "id": "ear-massage",
+    "tag": "安神",
+    "tip": "食指和拇指轻轻揉揉耳垂与耳廓边缘，由上到下捏揉30秒。刺激迷走神经耳支，带来安宁感。",
+    "source": "Evidence-Based Complementary Medicine",
+    "sourceUrl": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4010966/"
+  },
+  {
+    "id": "glance-greenery",
+    "tag": "远眺",
+    "tip": "把视线投向窗外的一棵树或一抹绿意，放空目光20秒。大自然的绿色波长对视觉皮层最温和。",
+    "source": "International Journal of Environmental Health",
+    "sourceUrl": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8017325/"
+  },
+  {
+    "id": "smile-mindset",
+    "tag": "心境",
+    "tip": "嘴角微微上扬5秒钟。面部表情的微笑反馈能向大脑扣动释放多巴胺与内啡肽的微开关。",
+    "source": "Psychological Science · 面部反馈假说",
+    "sourceUrl": "https://journals.sagepub.com/doi/10.1177/0956797612445312"
+  },
+  {
+    "id": "relax-jaw-tongue",
+    "tag": "下颌",
+    "tip": "留意牙齿是否正不自觉咬紧。轻轻分开上下牙齿，让舌尖轻触上颚，面部肌肉瞬间松弛。",
+    "source": "American Dental Association · 颞下颌关节健康",
+    "sourceUrl": "https://www.mouthhealthy.org/all-topics-a-z/tmj"
+  },
+  {
+    "id": "screen-angle-check",
+    "tag": "视角",
+    "tip": "确认电脑屏幕上沿是否与眼睛平齐或略低10—15度。视线微向下俯视时，眼睛泪液蒸发最少。",
+    "source": "OSHA · 电脑工作站工效学",
+    "sourceUrl": "https://www.osha.gov/etools/computer-workstations/components/monitors"
+  },
+  {
+    "id": "fidget-and-wiggle",
+    "tag": "微动",
+    "tip": "动动脚趾、转转脚踝，抖抖肩膀。身体喜欢微小的流动，不需要大汗淋漓才叫运动。",
+    "source": "Mayo Clinic · NEAT非运动热量消耗",
+    "sourceUrl": "https://www.mayoclinic.org/healthy-lifestyle/fitness/in-depth/sitting/art-20047306"
+  },
+  {
+    "id": "warm-palms-knees",
+    "tag": "膝关节",
+    "tip": "搓热双手掌心，贴在双侧膝盖上缓缓画圈轻揉。给长时间屈曲的膝关节送去一份温热。",
+    "source": "Arthritis Foundation · 关节日常护理",
+    "sourceUrl": "https://www.arthritis.org/health-wellness/healthy-living/managing-pain"
+  },
+  {
+    "id": "belly-rub-digestion",
+    "tag": "肠胃",
+    "tip": "正餐半小时后，以肚脐为中心顺时针轻柔摩腹20圈。辅助胃肠顺畅蠕动，缓解餐后腹胀。",
+    "source": "Gastroenterology Nursing",
+    "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/19478644/"
+  },
+  {
+    "id": "tidy-desktop",
+    "tag": "秩序",
+    "tip": "花1分钟顺手收拢桌上的杂物，把水杯摆正。物理环境的整洁有序，直接减轻大脑的视觉负荷。",
+    "source": "Princeton Neuroscience Institute · 视觉注意力",
+    "sourceUrl": "https://www.jneurosci.org/content/31/2/587"
+  },
+  {
+    "id": "soft-music-relax",
+    "tag": "听觉",
+    "tip": "若手头工作告一段落，摘下耳机，感受1分钟周遭环境自然的白噪音，让听觉神经休息一下。",
+    "source": "Hearing Health Foundation",
+    "sourceUrl": "https://hearinghealthfoundation.org/safe-listening"
+  },
+  {
+    "id": "hand-grip-pump",
+    "tag": "末梢",
+    "tip": "双手用力握拳3秒，随后完全张开手指并轻柔抖动。促进末梢血液微循环，赶走手指僵冷。",
+    "source": "American College of Sports Medicine",
+    "sourceUrl": "https://www.acsm.org/"
+  },
+  {
+    "id": "pillow-breath-align",
+    "tag": "坐姿",
+    "tip": "如果椅子过深，在腰后垫一个小靠枕。给腰椎前凸弧度一个坚实支撑，腰部肌肉立即减压。",
+    "source": "Ergonomics in Design",
+    "sourceUrl": "https://journals.sagepub.com/home/erg"
+  },
+  {
+    "id": "kind-self-talk",
+    "tag": "善待",
+    "tip": "对镜子或在心底对自己说一句：“今天做得很好了，慢慢来，不着急。”给予自己一份温厚包容。",
+    "source": "Center for Mindful Self-Compassion",
+    "sourceUrl": "https://centerformsc.org/"
   }
 ]
