@@ -97,7 +97,10 @@ function getOauthState(request: Request) {
 function getRedirectUri(request: Request, provider: string): string {
   const url = new URL(request.url)
   const proto = request.headers.get('x-forwarded-proto') || url.protocol.replace(':', '')
-  const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || url.host
+  let host = request.headers.get('x-forwarded-host') || request.headers.get('host') || url.host
+  if (host.includes('127.0.0.1') || host.includes('localhost')) {
+    return `http://localhost:8787/api/auth/${provider}/callback`
+  }
   return `${proto}://${host}/api/auth/${provider}/callback`
 }
 
