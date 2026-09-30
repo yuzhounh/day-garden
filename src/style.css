@@ -441,7 +441,8 @@
   color: var(--secondary);
   letter-spacing: .5px;
 }
-.cal-week-cell.weekend { color: #d33c3c; }
+.cal-week-cell.weekend { color: #2e7d55; }
+.dark .cal-week-cell.weekend { color: #4ade80; }
 .cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -476,7 +477,8 @@
   line-height: 1.15;
   color: var(--ink);
 }
-.cal-cell.is-weekend .cell-solar-num { color: #d33c3c; }
+.cal-cell.is-weekend .cell-solar-num { color: #2e7d55; }
+.dark .cal-cell.is-weekend .cell-solar-num { color: #4ade80; }
 .cal-cell.other-month { opacity: .32; }
 .cell-sub-text {
   font-size: 11px;
@@ -490,16 +492,37 @@
 }
 .cell-sub-text.festival,
 .cell-sub-text.is-rest-text {
-  color: #d33c3c;
+  color: #2e7d55;
   font-weight: 400;
+}
+.dark .cell-sub-text.festival,
+.dark .cell-sub-text.is-rest-text {
+  color: #4ade80;
+}
+.cell-sub-text.is-work-text {
+  color: #e04b4b;
+  font-weight: 400;
+}
+.dark .cell-sub-text.is-work-text {
+  color: #f87171;
 }
 .cell-sub-text.jieqi {
   color: var(--accent);
   font-weight: 400;
 }
-.cal-cell.is-rest { background: rgba(224, 75, 75, 0.05); }
-.dark .cal-cell.is-rest { background: rgba(224, 75, 75, 0.12); }
-.cal-cell.is-rest .cell-solar-num { color: #d33c3c; }
+/* 休息日用绿色 */
+.cal-cell.is-rest { background: rgba(46, 125, 85, 0.06); }
+.dark .cal-cell.is-rest { background: rgba(46, 125, 85, 0.14); }
+.cal-cell.is-rest .cell-solar-num { color: #2e7d55; }
+.dark .cal-cell.is-rest .cell-solar-num { color: #4ade80; }
+/* 调休用红色 */
+.cal-cell.is-work { background: rgba(224, 75, 75, 0.05); }
+.dark .cal-cell.is-work { background: rgba(224, 75, 75, 0.12); }
+.cal-cell.is-work .cell-solar-num { color: #e04b4b !important; }
+.dark .cal-cell.is-work .cell-solar-num { color: #f87171 !important; }
+.cal-cell.is-work .cell-sub-text { color: #e04b4b; }
+.dark .cal-cell.is-work .cell-sub-text { color: #f87171; }
+/* 今天用蓝色 */
 .cal-cell.is-today {
   border: 2px solid #3b82f6;
   background: rgba(59, 130, 246, 0.05);
@@ -508,13 +531,13 @@
   border-color: #60a5fa;
   background: rgba(96, 165, 250, 0.12);
 }
-.cal-cell.is-today .cell-solar-num { color: #2563eb; font-weight: 600; }
-.dark .cal-cell.is-today .cell-solar-num { color: #93c5fd; }
+.cal-cell.is-today .cell-solar-num { color: #2563eb !important; font-weight: 600; }
+.dark .cal-cell.is-today .cell-solar-num { color: #93c5fd !important; }
 .cal-cell.is-today .cell-sub-text {
-  color: #2563eb;
+  color: #2563eb !important;
   font-weight: 500;
 }
-.dark .cal-cell.is-today .cell-sub-text { color: #93c5fd; }
+.dark .cal-cell.is-today .cell-sub-text { color: #93c5fd !important; }
 .cal-cell.is-selected .cell-solar-num { font-weight: 600; }
 .cal-cell.is-selected:not(.is-today) {
   border-color: var(--accent);
@@ -531,8 +554,8 @@
   font-weight: 600;
   color: #fff;
 }
-.badge-rest { background: #e04b4b; }
-.badge-work { background: #475569; }
+.badge-rest { background: #2e7d55; }
+.badge-work { background: #e04b4b; }
 .badge-today { background: #3b82f6; }
 .cell-badge.mini {
   position: static;

@@ -282,7 +282,10 @@ function selectCell(cell: CalendarCell) {
           class="cell-sub-text"
           :class="[
             cell.subType,
-            { 'is-rest-text': cell.badge === '休' || cell.subType === 'festival' }
+            {
+              'is-rest-text': cell.badge === '休' || (cell.isWeekend && cell.badge !== '班' && cell.subType === 'festival'),
+              'is-work-text': cell.badge === '班',
+            }
           ]"
         >
           {{ cell.subText }}
