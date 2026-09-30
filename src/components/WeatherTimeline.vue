@@ -160,7 +160,7 @@ const chartData = computed(() => {
       <div v-if="today" class="today-content">
         <div class="today-main">
           <strong class="today-temp">{{ today.tempMax }}<span>°</span></strong>
-          <component :is="icon(today.iconName)" :size="38" :stroke-width="1.3" class="today-icon" />
+          <component :is="icon(today.iconName)" :size="46" :stroke-width="1.35" class="today-icon" />
         </div>
         <div class="today-condition-bar">
           <span class="today-condition-text">{{ today.weatherText }}</span>
@@ -169,15 +169,15 @@ const chartData = computed(() => {
         </div>
         <div class="today-sub-tags">
           <div class="today-tag" title="最高体感温度">
-            <span class="today-tag-label"><Thermometer :size="12" />体感温度</span>
+            <span class="today-tag-label"><Thermometer :size="13" />体感温度</span>
             <strong class="today-tag-val">{{ today.apparentTempMax }}°</strong>
           </div>
           <div v-if="today.precipProb > 0" class="today-tag" title="降水概率">
-            <span class="today-tag-label"><Umbrella :size="12" />降水概率</span>
+            <span class="today-tag-label"><Umbrella :size="13" />降水概率</span>
             <strong class="today-tag-val">{{ today.precipProb }}%</strong>
           </div>
           <div v-else class="today-tag" title="紫外线指数">
-            <span class="today-tag-label"><Sun :size="12" />紫外线指数</span>
+            <span class="today-tag-label"><Sun :size="13" />紫外线指数</span>
             <strong class="today-tag-val">{{ uvLevel(today.uvIndex) }}</strong>
           </div>
         </div>

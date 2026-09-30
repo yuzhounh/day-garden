@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
-import { LayoutGrid, Flower2, Heart, Sprout } from 'lucide-vue-next'
+import { Sprout } from 'lucide-vue-next'
 import HeaderHero from './components/HeaderHero.vue'
 import WeatherTimeline from './components/WeatherTimeline.vue'
 import MonthCalendarCard from './components/MonthCalendarCard.vue'
@@ -37,7 +37,6 @@ const weatherLoading = ref(false)
 const showSettings = ref(false)
 const showAccount = ref(false)
 const settingsTab = ref<'modules' | 'events' | 'notification'>('modules')
-const activeSection = ref('today')
 const dateKey = ref(localDateKey())
 const seasonBloom = ref(getTodaySeasonBloom())
 const evidenceGuide = ref(getTodayEvidenceGuide())
@@ -166,14 +165,6 @@ onUnmounted(() => {
     <div class="garden-shell">
       <HeaderHero :selected-city="prefs.selectedCity" :theme="prefs.theme" @update:city="handleCityChange" @toggle-theme="toggleTheme" @open-settings="openSettings()" @open-account="showAccount = true" />
       <main>
-        <div class="dashboard-toolbar">
-          <nav class="garden-tabs glass-panel" aria-label="页面导航">
-            <a href="#today" :class="{ active: activeSection === 'today' }" @click="activeSection = 'today'"><LayoutGrid :size="14" />今日花园</a>
-            <a v-if="prefs.modules.seasonal" href="#seasonal" :class="{ active: activeSection === 'seasonal' }" @click="activeSection = 'seasonal'"><Flower2 :size="14" />四时物候</a>
-            <a v-if="prefs.modules.healthTip" href="#wellbeing" :class="{ active: activeSection === 'wellbeing' }" @click="activeSection = 'wellbeing'"><Heart :size="14" />身心日常</a>
-          </nav>
-          <span class="dashboard-caption"><span class="status-dot"></span>一天一页，慢慢生长</span>
-        </div>
         <WeatherTimeline v-if="prefs.modules.weather" :days="weatherDays" :loading="weatherLoading" :city="prefs.selectedCity.name" />
 
         <!-- 中间卡片网格：除最顶部天气与最底部好好照顾自己外，其余卡片均占页面宽度的一半（两列排布） -->
