@@ -55,9 +55,11 @@ function handleRefresh() {
   }, 400)
 }
 
-function handleSelect(s: SportExercise) {
+const activeSportId = ref<string | null>(props.sport.id)
+
+function handleSetCurrentSport(s: SportExercise) {
   emit('select-sport', s)
-  showModal.value = false
+  activeSportId.value = s.id
 }
 
 function getIntensityColor(intensity: string) {
@@ -184,7 +186,6 @@ function getIntensityColor(intensity: string) {
           v-for="item in filteredSports"
           :key="item.id"
           class="modal-sport-card"
-          @click="handleSelect(item)"
         >
           <div class="modal-sport-header">
             <div class="modal-sport-title-group">
@@ -194,10 +195,14 @@ function getIntensityColor(intensity: string) {
               <span class="sport-cal-pill"><Flame :size="12" class="text-orange-500" />约 {{ item.caloriesPerHour }} kcal/h</span>
             </div>
             <button
-              class="text-button text-xs"
+              class="set-featured-btn"
+              :class="{ active: (activeSportId || sport.id) === item.id }"
               title="设为今日卡片推荐"
+              @click.stop="handleSetCurrentSport(item)"
             >
-              设为当前<ArrowUpRight :size="12" />
+              <Check v-if="(activeSportId || sport.id) === item.id" :size="12" />
+              <Sparkles v-else :size="12" />
+              <span>{{ (activeSportId || sport.id) === item.id ? '当前主页展示中' : '设为今日推荐' }}</span>
             </button>
           </div>
 

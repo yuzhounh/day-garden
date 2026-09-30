@@ -6,7 +6,7 @@ import DetailModal from './DetailModal.vue'
 import BotanicalArt from './BotanicalArt.vue'
 import rawSeasons from '../data/seasons-bloom.json'
 
-defineProps<{ bloom: SeasonBloom }>()
+const props = defineProps<{ bloom: SeasonBloom }>()
 const emit = defineEmits<{
   (e: 'next-bloom'): void
   (e: 'select-bloom', bloom: SeasonBloom): void
@@ -20,9 +20,10 @@ const monthBlooms = computed(() => list.filter(item => item.months.includes(mont
 function monthRange(months: number[]) {
   return months[0] + '—' + (months[0]! > months[months.length - 1]! ? '次年 ' : '') + months[months.length - 1] + ' 月'
 }
+const activeBloomName = ref<string | null>(props.bloom.name)
 function selectBloomItem(item: SeasonBloom) {
   emit('select-bloom', item)
-  showCalendar.value = false
+  activeBloomName.value = item.name
 }
 </script>
 
@@ -120,20 +121,27 @@ function selectBloomItem(item: SeasonBloom) {
         <article
           v-for="item in monthBlooms"
           :key="item.name"
-          class="cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-800/30 p-2.5 rounded-xl transition"
-          @click="selectBloomItem(item)"
+          class="p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 transition mb-3"
         >
           <span class="bloom-emoji">{{ item.icon }}</span>
           <div class="flex-1 min-w-0">
-            <h3>
-              {{ item.name }}
-              <span class="pill peach">{{ item.status }}</span>
-            </h3>
+            <div class="flex items-center justify-between">
+              <h3>
+                {{ item.name }}
+                <span class="pill peach">{{ item.status }}</span>
+              </h3>
+              <button
+                class="set-featured-btn"
+                :class="{ active: (activeBloomName || bloom.name) === item.name }"
+                @click.stop="selectBloomItem(item)"
+              >
+                <span>{{ (activeBloomName || bloom.name) === item.name ? '✓ 当前花信' : '设为当前花信' }}</span>
+              </button>
+            </div>
             <p>{{ item.description }}</p>
             <p class="observation-text">{{ item.observation }}</p>
-            <div class="flex items-center justify-between mt-1">
+            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
               <small><MapPin :size="12" />{{ item.bestSpot }} · {{ monthRange(item.months) }}</small>
-              <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">设为当前 ↗</span>
             </div>
           </div>
         </article>

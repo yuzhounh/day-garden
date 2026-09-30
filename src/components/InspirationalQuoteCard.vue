@@ -21,6 +21,9 @@ const filteredQuotes = computed(() => {
   return allQuotes.filter(q => q.tag === filterTag.value)
 })
 
+const copiedId = ref<string | null>(null)
+const featuredId = ref<string | null>(props.quote.id)
+
 function copyQuote() {
   const text = `“${props.quote.quote}” —— ${props.quote.author} ${props.quote.source || ''}`
   navigator.clipboard.writeText(text).then(() => {
@@ -29,9 +32,19 @@ function copyQuote() {
   }).catch(() => {})
 }
 
-function selectQuote(q: InspirationalQuote) {
+function copyQuoteText(q: InspirationalQuote) {
+  const text = `“${q.quote}” —— ${q.author} ${q.source || ''}`
+  navigator.clipboard.writeText(text).then(() => {
+    copiedId.value = q.id
+    setTimeout(() => {
+      if (copiedId.value === q.id) copiedId.value = null
+    }, 2000)
+  }).catch(() => {})
+}
+
+function setAsHomeQuote(q: InspirationalQuote) {
   emit('select-quote', q)
-  showList.value = false
+  featuredId.value = q.id
 }
 </script>
 
@@ -123,22 +136,49 @@ function selectQuote(q: InspirationalQuote) {
         </button>
       </div>
       <div class="quote-library-list">
-        <button
+        <article
           v-for="item in filteredQuotes"
           :key="item.id"
-          class="quote-item-button"
-          @click="selectQuote(item)"
+          class="quote-item-card"
         >
-          <div class="quote-item-content">
-            <p class="quote-item-text">“{{ item.quote }}”</p>
-            <div class="quote-item-author">
-              <strong>{{ item.author }}</strong>
-              <small v-if="item.source">· {{ item.source }}</small>
+          <div class="quote-item-header">
+            <blockquote class="quote-item-text">“{{ item.quote }}”</blockquote>
+            <div class="quote-item-meta">
+              <span class="quote-item-author">{{ item.author }}</span>
+              <span v-if="item.source" class="quote-item-source">· {{ item.source }}</span>
               <span class="pill sky mini">{{ item.tag }}</span>
             </div>
           </div>
-          <ArrowUpRight :size="16" class="shrink-0 text-slate-400" />
-        </button>
+
+          <!-- 生活心力解读：直接在集合卡片里展示，沉浸式阅读 -->
+          <div class="quote-item-insight">
+            <Eye :size="14" class="quote-insight-icon" />
+            <p>{{ item.insight }}</p>
+          </div>
+
+          <!-- 卡片底栏操作：不退出弹窗，方便连续向下浏览 -->
+          <div class="quote-item-actions">
+            <button
+              class="text-button text-xs"
+              :title="copiedId === item.id ? '已复制到剪贴板' : '复制此句'"
+              @click="copyQuoteText(item)"
+            >
+              <Check v-if="copiedId === item.id" :size="13" class="text-emerald-500" />
+              <Copy v-else :size="13" />
+              <span>{{ copiedId === item.id ? '已复制' : '复制金句' }}</span>
+            </button>
+
+            <button
+              class="set-featured-btn"
+              :class="{ active: (featuredId || props.quote.id) === item.id }"
+              @click="setAsHomeQuote(item)"
+            >
+              <Check v-if="(featuredId || props.quote.id) === item.id" :size="13" />
+              <Sparkles v-else :size="13" />
+              <span>{{ (featuredId || props.quote.id) === item.id ? '当前主页展示中' : '设为今日推荐' }}</span>
+            </button>
+          </div>
+        </article>
       </div>
     </DetailModal>
   </article>

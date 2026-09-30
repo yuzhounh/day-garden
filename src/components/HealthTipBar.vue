@@ -36,9 +36,11 @@ const filteredTips = computed(() => {
   })
 })
 
-function selectTip(t: HealthTip) {
+const activeTipId = ref<string | null>(props.tip.id)
+
+function setAsCurrentTip(t: HealthTip) {
   emit('select-tip', t)
-  showLibrary.value = false
+  activeTipId.value = t.id
 }
 
 const actions = [
@@ -183,12 +185,18 @@ function toggle(id: string) {
           v-for="item in filteredTips"
           :key="item.id"
           class="modal-tip-card"
-          @click="selectTip(item)"
         >
           <div class="modal-tip-header">
             <span class="pill sage">{{ item.tag }}</span>
-            <button class="text-button text-xs" title="设为当前提醒">
-              设为当前<ArrowUpRight :size="12" />
+            <button
+              class="set-featured-btn"
+              :class="{ active: (activeTipId || tip.id) === item.id }"
+              title="设为今日卡片提醒"
+              @click.stop="setAsCurrentTip(item)"
+            >
+              <Check v-if="(activeTipId || tip.id) === item.id" :size="12" />
+              <Heart v-else :size="12" />
+              <span>{{ (activeTipId || tip.id) === item.id ? '当前主页展示中' : '设为今日提醒' }}</span>
             </button>
           </div>
           <p class="modal-tip-text">{{ item.tip }}</p>

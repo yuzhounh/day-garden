@@ -5,7 +5,7 @@ import type { EvidenceGuide } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawEvidence from '../data/evidence-guide.json'
 
-defineProps<{ guide: EvidenceGuide }>()
+const props = defineProps<{ guide: EvidenceGuide }>()
 const emit = defineEmits<{
   (e: 'next-guide'): void
   (e: 'select-guide', guide: EvidenceGuide): void
@@ -40,9 +40,11 @@ const filteredGuides = computed(() => {
   })
 })
 
-function selectGuide(g: EvidenceGuide) {
+const activeGuideId = ref<string | null>(props.guide.id)
+
+function setAsCurrentGuide(g: EvidenceGuide) {
   emit('select-guide', g)
-  showLibrary.value = false
+  activeGuideId.value = g.id
 }
 </script>
 
@@ -143,15 +145,21 @@ function selectGuide(g: EvidenceGuide) {
           v-for="item in filteredGuides"
           :key="item.id"
           class="modal-guide-card"
-          @click="selectGuide(item)"
         >
           <div class="modal-guide-header">
             <div class="modal-guide-title-row">
               <h3>{{ item.title }}</h3>
               <span class="pill sage mini">{{ item.category }}</span>
             </div>
-            <button class="text-button text-xs" title="设为当前卡片展示">
-              设为当前<ArrowUpRight :size="12" />
+            <button
+              class="set-featured-btn"
+              :class="{ active: (activeGuideId || guide.id) === item.id }"
+              title="设为今日卡片推荐"
+              @click.stop="setAsCurrentGuide(item)"
+            >
+              <Check v-if="(activeGuideId || guide.id) === item.id" :size="12" />
+              <Sprout v-else :size="12" />
+              <span>{{ (activeGuideId || guide.id) === item.id ? '当前主页展示中' : '设为今日推荐' }}</span>
             </button>
           </div>
           <p class="modal-guide-action">{{ item.coreAction }}</p>
