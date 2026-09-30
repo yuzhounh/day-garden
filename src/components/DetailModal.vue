@@ -25,7 +25,7 @@ onMounted(() => {
   previousOverflow = document.body.style.overflow
   document.body.style.overflow = 'hidden'
   document.addEventListener('keydown', handleKey)
-  panel.value?.querySelector<HTMLElement>('button')?.focus()
+  panel.value?.focus()
 })
 onUnmounted(() => {
   document.body.style.overflow = previousOverflow
@@ -37,7 +37,7 @@ onUnmounted(() => {
 <template>
   <Teleport to="body">
     <div class="modal-backdrop" @click.self="emit('close')">
-      <section ref="panel" class="detail-modal glass-panel" :class="$attrs.class" role="dialog" aria-modal="true" :aria-labelledby="titleId">
+      <section ref="panel" class="detail-modal glass-panel focus:outline-none" :class="$attrs.class" role="dialog" aria-modal="true" :aria-labelledby="titleId" tabindex="-1">
         <header class="modal-heading">
           <div><p v-if="subtitle" class="eyebrow">{{ subtitle }}</p><h2 :id="titleId">{{ title }}</h2></div>
           <button class="icon-button" aria-label="关闭" @click="emit('close')"><X :size="18" /></button>

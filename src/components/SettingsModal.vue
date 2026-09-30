@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Plus, Trash2, Download, Upload, Check, Pencil } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
 import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate } from '../services/calendar'
@@ -15,7 +15,15 @@ const emit = defineEmits<{
   (e: 'update:preferences', prefs: UserPreferences): void
 }>()
 
-const currentTab = ref<'modules' | 'events' | 'notification'>(props.initialTab || 'modules')
+const currentTab = ref<'modules' | 'events' | 'notification'>(
+  (props.initialTab === 'events' || props.initialTab === 'notification') ? props.initialTab : 'modules'
+)
+
+watch(() => props.initialTab, (newTab) => {
+  if (newTab === 'events' || newTab === 'notification' || newTab === 'modules') {
+    currentTab.value = newTab
+  }
+})
 
 // 新增事件表单
 const newEventTitle = ref('')
@@ -115,11 +123,12 @@ function getCountdownClass(ev: LifeEvent) {
 }
 
 function toggleModule(key: keyof UserPreferences['modules']) {
+  const currentVal = props.preferences.modules[key] ?? true
   const updated = {
     ...props.preferences,
     modules: {
       ...props.preferences.modules,
-      [key]: !props.preferences.modules[key],
+      [key]: !currentVal,
     },
   }
   emit('update:preferences', updated)
@@ -233,54 +242,84 @@ function importData(e: Event) {
           </p>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">7天天气时间轴</span>
-              <input type="checkbox" :checked="preferences.modules.weather" @change="toggleModule('weather')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('weather')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">7天天气时间轴</span>
+              <input type="checkbox" :checked="preferences.modules.weather ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">月历与休班节气</span>
-              <input type="checkbox" :checked="preferences.modules.calendar ?? true" @change="toggleModule('calendar')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('calendar')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">月历与休班节气</span>
+              <input type="checkbox" :checked="preferences.modules.calendar ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">节日与重要纪念日</span>
-              <input type="checkbox" :checked="preferences.modules.upcoming" @change="toggleModule('upcoming')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('upcoming')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">节日与重要纪念日</span>
+              <input type="checkbox" :checked="preferences.modules.upcoming ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">四时物候与花期</span>
-              <input type="checkbox" :checked="preferences.modules.seasonal" @change="toggleModule('seasonal')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('seasonal')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">四时物候与花期</span>
+              <input type="checkbox" :checked="preferences.modules.seasonal ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">循证生活高性价比锦囊</span>
-              <input type="checkbox" :checked="preferences.modules.evidence" @change="toggleModule('evidence')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('evidence')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">循证生活高性价比锦囊</span>
+              <input type="checkbox" :checked="preferences.modules.evidence ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">今日一页 · 诗词名句</span>
-              <input type="checkbox" :checked="preferences.modules.dailyPoetry" @change="toggleModule('dailyPoetry')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('dailyPoetry')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">今日一页 · 诗词名句</span>
+              <input type="checkbox" :checked="preferences.modules.dailyPoetry ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">积极励志 · 名人名言</span>
-              <input type="checkbox" :checked="preferences.modules.inspirationalQuote ?? true" @change="toggleModule('inspirationalQuote')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('inspirationalQuote')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">积极励志 · 名人名言</span>
+              <input type="checkbox" :checked="preferences.modules.inspirationalQuote ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">中国最值得去的旅游景点</span>
-              <input type="checkbox" :checked="preferences.modules.chinaAttractions ?? true" @change="toggleModule('chinaAttractions')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('chinaAttractions')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">中国最值得去的旅游景点</span>
+              <input type="checkbox" :checked="preferences.modules.chinaAttractions ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">动健身心 · 运动项目指南</span>
-              <input type="checkbox" :checked="preferences.modules.sportsExercise ?? true" @change="toggleModule('sportsExercise')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('sportsExercise')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">动健身心 · 运动项目指南</span>
+              <input type="checkbox" :checked="preferences.modules.sportsExercise ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 
-            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">底部健康微提醒</span>
-              <input type="checkbox" :checked="preferences.modules.healthTip" @change="toggleModule('healthTip')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <label
+              class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+              @click.prevent="toggleModule('healthTip')"
+            >
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">底部健康微提醒</span>
+              <input type="checkbox" :checked="preferences.modules.healthTip ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
           </div>
         </div>

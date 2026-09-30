@@ -282,7 +282,8 @@ onUnmounted(() => {
         <!-- 设置入口 -->
         <button
           class="icon-button"
-          aria-label="设置与个性化"
+          aria-label="布置我的花园 · 设置与个性化"
+          title="布置我的花园 · 设置"
           @click="emit('open-settings')"
         >
           <Settings2 :size="17" />
