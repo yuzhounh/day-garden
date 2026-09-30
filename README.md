@@ -1,40 +1,63 @@
-# Day Garden (day-garden)
+# Day Garden · 日常花园
 
-> **A quiet personal daily dashboard** · 低干扰的个人生活首页与每日仪表盘。
+一个轻盈、安静的生活首页：看看天气，读一首诗，感受四季，也照顾自己。
 
-Day Garden 不是充满算法、广告与推荐流的信息门户，而是一个旨在“每天清晨用 30 秒扫视完毕，然后关掉去生活”的极简生活控制台。
+## 已实现
 
-### 核心设计原则
+- 磨砂玻璃卡片、鼠尾草绿 / 淡桃 / 淡紫背景、植物插画，支持手机布局与深色模式。
+- 七日天气（前两天、今天、后四天），可看体感温度、降水概率和紫外线。实时失败时明确标注缓存或示例数据；缓存按城市和有效期校验。
+- 24 篇古典诗词，按季节推荐；支持全文、读诗随想、季节筛选及收藏。
+- 16 条植物与物候内容，覆盖全年；可按月浏览，附观察提示与适宜场所。花期是一般参考，并非实时当地开花报告。
+- 12 条健康提醒、6 条有官方来源的生活建议、3 项每日行动打卡。打卡按本地日期分别保存，跨日更新。
+- 重要日子管理、模块开关、偏好导出与导入。
+- 可选账户同步：用户名与密码登录，Cloudflare Pages Functions + D1 存储诗词收藏与每日打卡；未登录也可本地使用。
 
-* **极简克制**：默认卡片数量控制在 6 个以内，一屏即可浏览全部要点，杜绝无意义的信息过载。
-* **生活时间轴**：天气不仅是预报，更是时间的流动。前 2 天过去时（淡色弱化）+ 今天（高光突出）+ 后 4 天（清晰预报）。
-* **重要日子三级提醒**：家人朋友生日与重大纪念日按“14天前备礼预警 → 3天前关键提醒 → 当天庆贺”三级触达。
-* **高可信循证锦囊**：拒绝伪科学与鸡汤，萃取自开源硬核项目，注明论文与官方出处，提供可执行的生活微行动。
-* **四时与诗意**：融入传统二十四节气、物候花期与唐宋名篇晨读，感知季节流转。
+## 保存与同步
 
-### 功能矩阵
+未登录数据保存在本浏览器；刷新后仍保留，但清除站点数据或换设备不会自动带过去。登录后收藏与打卡按用户隔离，网络失败的操作先存本机，联网或返回页面时重试；也可在账户面板手动同步。
 
-* **七日天气时间轴**：集成 Open-Meteo 免费气象接口，支持国内主要城市切换与自动定位，点击卡片展开体感温、风向风速、紫外线与降水概率。
-* **农历与节气**：基于 `lunar-javascript` 离线计算农历生肖、干支与节气倒计时（如“秋分后第 6 天”）。
-* **四时花期（Seasonal）**：动态感应当月物候（如 9-10 月桂花盛开、银杏始黄），提供适宜观赏处。
-* **生活近况与生日**：支持增删改查家人朋友生日、结婚纪念日，支持公历与农历，提供备礼建议与桌面系统通知提醒。
-* **循证生活指南**：萃取自开源项目 [eternity4719/HowToLiveBetter](https://github.com/eternity4719/HowToLiveBetter)（长寿防病、日常急救、口腔用眼、社保医保等高性价比策略）。
-* **今日一页晨读**：精选自 [chinese-poetry/chinese-poetry](https://github.com/chinese-poetry/chinese-poetry) 的典雅唐宋诗词名篇。
-* **偏好设置与数据备份**：支持模块开关、暗色模式、生日记事增删、一键导出与导入备份 JSON。
-* **PWA 原生体验**：支持安装到桌面（Windows / macOS / Chrome / Edge）与手机主屏幕（iOS / Android 全屏运行）。
+首次登录可选择合并本机未登录时的收藏与打卡。每个账户的本地缓存与未登录数据分开存储。修改以单项操作上传，避免整份记录覆盖其他设备的数据。同一项并发修改按服务器最后收到的操作生效。
 
-### 常用命令
+当前账户是轻量版本：不提供邮件找回密码、密码修改或账户删除界面。请保存用户名和密码。城市、自定义日程和其他偏好仍仅保存在本机。账户面板可导出收藏与打卡 JSON，偏好面板可另外导出偏好与日程。
 
-```bash
-# 安装依赖
-npm install
+## 本地开发
 
-# 本地启动
-npm run dev
-
-# 生产构建
-npm run build
-
-# 预览产物
-npm run preview
+```powershell
+npm ci
+npm run db:local
+# 创建不入库的 .dev.vars，设置 PASSWORD_PEPPER 为随机字符串
+npm run build      # 生成网页及 Pages Functions 的 _worker.js
+npm run dev:cloud  # Pages + 本地 D1，端口 8787
+npm run dev        # Vue 开发页，端口 5180，/api 代理到 Pages
 ```
+
+```powershell
+npm run build
+node tests/api.mjs  # 需本地 Pages 在 8787 运行；仅写入本地测试数据库
+```
+
+## Cloudflare
+
+- 线上地址：[Day Garden](https://day-garden.pages.dev/)
+- Pages 项目：`day-garden`，生产分支 `main`
+- D1：`day-garden`
+- 配置：`wrangler.jsonc`
+- 数据库迁移：`worker/migrations/`
+- 本地数据与密钥：`.wrangler/`、`.dev.vars`，均已忽略。
+
+```powershell
+npx wrangler login
+npm run db:remote
+npm run deploy
+npx wrangler pages secret put PASSWORD_PEPPER --project-name day-garden
+```
+
+生产环境的 PASSWORD_PEPPER 必须保持稳定；丢失或更改会让现有账户无法验证密码。不要提交密钥或本地 D1 文件。
+
+API 使用密码加盐及服务端密钥、HttpOnly / SameSite / Secure 会话 Cookie（Secure 仅 HTTPS）、来源检查、参数化 SQL、账户隔离和 D1 登录限流（每 IP 每分钟 10 次，仅存储哈希摘要）。前端与接口由同一 Pages 项目托管，避免跨站会话问题。系统通知需要浏览器授权，且只在页面打开时检查；目前没有后台推送调度。
+
+原 `day-garden.yuzhounh.workers.dev` 入口已停用；退休配置在 `worker/wrangler.retired.jsonc`，禁用默认及预览访问地址。现有 D1 数据库和密码密钥沿用；用户换域名后需要重新登录。旧域名浏览器里的未登录数据和偏好不会自动跨域迁移。
+
+## 内容出处
+
+健康内容核对 WHO、CDC、ADA 和 AAO EyeWiki 官方资料，来源链接可在卡片内打开。古典诗词为公版作品，读诗随想为本项目原创文字。物候为中国温带及江南常见植物的一般参考。

@@ -111,7 +111,10 @@ export function getTodayEvidenceGuide(date: Date = new Date()): EvidenceGuide {
  * 获取今日诗词名篇
  */
 export function getTodayPoetry(date: Date = new Date()): CuratedPoetry {
-  const list = rawPoetry as CuratedPoetry[]
+  const month = date.getMonth() + 1
+  const season = month >= 3 && month <= 5 ? '春' : month >= 6 && month <= 8 ? '夏' : month >= 9 && month <= 11 ? '秋' : '冬'
+  const seasonal = (rawPoetry as CuratedPoetry[]).filter(poem => poem.season === season)
+  const list = seasonal.length ? seasonal : rawPoetry as CuratedPoetry[]
   const idx = getDailyIndex(list.length, 79, date)
   return list[idx]
 }

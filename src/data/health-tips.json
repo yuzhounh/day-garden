@@ -1,32 +1,86 @@
 [
   {
-    "id": "hydrate-morning",
-    "tag": "饮水",
-    "tip": "晨起空腹饮用 200~300ml 温水，唤醒肠胃蠕动并补充夜间不显性失水。"
-  },
-  {
-    "id": "posture-screen",
-    "tag": "颈椎",
-    "tip": "屏幕上边缘与视线平齐，下巴微微内收，避免头部过度前倾（每前倾2.5厘米颈椎负荷增加约4.5公斤）。"
-  },
-  {
-    "id": "eye-blink",
-    "tag": "护眼",
-    "tip": "长久注视屏幕会无意识减少眨眼。偶尔用力闭眼2秒再自然睁开，可促使睑板腺排出健康脂质润滑眼球。"
-  },
-  {
-    "id": "stretch-calf",
+    "id": "move-break",
     "tag": "活动",
-    "tip": "工作间隙双脚平踏地面，做 15 次勾脚尖与提脚跟动作，快速促进下肢血液回流。"
+    "tip": "工作间隙起来走动一下。少坐一点，多动一点，从自己舒适的活动量开始。",
+    "source": "WHO · 身体活动",
+    "sourceUrl": "https://www.who.int/europe/news-room/fact-sheets/item/physical-activity"
   },
   {
-    "id": "deep-breath",
-    "tag": "呼吸",
-    "tip": "感到紧绷时尝试“箱式呼吸”：吸气 4 秒，屏气 4 秒，呼气 4 秒，屏气 4 秒，重复 3 组迅速降低交感神经兴奋。"
+    "id": "walk-outdoors",
+    "tag": "散步",
+    "tip": "把一段短途出行换成步行，或在方便时散步。日常的身体活动也算数。",
+    "source": "WHO · 身体活动",
+    "sourceUrl": "https://www.who.int/europe/news-room/fact-sheets/item/physical-activity"
   },
   {
-    "id": "sunlight-morning",
-    "tag": "节律",
-    "tip": "早晨起床后接触 10~15 分钟户外自然光线，能校准视交叉上核生物钟，帮助夜间褪黑素按时分泌。"
+    "id": "eyes-distance",
+    "tag": "护眼",
+    "tip": "看屏幕久了，看看约 6 米外的物体至少 20 秒，让双眼暂时离开近距离工作。",
+    "source": "AAO EyeWiki · 屏幕用眼",
+    "sourceUrl": "https://eyewiki.aao.org/Computer_Vision_Syndrome_%28Digital_Eye_Strain%29"
+  },
+  {
+    "id": "eyes-blink",
+    "tag": "眨眼",
+    "tip": "专注屏幕时，也记得自然、完整地眨眼。短暂休息，给眼睛一点缓冲。",
+    "source": "AAO EyeWiki · 屏幕用眼",
+    "sourceUrl": "https://eyewiki.aao.org/Computer_Vision_Syndrome_%28Digital_Eye_Strain%29"
+  },
+  {
+    "id": "screen-position",
+    "tag": "用眼",
+    "tip": "避免屏幕反光，调整到舒适的观看距离；文字太小时，先放大字号。",
+    "source": "AAO EyeWiki · 屏幕用眼",
+    "sourceUrl": "https://eyewiki.aao.org/Computer_Vision_Syndrome_%28Digital_Eye_Strain%29"
+  },
+  {
+    "id": "sleep-regular",
+    "tag": "作息",
+    "tip": "尽量在相近的时间入睡与起床，周末也保留一份规律。",
+    "source": "CDC · 睡眠",
+    "sourceUrl": "https://www.cdc.gov/sleep/about/"
+  },
+  {
+    "id": "sleep-space",
+    "tag": "睡眠",
+    "tip": "把卧室调得安静、舒适、凉爽一点，为入睡留出轻松的环境。",
+    "source": "CDC · 睡眠",
+    "sourceUrl": "https://www.cdc.gov/sleep/about/"
+  },
+  {
+    "id": "screen-evening",
+    "tag": "晚间",
+    "tip": "睡前至少半小时放下电子设备，试着用读书或安静的休息收尾。",
+    "source": "CDC · 睡眠",
+    "sourceUrl": "https://www.cdc.gov/sleep/about/"
+  },
+  {
+    "id": "oral-brush",
+    "tag": "口腔",
+    "tip": "每天用含氟牙膏刷牙两次，每次约两分钟。今天也别忘了晚间那一次。",
+    "source": "ADA · 口腔健康",
+    "sourceUrl": "https://www.mouthhealthy.org/oral-health-recommendations"
+  },
+  {
+    "id": "oral-clean",
+    "tag": "齿间清洁",
+    "tip": "每天清洁牙缝，选择适合自己的牙线或齿间清洁工具。",
+    "source": "ADA · 口腔健康",
+    "sourceUrl": "https://www.mouthhealthy.org/oral-health-recommendations"
+  },
+  {
+    "id": "colorful-plate",
+    "tag": "餐盘",
+    "tip": "今天的餐盘添一点不同颜色的蔬菜与水果，让选择更丰富。",
+    "source": "WHO · 健康饮食",
+    "sourceUrl": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+  },
+  {
+    "id": "wholegrain",
+    "tag": "饮食",
+    "tip": "有机会时尝试全谷物、豆类和完整水果，让饮食更有变化。",
+    "source": "WHO · 健康饮食",
+    "sourceUrl": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
   }
 ]

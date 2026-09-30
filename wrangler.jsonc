@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "day-garden",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-09-30",
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "day-garden",
+    "database_id": "fe6cdef3-db24-466e-936e-0397f30dc094",
+    "migrations_dir": "worker/migrations"
+  }]
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "day-garden",
+  "main": "retired.ts",
+  "compatibility_date": "2026-09-30",
+  "account_id": "317b5c4d8cf617476891b7b96e50c20a",
+  "workers_dev": false,
+  "preview_urls": false
+}

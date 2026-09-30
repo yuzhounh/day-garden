@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "build": "vue-tsc -b && tsc -p tsconfig.worker.json && vite build && esbuild worker/index.ts --bundle --format=esm --platform=browser --target=es2022 --outfile=dist/_worker.js",
+    "preview": "vite preview",
+    "dev:cloud": "wrangler pages dev dist --port 8787",
+    "db:local": "wrangler d1 migrations apply day-garden --local",
+    "db:remote": "wrangler d1 migrations apply day-garden --remote",
+    "deploy": "npm run build && wrangler pages deploy dist --project-name day-garden --branch main"
   },
   "dependencies": {
     "@lucide/vue": "^1.48.0",
@@ -16,14 +20,17 @@
     "vue": "^3.5.42"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260930.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^24.13.3",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/tsconfig": "^0.9.1",
+    "esbuild": "^0.28.2",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
-    "vue-tsc": "^3.3.11"
+    "vue-tsc": "^3.3.11",
+    "wrangler": "^4.144.0"
   }
 }

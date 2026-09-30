@@ -12,6 +12,7 @@ export interface WeatherDay {
   apparentTempMin: number
   precipProb: number
   uvIndex?: number
+  dataSource?: 'live' | 'cached' | 'demo'
 }
 
 export interface CityOption {
@@ -42,6 +43,8 @@ export interface SeasonBloom {
   status: string
   description: string
   bestSpot: string
+  observation: string
+  color: string
 }
 
 export interface EvidenceGuide {
@@ -52,6 +55,7 @@ export interface EvidenceGuide {
   roi: string
   source: string
   details: string
+  sourceUrl: string
 }
 
 export interface CuratedPoetry {
@@ -63,12 +67,15 @@ export interface CuratedPoetry {
   content: string
   season?: string
   mood?: string
+  reading?: string
 }
 
 export interface HealthTip {
   id: string
   tag: string
   tip: string
+  source: string
+  sourceUrl: string
 }
 
 export interface UserPreferences {

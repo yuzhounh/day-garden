@@ -4,8 +4,8 @@
   "description": "低干扰的个人生活首页与每日仪表盘：七日天气时间轴、四时花期、生活纪念日、循证生活锦囊与经典晨读",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#10b981",
+  "background_color": "#f5f6f1",
+  "theme_color": "#f5f6f1",
   "icons": [
     {
       "src": "/favicon.svg",

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { X, Sliders, Plus, Trash2, Download, Upload, Check } from '@lucide/vue'
+import { Plus, Trash2, Download, Upload, Check } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
 import { requestNotificationPermission, sendDesktopNotification } from '../services/calendar'
+import DetailModal from './DetailModal.vue'
 
 const props = defineProps<{
   preferences: UserPreferences
+  initialTab?: 'modules' | 'events' | 'notification'
 }>()
 
 const emit = defineEmits<{
@@ -13,7 +15,7 @@ const emit = defineEmits<{
   (e: 'update:preferences', prefs: UserPreferences): void
 }>()
 
-const currentTab = ref<'modules' | 'events' | 'notification'>('modules')
+const currentTab = ref<'modules' | 'events' | 'notification'>(props.initialTab || 'modules')
 
 // 新增事件表单
 const newEventTitle = ref('')
@@ -72,6 +74,7 @@ async function handleTestNotification() {
   const granted = await requestNotificationPermission()
   if (granted) {
     notificationStatus.value = 'success'
+    emit('update:preferences', { ...props.preferences, notificationEnabled: true })
     sendDesktopNotification('Day Garden 生日提前预警', '🎂 妈妈生日还有 12 天 · 建议提前准备礼物')
   } else {
     notificationStatus.value = 'denied'
@@ -106,21 +109,7 @@ function importData(e: Event) {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-    <div class="w-full max-w-xl max-h-[85vh] flex flex-col rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-      <!-- Header -->
-      <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
-        <div class="flex items-center gap-2">
-          <Sliders class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          <h3 class="text-base font-medium text-slate-900 dark:text-white">Day Garden 偏好与生活记事</h3>
-        </div>
-        <button
-          @click="emit('close')"
-          class="p-1 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-        >
-          <X class="w-4 h-4" />
-        </button>
-      </div>
+  <DetailModal title="布置你的日常花园" subtitle="PERSONALIZE YOUR GARDEN" class="settings-content" @close="emit('close')">
 
       <!-- Tab Nav -->
       <div class="flex border-b border-slate-100 dark:border-slate-800 px-6 shrink-0 bg-slate-50/50 dark:bg-slate-800/30">
@@ -315,6 +304,5 @@ function importData(e: Event) {
           完成
         </button>
       </div>
-    </div>
-  </div>
+  </DetailModal>
 </template>

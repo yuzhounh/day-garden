@@ -1,4 +1,5 @@
 import type { CityOption, WeatherDay } from '../types'
+import { localDateKey } from './day'
 
 export const DEFAULT_CITIES: CityOption[] = [
   { name: '北京', province: '直辖市', lat: 39.9042, lon: 116.4074 },
@@ -33,16 +34,16 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,uv_index_max&timezone=auto&past_days=2&forecast_days=5`
 
   try {
-    const res = await fetch(url, { headers: { Accept: 'application/json' } })
+    const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(10000) })
     if (!res.ok) throw new Error(`Weather API error: ${res.status}`)
     const data = await res.json()
     const daily = data.daily
 
     if (!daily || !daily.time) throw new Error('Invalid weather payload')
 
-    const todayDateStr = new Date().toISOString().slice(0, 10)
+    const todayDateStr = localDateKey()
 
-    const list: WeatherDay[] = daily.time.map((timeStr: string, idx: number) => {
+    const list: WeatherDay[] = daily.time.map((timeStr: string, idx: number): WeatherDay => {
       const d = new Date(timeStr + 'T00:00:00')
       const isToday = timeStr === todayDateStr
       const isPast = timeStr < todayDateStr
@@ -64,6 +65,7 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
         apparentTempMin: Math.round(daily.apparent_temperature_min[idx]),
         precipProb: Math.round(daily.precipitation_probability_max[idx] || 0),
         uvIndex: daily.uv_index_max ? Math.round(daily.uv_index_max[idx]) : undefined,
+        dataSource: 'live',
       }
     })
 
@@ -82,7 +84,10 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
       const cached = localStorage.getItem('daygarden_weather_cache') || localStorage.getItem('daybloom_weather_cache')
       if (cached) {
         const parsed = JSON.parse(cached)
-        return parsed.list
+        const today = localDateKey()
+        if (parsed.city === city.name && Date.now() - parsed.timestamp < 6 * 60 * 60 * 1000 && Array.isArray(parsed.list) && parsed.list.length === 7 && parsed.list.some((day: WeatherDay) => day.date === today)) {
+          return parsed.list.map((day: WeatherDay): WeatherDay => ({ ...day, isToday: day.date === today, isPast: day.date < today, dataSource: 'cached' }))
+        }
       }
     } catch {
       // ignore
@@ -99,7 +104,7 @@ function generateFallbackWeather(): WeatherDay[] {
   for (let offset = -2; offset <= 4; offset++) {
     const cur = new Date(now)
     cur.setDate(now.getDate() + offset)
-    const timeStr = cur.toISOString().slice(0, 10)
+    const timeStr = localDateKey(cur)
     const isToday = offset === 0
     const isPast = offset < 0
     const dayOfWeek = isToday ? '今天' : WEEK_DAYS[cur.getDay()]
@@ -120,6 +125,7 @@ function generateFallbackWeather(): WeatherDay[] {
       apparentTempMin: tempMin - 1,
       precipProb: 15,
       uvIndex: 4,
+      dataSource: 'demo',
     })
   }
   return list
