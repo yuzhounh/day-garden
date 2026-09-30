@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Sun, Moon, Settings2, MapPin, ChevronDown, Sprout, Check, ArrowUpRight, Cloud, UserRound } from 'lucide-vue-next'
+import { Sun, Moon, Settings2, MapPin, ChevronDown, Sprout, Check, Cloud, UserRound } from 'lucide-vue-next'
 import { getTodayCalendarInfo } from '../services/calendar'
 import { DEFAULT_CITIES } from '../services/weather'
 import BotanicalArt from './BotanicalArt.vue'
@@ -74,7 +74,7 @@ onUnmounted(() => {
         <p class="eyebrow"><span class="status-dot"></span> A LITTLE SPACE FOR EVERYDAY LIFE</p>
         <h1>{{ greeting }}</h1>
         <p class="hero-description">感受四时流转，照顾日常，也收藏一点诗意。</p>
-        <div class="season-note"><Sprout :size="14" /><span>{{ calendar.termSummary }}</span><ArrowUpRight :size="13" /></div>
+        <div class="season-note"><Sprout :size="14" /><span>{{ calendar.termSummary }}</span></div>
       </div>
       <div class="hero-botanical"><BotanicalArt /><span>一枝一叶，都是生活。</span></div>
       <div class="date-card glass-panel">
