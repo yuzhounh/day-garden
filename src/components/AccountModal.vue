@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Cloud, Check, Download, RefreshCw, LogOut, User as UserIcon, Link2, Unlink } from 'lucide-vue-next'
+import { Cloud, Check, Download, RefreshCw, LogOut, User as UserIcon } from 'lucide-vue-next'
 import DetailModal from './DetailModal.vue'
 import {
   account,
@@ -11,7 +11,6 @@ import {
   loginWithOAuth,
   loginWithMock,
   authProviders,
-  unlinkProvider,
 } from '../services/sync'
 
 const emit = defineEmits<{ close: [] }>()
@@ -45,15 +44,6 @@ function handleOAuth(provider: 'google' = 'google') {
 
 function handleMock(provider: 'google' = 'google') {
   void loginWithMock(provider, mergeGuest.value)
-}
-
-async function handleUnlink(provider: 'google' = 'google') {
-  if (!confirm('确定要解除与 Google 账户的关联吗？')) return
-  try {
-    await unlinkProvider(provider)
-  } catch {
-    /* error handled in sync.ts */
-  }
 }
 </script>
 
@@ -92,38 +82,17 @@ async function handleUnlink(provider: 'google' = 'google') {
 
         <p>{{ message }}</p>
 
-        <!-- 关联/解绑第三方快捷方式 -->
-        <div class="account-link-row">
-          <span>快捷登录绑定：</span>
-          <button
-            v-if="!hasGoogle"
-            class="oauth-mock-btn"
-            :disabled="account.busy"
-            @click="handleOAuth('google')"
-          >
-            <Link2 :size="12" /> 关联 Google 账户
+        <div class="account-actions">
+          <button class="soft-button" :disabled="account.busy || account.status === 'syncing'" @click="refreshCloud()">
+            <RefreshCw :size="14" :class="{ 'spin-active': account.status === 'syncing' }" />同步一下
           </button>
-          <button
-            v-else-if="(account.user.providers && account.user.providers.length > 1)"
-            class="oauth-mock-btn"
-            :disabled="account.busy"
-            @click="handleUnlink('google')"
-          >
-            <Unlink :size="12" /> 解绑 Google
+          <button class="soft-button" :disabled="account.busy" @click="signOut()">
+            <LogOut :size="14" />退出账户
           </button>
         </div>
       </div>
 
       <p v-if="account.error" class="account-error" role="status">{{ account.error }}</p>
-
-      <div class="account-actions">
-        <button class="soft-button" :disabled="account.busy || account.status === 'syncing'" @click="refreshCloud()">
-          <RefreshCw :size="14" />同步一下
-        </button>
-        <button class="soft-button" :disabled="account.busy" @click="signOut()">
-          <LogOut :size="14" />退出账户
-        </button>
-      </div>
     </template>
 
     <!-- 未登录：快捷社交登录与密码登录 -->
