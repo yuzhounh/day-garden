@@ -1,31 +1,129 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Sun, Moon, Settings2, MapPin, ChevronDown, Sprout, Check, Cloud, UserRound } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import {
+  Sun,
+  Moon,
+  Settings2,
+  MapPin,
+  ChevronDown,
+  Sprout,
+  Check,
+  Cloud,
+  UserRound,
+  Search,
+  X,
+  Loader2,
+} from 'lucide-vue-next'
 import { getTodayCalendarInfo } from '../services/calendar'
-import { DEFAULT_CITIES } from '../services/weather'
+import {
+  DEFAULT_CITIES,
+  getRecentCities,
+  saveRecentCity,
+  searchCities,
+} from '../services/weather'
 import type { CityOption } from '../types'
 import { account } from '../services/sync'
 
 const props = defineProps<{ selectedCity: CityOption; theme: 'light' | 'dark' | 'auto' }>()
 const emit = defineEmits<{ 'update:city': [city: CityOption]; 'toggle-theme': []; 'open-settings': []; 'open-account': [] }>()
+
 const now = ref(new Date())
 const calendar = computed(() => getTodayCalendarInfo(now.value))
 const time = computed(() => now.value.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }))
 const greeting = computed(() => {
   const hour = now.value.getHours()
-  return hour < 6 ? '夜深了，给自己一点安静。' : hour < 11 ? '早安，让美好慢慢发生。' : hour < 14 ? '午安，留一点时间给自己。' : hour < 18 ? '下午好，日子正在发光。' : '晚上好，把日子过成诗。'
+  return hour < 6
+    ? '夜深了，给自己一点安静。'
+    : hour < 11
+    ? '早安，让美好慢慢发生。'
+    : hour < 14
+    ? '午安，留一点时间给自己。'
+    : hour < 18
+    ? '下午好，日子正在发光。'
+    : '晚上好，把日子过成诗。'
 })
+
 const isDark = computed(() => props.theme === 'dark' || (props.theme === 'auto' && systemDark.value))
 const systemDark = ref(false)
+
 const showCities = ref(false)
 const cityMenu = ref<HTMLElement | null>(null)
+const searchInputRef = ref<HTMLInputElement | null>(null)
+const searchQuery = ref('')
+const searchResults = ref<CityOption[]>([])
+const searchLoading = ref(false)
+const recentCities = ref<CityOption[]>(getRecentCities())
+let searchTimer: number | undefined
 let timer: number | undefined
-function closeCities(event: MouseEvent) {
-  if (!cityMenu.value?.contains(event.target as Node)) showCities.value = false
+
+function toggleCities() {
+  showCities.value = !showCities.value
+  if (showCities.value) {
+    recentCities.value = getRecentCities()
+    nextTick(() => {
+      searchInputRef.value?.focus()
+    })
+  } else {
+    clearSearch()
+  }
 }
-function onKey(event: KeyboardEvent) { if (event.key === 'Escape') showCities.value = false }
-function selectCity(city: CityOption) { emit('update:city', city); showCities.value = false }
-function updateSystem(event: MediaQueryListEvent) { systemDark.value = event.matches }
+
+function closeCities(event: MouseEvent) {
+  if (!cityMenu.value?.contains(event.target as Node)) {
+    showCities.value = false
+    clearSearch()
+  }
+}
+
+function onKey(event: KeyboardEvent) {
+  if (event.key === 'Escape') {
+    showCities.value = false
+    clearSearch()
+  }
+}
+
+function onSearchInput() {
+  const q = searchQuery.value.trim()
+  if (!q) {
+    searchResults.value = []
+    searchLoading.value = false
+    return
+  }
+  clearTimeout(searchTimer)
+  searchLoading.value = true
+  searchTimer = window.setTimeout(async () => {
+    try {
+      searchResults.value = await searchCities(q)
+    } finally {
+      searchLoading.value = false
+    }
+  }, 200)
+}
+
+function onSearchEnter() {
+  if (searchResults.value.length > 0) {
+    selectCity(searchResults.value[0]!)
+  }
+}
+
+function clearSearch() {
+  searchQuery.value = ''
+  searchResults.value = []
+  searchLoading.value = false
+}
+
+function selectCity(city: CityOption) {
+  saveRecentCity(city)
+  recentCities.value = getRecentCities()
+  emit('update:city', city)
+  showCities.value = false
+  clearSearch()
+}
+
+function updateSystem(event: MediaQueryListEvent) {
+  systemDark.value = event.matches
+}
+
 onMounted(() => {
   const query = window.matchMedia('(prefers-color-scheme: dark)')
   systemDark.value = query.matches
@@ -34,8 +132,10 @@ onMounted(() => {
   document.addEventListener('click', closeCities)
   document.addEventListener('keydown', onKey)
 })
+
 onUnmounted(() => {
   clearInterval(timer)
+  clearTimeout(searchTimer)
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', updateSystem)
   document.removeEventListener('click', closeCities)
   document.removeEventListener('keydown', onKey)
@@ -49,25 +149,148 @@ onUnmounted(() => {
         <span class="brand-symbol"><Sprout :size="23" :stroke-width="1.5" /></span>
         <span>Day Garden<small>日 常 花 园</small></span>
       </a>
+
       <div class="header-actions">
+        <!-- 城市选择及搜索入口 -->
         <div ref="cityMenu" class="city-control">
-          <button class="toolbar-button" :aria-expanded="showCities" aria-controls="city-options" @click="showCities = !showCities">
-            <MapPin :size="14" /><span>{{ selectedCity.name }}</span><ChevronDown :size="12" />
+          <button
+            class="toolbar-button"
+            :aria-expanded="showCities"
+            aria-controls="city-options"
+            aria-label="选择或搜索城市"
+            @click="toggleCities"
+          >
+            <MapPin :size="14" />
+            <span>{{ selectedCity.name }}</span>
+            <ChevronDown :size="12" />
           </button>
-          <div v-if="showCities" id="city-options" class="city-menu glass-panel">
-            <p class="eyebrow">选择你的城市</p>
-            <button v-for="city in DEFAULT_CITIES" :key="city.name" :aria-pressed="city.name === selectedCity.name" @click="selectCity(city)">
-              <span>{{ city.name }}<small>{{ city.province }}</small></span><Check v-if="city.name === selectedCity.name" :size="14" />
-            </button>
+
+          <!-- 城市搜索与快捷选择面板 -->
+          <div v-if="showCities" id="city-options" class="city-menu glass-panel" @click.stop>
+            <div class="city-search-box">
+              <Search :size="14" class="search-icon" />
+              <input
+                ref="searchInputRef"
+                v-model="searchQuery"
+                type="text"
+                placeholder="搜索任意城市（如：苏州、三亚、青岛…）"
+                class="city-search-input"
+                @input="onSearchInput"
+                @keydown.enter="onSearchEnter"
+              />
+              <button
+                v-if="searchQuery"
+                class="clear-search-btn"
+                type="button"
+                aria-label="清空输入"
+                @click="clearSearch"
+              >
+                <X :size="13" />
+              </button>
+            </div>
+
+            <!-- 搜索结果模式 -->
+            <div v-if="searchQuery.trim()" class="city-scroll-body">
+              <div v-if="searchLoading" class="city-loading-hint">
+                <Loader2 :size="14" class="animate-spin" />
+                <span>正在寻找城市定位…</span>
+              </div>
+              <template v-else-if="searchResults.length">
+                <p class="city-section-title">搜索结果 ({{ searchResults.length }})</p>
+                <div class="city-result-list">
+                  <button
+                    v-for="city in searchResults"
+                    :key="city.name + '_' + city.lat"
+                    type="button"
+                    :aria-pressed="city.name === selectedCity.name"
+                    class="city-result-item"
+                    @click="selectCity(city)"
+                  >
+                    <span>
+                      <strong>{{ city.name }}</strong>
+                      <small>{{ city.province }}</small>
+                    </span>
+                    <Check v-if="city.name === selectedCity.name" :size="14" />
+                  </button>
+                </div>
+              </template>
+              <div v-else class="city-empty-hint">
+                未找到匹配城市。可尝试输入汉字、地名或拼音。
+              </div>
+            </div>
+
+            <!-- 默认分类模式（最近使用 + 常用热门城市） -->
+            <div v-else class="city-scroll-body">
+              <div v-if="recentCities.length" class="city-section">
+                <p class="city-section-title">最近使用</p>
+                <div class="city-pills-wrap">
+                  <button
+                    v-for="city in recentCities"
+                    :key="'rec-' + city.name"
+                    type="button"
+                    class="city-pill-btn"
+                    :class="{ active: city.name === selectedCity.name }"
+                    @click="selectCity(city)"
+                  >
+                    {{ city.name }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="city-section">
+                <p class="city-section-title">常用热门城市</p>
+                <div class="city-pills-wrap">
+                  <button
+                    v-for="city in DEFAULT_CITIES"
+                    :key="city.name"
+                    type="button"
+                    class="city-pill-btn"
+                    :class="{ active: city.name === selectedCity.name }"
+                    @click="selectCity(city)"
+                  >
+                    {{ city.name }}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
         <span class="live-clock">{{ time }}</span>
         <span class="toolbar-divider"></span>
-        <button class="toolbar-button account-button" aria-label="账户与云端同步" @click="emit('open-account')"><Cloud v-if="account.user" :size="15" /><UserRound v-else :size="15" /><span>{{ account.user ? account.status === 'synced' ? '已同步' : '本机已保存' : '我的花园' }}</span></button>
-        <button class="icon-button" :aria-label="isDark ? '切换浅色模式' : '切换深色模式'" @click="emit('toggle-theme')"><Sun v-if="isDark" :size="17" /><Moon v-else :size="17" /></button>
-        <button class="icon-button" aria-label="设置与个性化" @click="emit('open-settings')"><Settings2 :size="17" /></button>
+
+        <!-- 账户同步按钮 -->
+        <button
+          class="toolbar-button account-button"
+          aria-label="账户与云端同步"
+          @click="emit('open-account')"
+        >
+          <Cloud v-if="account.user" :size="15" />
+          <UserRound v-else :size="15" />
+          <span>{{ account.user ? account.status === 'synced' ? '已同步' : '本机已保存' : '我的花园' }}</span>
+        </button>
+
+        <!-- 主题切换 -->
+        <button
+          class="icon-button"
+          :aria-label="isDark ? '切换浅色模式' : '切换深色模式'"
+          @click="emit('toggle-theme')"
+        >
+          <Sun v-if="isDark" :size="17" />
+          <Moon v-else :size="17" />
+        </button>
+
+        <!-- 设置入口 -->
+        <button
+          class="icon-button"
+          aria-label="设置与个性化"
+          @click="emit('open-settings')"
+        >
+          <Settings2 :size="17" />
+        </button>
       </div>
     </div>
+
     <div class="hero-intro">
       <div class="hero-copy">
         <p class="eyebrow"><span class="status-dot"></span> A LITTLE SPACE FOR EVERYDAY LIFE</p>
@@ -75,7 +298,8 @@ onUnmounted(() => {
         <p class="hero-description">感受四时流转，照顾日常，也收藏一点诗意。</p>
         <div class="season-note"><Sprout :size="14" /><span>{{ calendar.termSummary }}</span></div>
       </div>
-      <div class="date-card glass-panel">
+
+      <div class="date-card glass-panel" aria-label="今日日期">
         <span>{{ now.getFullYear() }} / {{ String(now.getMonth() + 1).padStart(2, '0') }}</span>
         <strong>{{ String(now.getDate()).padStart(2, '0') }}</strong>
         <span>{{ calendar.dayOfWeek }}</span>
