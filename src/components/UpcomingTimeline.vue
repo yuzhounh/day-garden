@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Cake, Gift, Heart, Plus, ArrowUpRight } from 'lucide-vue-next'
+import { Cake, Gift, Heart, Plus, BookOpen } from 'lucide-vue-next'
 import type { LifeEvent } from '../types'
 defineProps<{ events: LifeEvent[] }>()
 const emit = defineEmits<{ 'add-event': [] }>()
@@ -11,6 +11,7 @@ const emit = defineEmits<{ 'add-event': [] }>()
       <div class="section-label">
         <span class="icon-tile sky"><Heart :size="17" /></span>
         <h2>纪念日与重要日子</h2>
+        <span class="eyebrow">MILESTONES</span>
       </div>
       <button class="icon-button small" aria-label="添加纪念日" @click="emit('add-event')">
         <Plus :size="16" />
@@ -41,10 +42,10 @@ const emit = defineEmits<{ 'add-event': [] }>()
       </div>
     </div>
     <footer class="card-footer">
-      <span class="muted">未来 30 天 · {{ events.length }} 个日子</span>
       <button class="text-button" @click="emit('add-event')">
-        管理纪念日<ArrowUpRight :size="14" />
+        <BookOpen :size="14" />管理纪念日
       </button>
+      <span class="muted">未来 30 天 · {{ events.length }} 个日子</span>
     </footer>
   </article>
 </template>

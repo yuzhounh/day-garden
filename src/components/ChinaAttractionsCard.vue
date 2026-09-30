@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { MapPin, Compass, CheckCircle2, Heart, ArrowUpRight, Search, Sparkles, RotateCw } from 'lucide-vue-next'
+import { MapPin, Compass, CheckCircle2, Heart, ArrowUpRight, Search, Sparkles, RefreshCw, BookOpen } from 'lucide-vue-next'
 import type { ChinaAttraction, AttractionStatusType } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawAttractions from '../data/china-attractions.json'
@@ -95,12 +95,12 @@ const filteredList = computed(() => {
         <span class="eyebrow">MUST-VISIT CHINA</span>
       </div>
       <button
-        class="refresh-icon-btn"
+        class="icon-button small"
+        aria-label="换一批胜景推荐"
         title="换一批胜景推荐"
         @click="refreshPreview"
       >
-        <RotateCw :size="12" :class="{ 'spin-active': isRefreshing }" />
-        <span>换一批</span>
+        <RefreshCw :size="14" :class="{ 'spin-active': isRefreshing }" />
       </button>
     </header>
 
@@ -153,10 +153,15 @@ const filteredList = computed(() => {
     </div>
 
     <footer class="card-footer">
-      <span class="footer-hint"><Sparkles :size="12" />山河辽阔，步履不停</span>
       <button class="text-button" @click="showModal = true">
-        探索更多胜景<ArrowUpRight :size="14" />
+        <BookOpen :size="14" />华夏胜景库
       </button>
+      <div class="inline-actions">
+        <span class="footer-hint"><Sparkles :size="12" />山河漫游</span>
+        <button class="text-button" @click="showModal = true">
+          足迹探索<ArrowUpRight :size="14" />
+        </button>
+      </div>
     </footer>
 
     <!-- 全量景点足迹探索弹窗 -->

@@ -15,7 +15,7 @@ import HealthTipBar from './components/HealthTipBar.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import AccountModal from './components/AccountModal.vue'
 import { initializeSync, refreshCloud, account, syncCustomEvents } from './services/sync'
-import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide, LifeEvent, InspirationalQuote, AttractionStatusType, SportExercise } from './types'
+import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide, LifeEvent, InspirationalQuote, AttractionStatusType, SportExercise, SeasonBloom } from './types'
 import { fetch7DayWeather } from './services/weather'
 import { getUpcomingEvents, sendDesktopNotification } from './services/calendar'
 import { loadUserPreferences, saveUserPreferences, getTodaySeasonBloom, getTodayEvidenceGuide, getTodayPoetry, getTodayHealthTip, getTodayQuote, getTodaySportExercise } from './services/storage'
@@ -25,6 +25,7 @@ import rawHealthTips from './data/health-tips.json'
 import rawEvidence from './data/evidence-guide.json'
 import rawQuotes from './data/inspirational-quotes.json'
 import rawSports from './data/sports-exercise.json'
+import rawSeasons from './data/seasons-bloom.json'
 
 const prefs = ref<UserPreferences>(loadUserPreferences(account.user?.id))
 
@@ -102,6 +103,11 @@ function handleNextQuote() {
 function handleNextSport() {
   const list = rawSports as SportExercise[]
   currentSport.value = list[(list.findIndex(s => s.id === currentSport.value.id) + 1) % list.length]
+}
+function handleNextBloom() {
+  const list = rawSeasons as SeasonBloom[]
+  const currentIdx = list.findIndex(b => b.name === seasonBloom.value.name)
+  seasonBloom.value = list[(currentIdx + 1) % list.length]
 }
 function handleUpdateAttractionStatus(newMap: Record<string, AttractionStatusType>) {
   prefs.value = {
@@ -193,11 +199,14 @@ onUnmounted(() => {
           <SeasonalCard
             v-if="prefs.modules.seasonal"
             :bloom="seasonBloom"
+            @next-bloom="handleNextBloom"
+            @select-bloom="seasonBloom = $event"
           />
           <EvidenceCard
             v-if="prefs.modules.evidence"
             :guide="evidenceGuide"
             @next-guide="handleNextGuide"
+            @select-guide="evidenceGuide = $event"
           />
           <ChinaAttractionsCard
             v-if="prefs.modules.chinaAttractions ?? true"
@@ -213,7 +222,13 @@ onUnmounted(() => {
         </section>
 
         <!-- 最下面：好好照顾自己卡片（全宽） -->
-        <HealthTipBar v-if="prefs.modules.healthTip" :tip="currentHealthTip" :date-key="dateKey" @next-tip="handleNextTip" />
+        <HealthTipBar
+          v-if="prefs.modules.healthTip"
+          :tip="currentHealthTip"
+          :date-key="dateKey"
+          @next-tip="handleNextTip"
+          @select-tip="currentHealthTip = $event"
+        />
         <div v-if="!Object.values(prefs.modules).some(Boolean)" class="glass-panel empty-dashboard"><Sprout :size="32" /><h2>花园留白，随你安排。</h2><button class="soft-button" @click="openSettings()">选择想看的内容</button></div>
       </main>
       <footer class="garden-footer"><span><Sprout :size="13" />Day Garden · 今日花园</span><p>心有闲田，日有花开。</p><button class="text-button" @click="openSettings()">布置我的花园</button></footer>

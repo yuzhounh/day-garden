@@ -224,6 +224,7 @@ function selectCell(cell: CalendarCell) {
       <div class="section-label">
         <span class="icon-tile sage"><CalendarDays :size="17" /></span>
         <h2>{{ currentYear }} 年 {{ currentMonth }} 月</h2>
+        <span class="eyebrow">CALENDAR</span>
         <span v-if="isCurrentViewToday" class="current-month-badge">本月</span>
       </div>
       <div class="cal-controls">

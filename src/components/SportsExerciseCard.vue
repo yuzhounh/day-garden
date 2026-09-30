@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Activity, Flame, ArrowUpRight, Search, RotateCw, ShieldCheck, HeartPulse, Sparkles } from 'lucide-vue-next'
+import { Activity, Flame, ArrowUpRight, Search, RefreshCw, ShieldCheck, HeartPulse, Sparkles, BookOpen } from 'lucide-vue-next'
 import type { SportExercise } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawSports from '../data/sports-exercise.json'
@@ -15,6 +15,7 @@ const emit = defineEmits<{
 }>()
 
 const showModal = ref(false)
+const showDetail = ref(false)
 const searchQuery = ref('')
 const filterCategory = ref('全部')
 const isRotating = ref(false)
@@ -75,12 +76,12 @@ function getIntensityColor(intensity: string) {
         <span class="eyebrow">SPORTS & EXERCISE</span>
       </div>
       <button
-        class="refresh-icon-btn"
+        class="icon-button small"
+        aria-label="换一项运动"
         title="换一项运动"
         @click="handleRefresh"
       >
-        <RotateCw :size="12" :class="{ 'spin-active': isRotating }" />
-        <span>换一项</span>
+        <RefreshCw :size="14" :class="{ 'spin-active': isRotating }" />
       </button>
     </header>
 
@@ -105,7 +106,7 @@ function getIntensityColor(intensity: string) {
           :key="idx"
           class="benefit-pill"
         >
-          <ShieldCheck :size="12" class="text-emerald-500 shrink-0" />
+          <ShieldCheck :size="13" class="text-emerald-500 shrink-0" />
           <span>{{ benefit }}</span>
         </span>
       </div>
@@ -113,7 +114,7 @@ function getIntensityColor(intensity: string) {
       <!-- 循证科学解析 -->
       <div class="sport-insight-box">
         <p class="sport-insight-text">
-          <HeartPulse :size="13" class="text-rose-500 shrink-0 inline-block mr-1" />
+          <HeartPulse :size="14" class="text-rose-500 shrink-0 inline-block mr-1" />
           <span>{{ sport.evidenceInsight }}</span>
         </p>
       </div>
@@ -134,10 +135,15 @@ function getIntensityColor(intensity: string) {
     </div>
 
     <footer class="card-footer">
-      <span class="footer-hint"><Sparkles :size="12" />运动是给生命最廉价的长寿药</span>
       <button class="text-button" @click="showModal = true">
-        运动项目库<ArrowUpRight :size="14" />
+        <BookOpen :size="14" />运动项目库
       </button>
+      <div class="inline-actions">
+        <span class="footer-hint"><Sparkles :size="12" />科学运动</span>
+        <button class="text-button" @click="showDetail = true">
+          动作详解<ArrowUpRight :size="14" />
+        </button>
+      </div>
     </footer>
 
     <!-- 全量运动项目库弹窗 -->
@@ -221,6 +227,47 @@ function getIntensityColor(intensity: string) {
         </p>
       </div>
     </DetailModal>
+
+    <!-- 单个运动项目动作详解弹窗 -->
+    <DetailModal
+      v-if="showDetail"
+      :title="sport.name + ' · 动作与身心益处详解'"
+      :subtitle="sport.category + ' · ' + sport.intensity"
+      @close="showDetail = false"
+    >
+      <div class="modal-sport-title-group mb-3">
+        <span class="pill sage">{{ sport.category }}</span>
+        <span class="pill" :class="getIntensityColor(sport.intensity)">{{ sport.intensity }}</span>
+        <span class="sport-cal-pill"><Flame :size="12" class="text-orange-500" />约 {{ sport.caloriesPerHour }} kcal/h</span>
+      </div>
+
+      <div class="reading-note">
+        <span class="eyebrow">循证生理益处</span>
+        <p>{{ sport.evidenceInsight }}</p>
+      </div>
+
+      <div class="space-y-2 mb-4">
+        <h4 class="font-semibold text-sm text-slate-800 dark:text-slate-200">核心健康益处</h4>
+        <div class="flex flex-wrap gap-2">
+          <span v-for="(b, bi) in sport.benefits" :key="bi" class="modal-benefit-badge">
+            ✓ {{ b }}
+          </span>
+        </div>
+      </div>
+
+      <div class="space-y-2 mb-4">
+        <h4 class="font-semibold text-sm text-slate-800 dark:text-slate-200">主要锻炼肌群</h4>
+        <div class="flex flex-wrap gap-1.5">
+          <span v-for="m in sport.targetMuscles" :key="m" class="muscle-tag">
+            {{ m }}
+          </span>
+        </div>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
+        <strong>💡 运动小建议：</strong>{{ sport.tips }}
+      </div>
+    </DetailModal>
   </article>
 </template>
 
@@ -257,9 +304,9 @@ function getIntensityColor(intensity: string) {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 8px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   background: rgba(249, 115, 22, 0.08);
   color: #ea580c;
@@ -274,47 +321,49 @@ function getIntensityColor(intensity: string) {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 8px;
+  padding: 4px 9px;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 12px;
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--ink);
 }
 .sport-insight-box {
-  padding: 8px 11px;
+  padding: 9px 12px;
   border-radius: 10px;
   background: rgba(16, 185, 129, 0.05);
   border: 1px solid rgba(16, 185, 129, 0.15);
 }
 .sport-insight-text {
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 13.5px;
+  line-height: 1.6;
   color: var(--ink);
 }
 .sport-muscles-row {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12.5px;
   flex-wrap: wrap;
 }
 .muscles-label {
   color: var(--muted);
   flex-shrink: 0;
+  font-size: 12.5px;
+  font-weight: 500;
 }
 .muscle-tags-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 5px;
 }
 .muscle-tag {
-  padding: 1px 6px;
-  border-radius: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
   background: var(--surface);
   border: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 10.5px;
+  color: var(--secondary);
+  font-size: 12px;
 }
 .sports-modal-list {
   display: flex;
@@ -359,10 +408,10 @@ function getIntensityColor(intensity: string) {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  font-size: 10.5px;
+  font-size: 11.5px;
   color: #ea580c;
   background: rgba(249, 115, 22, 0.08);
-  padding: 1px 7px;
+  padding: 2px 8px;
   border-radius: 6px;
 }
 .modal-sport-benefits {
@@ -372,15 +421,15 @@ function getIntensityColor(intensity: string) {
   margin-bottom: 8px;
 }
 .modal-benefit-badge {
-  font-size: 11px;
+  font-size: 12px;
   color: #059669;
   background: rgba(16, 185, 129, 0.08);
-  padding: 2px 7px;
+  padding: 3px 8px;
   border-radius: 6px;
 }
 .modal-sport-insight {
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 13.5px;
+  line-height: 1.6;
   color: var(--ink);
   margin-bottom: 8px;
 }
@@ -388,7 +437,7 @@ function getIntensityColor(intensity: string) {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 11px;
+  font-size: 12.5px;
   padding-top: 6px;
   border-top: 1px dashed var(--line);
 }
