@@ -31,10 +31,6 @@ const wishlistCount = computed(() => {
   return attractions.filter(a => currentStatusMap.value[a.id] === 'wishlist').length
 })
 
-const progressPercent = computed(() => {
-  if (attractions.length === 0) return 0
-  return Math.round((visitedCount.value / attractions.length) * 100)
-})
 
 // 首页卡片展示的 3 个推荐景点（支持点击换一批轮换）
 const todayFeaturedIndex = computed(() => {
@@ -108,7 +104,7 @@ const filteredList = computed(() => {
       </button>
     </header>
 
-    <!-- 足迹进度概览 -->
+    <!-- 足迹概览 -->
     <div class="attraction-stats-bar">
       <div class="stats-pills">
         <span class="stat-pill visited">
@@ -118,12 +114,7 @@ const filteredList = computed(() => {
           <Heart :size="13" />想去 <strong>{{ wishlistCount }}</strong>
         </span>
       </div>
-      <div class="progress-track-wrapper">
-        <div class="progress-track" :title="'华夏足迹点亮率：' + progressPercent + '%'">
-          <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
-        </div>
-        <span class="progress-percent-label">{{ progressPercent }}% 足迹</span>
-      </div>
+      <span class="stats-whisper">随心漫游 · 步履所至皆风景</span>
     </div>
 
     <!-- 今日精选景点列表 -->
@@ -164,7 +155,7 @@ const filteredList = computed(() => {
     <footer class="card-footer">
       <span class="footer-hint"><Sparkles :size="12" />山河辽阔，步履不停</span>
       <button class="text-button" @click="showModal = true">
-        点亮更多足迹 (共 {{ attractions.length }} 景)<ArrowUpRight :size="14" />
+        探索更多胜景<ArrowUpRight :size="14" />
       </button>
     </footer>
 
@@ -172,7 +163,7 @@ const filteredList = computed(() => {
     <DetailModal
       v-if="showModal"
       title="中国最值得去的旅游胜景"
-      :subtitle="'收录 ' + attractions.length + ' 处华夏名山大川与文化圣地 · 记录你的旅行足迹'"
+      subtitle="华夏名山大川与文化圣地 · 随心记录足迹与心愿"
       @close="showModal = false"
     >
       <!-- 搜索与状态 Tab -->
@@ -189,7 +180,7 @@ const filteredList = computed(() => {
       </div>
 
       <div class="filter-pills">
-        <button :class="{ active: filterTab === 'all' }" @click="filterTab = 'all'">全部 ({{ attractions.length }})</button>
+        <button :class="{ active: filterTab === 'all' }" @click="filterTab = 'all'">全部</button>
         <button :class="{ active: filterTab === 'visited' }" @click="filterTab = 'visited'">已去过 ({{ visitedCount }})</button>
         <button :class="{ active: filterTab === 'wishlist' }" @click="filterTab = 'wishlist'">想去 ({{ wishlistCount }})</button>
       </div>

@@ -136,7 +136,7 @@ function getIntensityColor(intensity: string) {
     <footer class="card-footer">
       <span class="footer-hint"><Sparkles :size="12" />运动是给生命最廉价的长寿药</span>
       <button class="text-button" @click="showModal = true">
-        运动项目库 (共 {{ allSports.length }} 项)<ArrowUpRight :size="14" />
+        运动项目库<ArrowUpRight :size="14" />
       </button>
     </footer>
 
@@ -144,7 +144,7 @@ function getIntensityColor(intensity: string) {
     <DetailModal
       v-if="showModal"
       title="运动项目与健康益处大观"
-      :subtitle="'收录 ' + allSports.length + ' 种运动健身项目 · 循证运动科学对身心的深度滋养'"
+      subtitle="运动健身与身心滋养大观 · 感受身体舒展的生命力"
       @close="showModal = false"
     >
       <!-- 搜索框 -->

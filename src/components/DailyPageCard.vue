@@ -51,7 +51,7 @@ function selectPoem(poem: CuratedPoetry) { emit('select-poetry', poem); showLibr
       <div class="reading-note"><span class="eyebrow">读诗随想</span><p>{{ poetry.reading || poetry.mood }}</p></div>
       <button class="soft-button" :aria-pressed="isSaved" @click="toggleSave()"><Bookmark :size="15" />{{ isSaved ? '已收藏 · 点击取消' : '收藏这首诗' }}</button>
     </DetailModal>
-    <DetailModal v-if="showLibrary" title="把诗意，留在日常" :subtitle="poems.length + ' 篇古典诗词 · 随四季与心境慢慢读'" @close="showLibrary = false">
+    <DetailModal v-if="showLibrary" title="把诗意，留在日常" subtitle="古典诗词典藏 · 随四季与心境慢慢读" @close="showLibrary = false">
       <div class="filter-pills"><button v-for="season in ['全部', '春', '夏', '秋', '冬', '豁达励志', '收藏']" :key="season" :class="{ active: filter === season }" :aria-pressed="filter === season" @click="filter = season">{{ season }}</button></div>
       <div class="poem-list"><button v-for="poem in filteredPoems" :key="poem.id" @click="selectPoem(poem)"><span><strong>{{ poem.title }}</strong><small>{{ poem.author }} · {{ poem.dynasty }}</small><p>{{ poem.quote }}</p></span><ArrowUpRight :size="16" /></button><p v-if="!filteredPoems.length" class="empty-state">还没有收藏。遇见喜欢的诗，点一下书签留下它。</p></div>
     </DetailModal>
