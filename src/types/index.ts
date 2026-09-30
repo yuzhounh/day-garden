@@ -92,3 +92,17 @@ export interface UserPreferences {
   customEvents: LifeEvent[]
   notificationEnabled: boolean
 }
+
+export interface User {
+  id: string
+  username: string
+  displayName?: string
+  avatarUrl?: string
+  providers?: string[]
+}
+
+export interface AuthProvidersConfig {
+  google: boolean
+  github: boolean
+}
+

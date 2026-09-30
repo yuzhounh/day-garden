@@ -18,7 +18,10 @@
 
 首次登录可选择合并本机未登录时的收藏与打卡。每个账户的本地缓存与未登录数据分开存储。修改以单项操作上传，避免整份记录覆盖其他设备的数据。同一项并发修改按服务器最后收到的操作生效。
 
-当前账户是轻量版本：不提供邮件找回密码、密码修改或账户删除界面。请保存用户名和密码。城市、自定义日程和其他偏好仍仅保存在本机。账户面板可导出收藏与打卡 JSON，偏好面板可另外导出偏好与日程。
+当前账户支持两种登录方式：
+- **快捷社交登录**：支持 Google 登录与 GitHub 登录，授权成功后自动同步资料、头像与云端数据，并可在账户面板一键解除绑定或关联其他登录方式。
+- **轻量独立密码**：支持传统的 3—32 位用户名与密码登录；不提供邮件找回密码，请使用密码管理器妥善保存。
+城市、自定义日程和其他偏好仍保存在本机。账户面板可随时导出收藏与打卡 JSON。
 
 ## 本地开发
 
@@ -26,6 +29,7 @@
 npm ci
 npm run db:local
 # 创建不入库的 .dev.vars，设置 PASSWORD_PEPPER 为随机字符串
+# 如需本地调试真实第三方登录，可在 .dev.vars 中设置 GOOGLE_CLIENT_ID / GITHUB_CLIENT_ID
 npm run build      # 生成网页及 Pages Functions 的 _worker.js
 npm run dev:cloud  # Pages + 本地 D1，端口 8787
 npm run dev        # Vue 开发页，端口 5180，/api 代理到 Pages
@@ -36,7 +40,7 @@ npm run build
 node tests/api.mjs  # 需本地 Pages 在 8787 运行；仅写入本地测试数据库
 ```
 
-## Cloudflare
+## Cloudflare 部署与 OAuth 配置
 
 - 线上地址：[Day Garden](https://day-garden.pages.dev/)
 - Pages 项目：`day-garden`，生产分支 `main`
@@ -51,6 +55,28 @@ npm run db:remote
 npm run deploy
 npx wrangler pages secret put PASSWORD_PEPPER --project-name day-garden
 ```
+
+### 配置 Google 登录 (OAuth 2.0)
+1. 在 [Google Cloud Console](https://console.cloud.google.com/apis/credentials) 创建 OAuth 2.0 客户端 ID（Web 应用）。
+2. 在已获授权的重定向 URI 中填入：
+   - 线上：`https://day-garden.pages.dev/api/auth/google/callback`
+   - 本地：`http://127.0.0.1:8787/api/auth/google/callback` 及 `http://localhost:5180/api/auth/google/callback`
+3. 设置 Cloudflare Pages 密钥：
+   ```powershell
+   npx wrangler pages secret put GOOGLE_CLIENT_ID --project-name day-garden
+   npx wrangler pages secret put GOOGLE_CLIENT_SECRET --project-name day-garden
+   ```
+
+### 配置 GitHub 登录 (OAuth Apps)
+1. 在 [GitHub Developer Settings](https://github.com/settings/developers) 创建 OAuth App。
+2. 填写 Authorization callback URL：
+   - 线上：`https://day-garden.pages.dev/api/auth/github/callback`
+   - 本地：`http://127.0.0.1:8787/api/auth/github/callback`
+3. 设置 Cloudflare Pages 密钥：
+   ```powershell
+   npx wrangler pages secret put GITHUB_CLIENT_ID --project-name day-garden
+   npx wrangler pages secret put GITHUB_CLIENT_SECRET --project-name day-garden
+   ```
 
 生产环境的 PASSWORD_PEPPER 必须保持稳定；丢失或更改会让现有账户无法验证密码。不要提交密钥或本地 D1 文件。
 

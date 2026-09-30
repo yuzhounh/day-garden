@@ -7,7 +7,7 @@ const password = randomBytes(20).toString('hex')
 let checks = 0
 async function request(path, { method = 'GET', data, cookie, origin = base } = {}) {
   const response = await fetch(base + path, { method, headers: { Origin: origin, ...(data ? { 'Content-Type': 'application/json' } : {}), ...(cookie ? { Cookie: cookie } : {}) }, body: data ? JSON.stringify(data) : undefined })
-  const value = await response.json()
+  const value = response.headers.get('content-type')?.includes('application/json') ? await response.json() : await response.text()
   return { status: response.status, value, cookie: response.headers.get('set-cookie')?.split(';')[0], headers: response.headers }
 }
 function check(value, description) { assert.ok(value, description); checks++ }
@@ -19,11 +19,11 @@ const first = await request('/api/register', { method: 'POST', data: { username:
 check(first.status === 200 && first.cookie && first.value.user.id, 'Registration creates a session')
 check(first.headers.get('set-cookie').includes('HttpOnly') && first.headers.get('set-cookie').includes('SameSite=Strict'), 'Session cookies have security flags')
 const cookie = first.cookie
-check((await request('/api/poetry/du-qiuxi', { method: 'PUT', cookie })).status === 200, 'Poetry can be saved')
+check((await request('/api/poetry/dumu-shanxing', { method: 'PUT', cookie })).status === 200, 'Poetry can be saved')
 check((await request('/api/habits/2026-09-30/move', { method: 'PUT', cookie })).status === 200, 'Daily habit can be saved')
 check((await request('/api/habits/2026-09-30/move', { method: 'PUT', cookie })).status === 200, 'Repeated writes are idempotent')
 let state = await request('/api/state', { cookie })
-check(state.value.savedPoetry.includes('du-qiuxi') && state.value.dailyActions['2026-09-30'].length === 1, 'Saved state is persistent and deduplicated')
+check(state.value.savedPoetry.includes('dumu-shanxing') && state.value.dailyActions['2026-09-30'].length === 1, 'Saved state is persistent and deduplicated')
 check((await request('/api/habits/2026-02-30/move', { method: 'PUT', cookie })).status === 400, 'Invalid calendar dates are rejected')
 check((await request('/api/poetry/nonexistent', { method: 'PUT', cookie })).status === 400, 'Unknown poem IDs are rejected')
 const second = await request('/api/register', { method: 'POST', data: { username: 'test_b_' + suffix, password } })
@@ -35,8 +35,8 @@ check(badPassword.status === 401, 'Wrong passwords are rejected')
 const login = await request('/api/login', { method: 'POST', data: { username: 'test_a_' + suffix, password } })
 check(login.status === 200, 'The same account can sign in with a new session')
 state = await request('/api/state', { cookie: login.cookie })
-check(state.value.savedPoetry.includes('du-qiuxi'), 'A new session retrieves existing saved data')
-check((await request('/api/poetry/du-qiuxi', { method: 'DELETE', cookie: login.cookie })).status === 200, 'A saved poem can be removed')
+check(state.value.savedPoetry.includes('dumu-shanxing'), 'A new session retrieves existing saved data')
+check((await request('/api/poetry/dumu-shanxing', { method: 'DELETE', cookie: login.cookie })).status === 200, 'A saved poem can be removed')
 check((await request('/api/habits/2026-09-30/move', { method: 'DELETE', cookie: login.cookie })).status === 200, 'A habit completion can be undone')
 state = await request('/api/state', { cookie: login.cookie })
 check(state.value.savedPoetry.length === 0 && !state.value.dailyActions['2026-09-30'], 'Deleted state remains deleted')
@@ -49,4 +49,22 @@ for (let i = 0; i < 11; i++) {
   if (attempt.status === 429) { rateLimited = true; break }
 }
 check(rateLimited, 'Authentication is rate limited by the shared D1 counter')
+
+// OAuth endpoints checks
+const providers = await request('/api/auth/providers')
+check(providers.status === 200 && typeof providers.value.dev === 'boolean', 'Auth providers endpoint returns configuration')
+
+// Mock Google OAuth login
+const mockGoogle = await request('/api/auth/mock', { method: 'POST', data: { provider: 'google' } })
+check(mockGoogle.status === 200 && mockGoogle.cookie, 'Google mock auth creates a session')
+const googleSession = await request('/api/session', { cookie: mockGoogle.cookie })
+check(googleSession.status === 200 && googleSession.value.user.providers.includes('google'), 'Google session contains provider tag')
+
+// Mock GitHub OAuth login
+const mockGithub = await request('/api/auth/mock', { method: 'POST', data: { provider: 'github' } })
+check(mockGithub.status === 200 && mockGithub.cookie, 'GitHub mock auth creates a session')
+const githubSession = await request('/api/session', { cookie: mockGithub.cookie })
+check(githubSession.status === 200 && githubSession.value.user.providers.includes('github'), 'GitHub session contains provider tag')
+
 console.log(checks + ' API checks passed (local D1 only).')
+

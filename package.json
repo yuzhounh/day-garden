@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc -b && tsc -p tsconfig.worker.json && vite build && esbuild worker/index.ts --bundle --format=esm --platform=browser --target=es2022 --outfile=dist/_worker.js",
     "preview": "vite preview",
-    "dev:cloud": "wrangler pages dev dist --port 8787",
+    "dev:cloud": "wrangler pages dev dist --port 8787 --ip 127.0.0.1 --show-interactive-dev-session=false",
     "db:local": "wrangler d1 migrations apply day-garden --local",
     "db:remote": "wrangler d1 migrations apply day-garden --remote",
     "deploy": "npm run build && wrangler pages deploy dist --project-name day-garden --branch main"
