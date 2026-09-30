@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Plus, Trash2, Download, Upload, Check } from 'lucide-vue-next'
+import { Plus, Trash2, Download, Upload, Check, Pencil } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
-import { requestNotificationPermission, sendDesktopNotification } from '../services/calendar'
+import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate } from '../services/calendar'
 import DetailModal from './DetailModal.vue'
 
 const props = defineProps<{
@@ -25,6 +25,94 @@ const newEventRole = ref('')
 const newEventAdvice = ref('')
 const newEventIsLunar = ref(false)
 const notificationStatus = ref<'idle' | 'success' | 'denied'>('idle')
+
+// 编辑事件表单
+const editingId = ref<string | null>(null)
+const editForm = ref<{
+  title: string
+  date: string
+  role: string
+  giftAdvice: string
+  isLunar: boolean
+}>({
+  title: '',
+  date: '',
+  role: '',
+  giftAdvice: '',
+  isLunar: false,
+})
+
+function startEdit(ev: LifeEvent) {
+  editingId.value = ev.id
+  editForm.value = {
+    title: ev.title,
+    date: ev.date,
+    role: ev.role || '',
+    giftAdvice: ev.giftAdvice || '',
+    isLunar: !!ev.isLunar,
+  }
+}
+
+function cancelEdit() {
+  editingId.value = null
+}
+
+function saveEdit(id: string) {
+  if (!editForm.value.title.trim() || !editForm.value.date.trim()) return
+
+  const updatedEvents = props.preferences.customEvents.map((ev) => {
+    if (ev.id !== id) return ev
+    return {
+      ...ev,
+      title: editForm.value.title.trim(),
+      date: editForm.value.date.trim(),
+      role: editForm.value.role.trim() || undefined,
+      giftAdvice: editForm.value.giftAdvice.trim() || undefined,
+      isLunar: editForm.value.isLunar,
+    }
+  })
+
+  emit('update:preferences', {
+    ...props.preferences,
+    customEvents: updatedEvents,
+  })
+  editingId.value = null
+}
+
+function getEventCountdown(ev: LifeEvent) {
+  try {
+    return calculateNextEventDate(ev.date, !!ev.isLunar)
+  } catch {
+    return { daysLeft: -1, nextDateStr: '' }
+  }
+}
+
+function getCountdownText(ev: LifeEvent) {
+  const { daysLeft } = getEventCountdown(ev)
+  if (daysLeft === 0) return '今天'
+  if (daysLeft === 1) return '明天'
+  if (daysLeft > 0) return `还有 ${daysLeft} 天`
+  return '已过去'
+}
+
+function getNextDateText(ev: LifeEvent) {
+  const { nextDateStr } = getEventCountdown(ev)
+  return nextDateStr
+}
+
+function getCountdownClass(ev: LifeEvent) {
+  const { daysLeft } = getEventCountdown(ev)
+  if (daysLeft === 0) {
+    return 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-bold'
+  }
+  if (daysLeft <= 7) {
+    return 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 font-semibold'
+  }
+  if (daysLeft <= 30) {
+    return 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-medium'
+  }
+  return 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+}
 
 function toggleModule(key: keyof UserPreferences['modules']) {
   const updated = {
@@ -242,26 +330,127 @@ function importData(e: Event) {
 
           <!-- Existing List -->
           <div class="space-y-2">
-            <div
-              v-for="ev in preferences.customEvents"
-              :key="ev.id"
-              class="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs"
-            >
-              <div class="truncate">
-                <div class="font-medium text-slate-800 dark:text-slate-200">
-                  {{ ev.title }} · {{ ev.date }} {{ ev.isLunar ? '(农历)' : '' }}
+            <template v-for="ev in preferences.customEvents" :key="ev.id">
+              <!-- Inline Edit Form -->
+              <div
+                v-if="editingId === ev.id"
+                class="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-2.5 text-xs transition"
+              >
+                <div class="flex items-center justify-between text-[11px] font-semibold text-emerald-800 dark:text-emerald-300">
+                  <span class="flex items-center gap-1.5">
+                    <Pencil class="w-3.5 h-3.5" />
+                    <span>编辑纪念日</span>
+                  </span>
+                  <span class="text-slate-400 font-mono text-[10px]">{{ ev.id }}</span>
                 </div>
-                <div class="text-[11px] text-slate-400 truncate">
-                  {{ ev.giftAdvice || '无备忘' }}
+                <div class="grid grid-cols-2 gap-2">
+                  <input
+                    v-model="editForm.title"
+                    type="text"
+                    placeholder="事件名 (如: 妈妈生日)"
+                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  />
+                  <input
+                    v-model="editForm.date"
+                    type="text"
+                    placeholder="YYYY-MM-DD 或 MM-DD"
+                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  />
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <input
+                    v-model="editForm.role"
+                    type="text"
+                    placeholder="角色备注 (如: 侄女 / 伴侣)"
+                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  />
+                  <input
+                    v-model="editForm.giftAdvice"
+                    type="text"
+                    placeholder="备忘/备礼建议 (如: 订蛋糕)"
+                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  />
+                </div>
+                <div class="flex items-center justify-between pt-1">
+                  <label class="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                    <input type="checkbox" v-model="editForm.isLunar" class="rounded text-emerald-600 focus:ring-emerald-500" />
+                    <span>农历日期</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button
+                      @click="cancelEdit"
+                      class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs transition"
+                    >
+                      取消
+                    </button>
+                    <button
+                      @click="saveEdit(ev.id)"
+                      class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition flex items-center gap-1 shadow-sm"
+                    >
+                      <Check class="w-3.5 h-3.5" />
+                      <span>保存</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-              <button
-                @click="removeEvent(ev.id)"
-                class="p-1 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition shrink-0 ml-2"
+
+              <!-- Normal Display Row -->
+              <div
+                v-else
+                class="group flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-xs transition"
               >
-                <Trash2 class="w-3.5 h-3.5" />
-              </button>
-            </div>
+                <!-- Title, Role, Date, Advice -->
+                <div class="truncate min-w-0 flex-1 mr-3">
+                  <div class="flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200 truncate">
+                    <span class="truncate">{{ ev.title }}</span>
+                    <span
+                      v-if="ev.role"
+                      class="px-1.5 py-0.2 text-[10px] rounded bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0 font-normal"
+                    >
+                      {{ ev.role }}
+                    </span>
+                    <span class="text-slate-400 font-normal shrink-0">· {{ ev.date }} {{ ev.isLunar ? '(农历)' : '(公历)' }}</span>
+                  </div>
+                  <div class="text-[11px] text-slate-400 truncate mt-0.5">
+                    {{ ev.giftAdvice || '无备忘' }}
+                  </div>
+                </div>
+
+                <!-- Right Side: Countdown and Action Buttons -->
+                <div class="flex items-center gap-2 shrink-0">
+                  <!-- 到下一个纪念日的天数 -->
+                  <div class="text-right shrink-0">
+                    <span
+                      class="inline-block px-2 py-0.5 rounded-full text-[11px]"
+                      :class="getCountdownClass(ev)"
+                    >
+                      {{ getCountdownText(ev) }}
+                    </span>
+                    <div class="text-[10px] text-slate-400 mt-0.5 text-right font-mono">
+                      {{ getNextDateText(ev) }}
+                    </div>
+                  </div>
+
+                  <!-- 操作按钮组（编辑 + 删除）：默认隐藏，鼠标悬停时显示 -->
+                  <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      @click="startEdit(ev)"
+                      title="编辑此纪念日"
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition"
+                    >
+                      <Pencil class="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      @click="removeEvent(ev.id)"
+                      title="删除此纪念日"
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                    >
+                      <Trash2 class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
 
