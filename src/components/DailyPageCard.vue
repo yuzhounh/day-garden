@@ -36,9 +36,18 @@ function selectPoem(poem: CuratedPoetry) { emit('select-poetry', poem); showLibr
     <div class="poetry-body">
       <span class="poetry-quotes" aria-hidden="true">“</span>
       <blockquote><span v-for="(line, i) in quoteLines" :key="i"><span v-for="(phrase, j) in (line.match(/[^，]+，?/g) || [line])" :key="j" class="poetry-phrase">{{ phrase }}</span></span></blockquote>
-      <p class="poetry-credit">{{ poetry.author }}<span>·</span>《{{ poetry.title }}》<span class="poetry-seal">{{ poetry.dynasty }}</span></p>
+      <div class="poetry-credit">
+        <span class="poetry-author-name">{{ poetry.author }}</span>
+        <span class="poetry-dot">·</span>
+        <span class="poetry-work-title">《{{ poetry.title }}》</span>
+        <span class="poetry-seal">{{ poetry.dynasty }}</span>
+        <span class="pill lavender mini">{{ poetry.season === '通' ? '常读' : poetry.season + '日' }} · {{ poetry.mood }}</span>
+      </div>
     </div>
-    <div class="poetry-reading"><p>{{ poetry.reading || poetry.mood }}</p><span class="pill lavender">{{ poetry.season === '通' ? '常读' : poetry.season + '日' }} · {{ poetry.mood }}</span></div>
+    <div class="poetry-reading">
+      <Feather :size="15" class="poetry-reading-icon" />
+      <p>{{ poetry.reading || poetry.mood }}</p>
+    </div>
     <footer class="card-footer">
       <button class="text-button" @click="showLibrary = true"><BookOpen :size="14" />诗词小集</button>
       <div class="inline-actions">

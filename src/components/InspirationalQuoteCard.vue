@@ -53,8 +53,9 @@ function selectQuote(q: InspirationalQuote) {
       <blockquote class="quote-text">{{ quote.quote }}</blockquote>
       <div class="quote-author-row">
         <span class="quote-author">{{ quote.author }}</span>
+        <span v-if="quote.source" class="quote-dot">·</span>
         <span v-if="quote.source" class="quote-source">{{ quote.source }}</span>
-        <span class="pill sky">{{ quote.tag }}</span>
+        <span class="pill sky mini">{{ quote.tag }}</span>
       </div>
     </div>
 

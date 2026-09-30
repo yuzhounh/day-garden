@@ -623,15 +623,52 @@
 .muted { font-size: 13px; color: var(--muted); }
 .inline-actions { display: flex; align-items: center; gap: 14px; }
 .poetry-card { background: var(--glass); position: relative; }
-.poetry-body { padding: 10px 12px 18px; position: relative; }
+.poetry-body { padding: 4px 6px 14px; position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .poetry-quotes { position: absolute; left: -2px; top: -16px; color: #9bb2a1; opacity: .35; font: 68px var(--poetry-font); }
-.poetry-body blockquote { position: relative; font-family: var(--poetry-font); font-size: 26px; font-weight: normal; line-height: 1.8; letter-spacing: 2px; }
+.poetry-body blockquote { position: relative; font-family: var(--poetry-font); font-size: 24px; font-weight: normal; line-height: 1.7; letter-spacing: 1.5px; }
 .poetry-body blockquote span { display: block; }
 .poetry-body blockquote .poetry-phrase { display: inline-block; }
-.poetry-credit { font-size: 14px; color: var(--secondary); display: flex; align-items: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-.poetry-seal { border: 1px solid rgba(175, 112, 99, .35); border-radius: 4px; padding: 0 5px; color: #ae8472; font-family: var(--poetry-font); font-size: 12px; }
-.poetry-reading { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 0 20px; }
-.poetry-reading > p { font-size: 15px; line-height: 1.8; color: var(--secondary); max-width: 310px; }
+.poetry-credit { font-size: 13.5px; color: var(--secondary); display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.poetry-author-name { font-weight: 600; color: var(--ink); }
+.poetry-dot { color: var(--muted); }
+.poetry-work-title { color: var(--secondary); }
+.poetry-seal { border: 1px solid rgba(175, 112, 99, .35); border-radius: 4px; padding: 0 5px; color: #ae8472; font-family: var(--poetry-font); font-size: 11.5px; }
+.poetry-reading {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(138, 123, 156, 0.08);
+  border: 1px solid rgba(138, 123, 156, 0.16);
+  border-radius: 14px;
+  padding: 11px 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--secondary);
+  margin-bottom: 16px;
+}
+.dark .poetry-reading {
+  background: rgba(192, 174, 207, 0.08);
+  border-color: rgba(192, 174, 207, 0.18);
+  color: #cbd5e1;
+}
+.poetry-reading-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #8a7b9c;
+}
+.dark .poetry-reading-icon {
+  color: #c0aecf;
+}
+.poetry-reading > p {
+  margin: 0;
+  flex: 1;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--secondary);
+}
+.dark .poetry-reading > p {
+  color: #cbd5e1;
+}
 .bloom-scene { position: relative; display: flex; align-items: center; min-height: 144px; }
 .bloom-copy { width: 71%; z-index: 1; }
 .bloom-copy > .eyebrow { letter-spacing: .5px; font-size: 12px; }
@@ -788,11 +825,11 @@
   margin-bottom: 6px;
 }
 .quote-text {
-  font-size: 18.5px;
+  font-size: 18px;
   font-weight: 500;
   line-height: 1.55;
   color: var(--ink);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   letter-spacing: 0.3px;
   font-family: serif;
 }
@@ -801,30 +838,35 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 13px;
+  font-size: 13.5px;
 }
 .quote-author {
   font-weight: 600;
   color: var(--ink);
 }
-.quote-source {
+.quote-dot {
   color: var(--muted);
-  font-size: 12px;
+}
+.quote-source {
+  color: var(--secondary);
+  font-size: 13px;
 }
 .quote-insight {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   background: #fbf7f0;
+  border: 1px solid rgba(245, 158, 11, 0.18);
   border-radius: 14px;
   padding: 11px 14px;
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.55;
   color: var(--secondary);
   margin-bottom: 16px;
 }
 .dark .quote-insight {
-  background: rgba(245, 158, 11, 0.1);
+  background: rgba(245, 158, 11, 0.08);
+  border-color: rgba(245, 158, 11, 0.2);
   color: #cbd5e1;
 }
 .quote-insight-icon {
@@ -838,6 +880,12 @@
 .quote-insight p {
   margin: 0;
   flex: 1;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--secondary);
+}
+.dark .quote-insight p {
+  color: #cbd5e1;
 }
 .full-quote-modal {
   padding: 14px 0;
