@@ -133,12 +133,11 @@
 .trend-scroll-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .trend-grid-wrapper {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
   grid-template-rows: auto 130px auto;
   gap: 4px;
   position: relative;
   padding: 4px 2px;
-  min-width: 480px;
+  min-width: 620px;
 }
 .trend-col-card {
   grid-row: 1 / 4;

@@ -31,7 +31,7 @@ export function getWeatherMeta(code: number): { text: string; icon: string } {
 const WEEK_DAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
 export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,uv_index_max&timezone=auto&past_days=2&forecast_days=5`
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,uv_index_max&timezone=auto&past_days=2&forecast_days=8`
 
   try {
     const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(10000) })
@@ -85,7 +85,7 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
       if (cached) {
         const parsed = JSON.parse(cached)
         const today = localDateKey()
-        if (parsed.city === city.name && Date.now() - parsed.timestamp < 6 * 60 * 60 * 1000 && Array.isArray(parsed.list) && parsed.list.length === 7 && parsed.list.some((day: WeatherDay) => day.date === today)) {
+        if (parsed.city === city.name && Date.now() - parsed.timestamp < 6 * 60 * 60 * 1000 && Array.isArray(parsed.list) && parsed.list.length >= 8 && parsed.list.some((day: WeatherDay) => day.date === today)) {
           return parsed.list.map((day: WeatherDay): WeatherDay => ({ ...day, isToday: day.date === today, isPast: day.date < today, dataSource: 'cached' }))
         }
       }
@@ -93,7 +93,7 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
       // ignore
     }
 
-    // 兜底返回模拟 7 天数据
+    // 兜底返回模拟数据（前两天 + 今天 + 后七天）
     return generateFallbackWeather()
   }
 }
@@ -101,7 +101,7 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
 function generateFallbackWeather(): WeatherDay[] {
   const now = new Date()
   const list: WeatherDay[] = []
-  for (let offset = -2; offset <= 4; offset++) {
+  for (let offset = -2; offset <= 7; offset++) {
     const cur = new Date(now)
     cur.setDate(now.getDate() + offset)
     const timeStr = localDateKey(cur)

@@ -61,7 +61,9 @@ function getDayTitle(day: WeatherDay, index: number): string {
   const todayIdx = props.days.findIndex(d => d.isToday)
   if (todayIdx !== -1) {
     if (index === todayIdx - 1) return '昨天'
+    if (index === todayIdx - 2) return '前天'
     if (index === todayIdx + 1) return '明天'
+    if (index === todayIdx + 2) return '后天'
   }
   return day.dayOfWeek
 }
@@ -97,7 +99,8 @@ function buildSpline(points: { x: number; y: number }[]): string {
 const chartData = computed(() => {
   if (!props.days || props.days.length === 0) return null
   const count = props.days.length
-  const colWidth = 700 / count
+  const colWidth = 90
+  const totalWidth = count * colWidth
 
   const allMin = props.days.map(d => d.tempMin)
   const allMax = props.days.map(d => d.tempMax)
@@ -141,7 +144,7 @@ const chartData = computed(() => {
     points,
     maxPath,
     minPath,
-    viewBox: `0 0 700 ${chartHeight}`,
+    viewBox: `0 0 ${totalWidth} ${chartHeight}`,
   }
 })
 </script>
@@ -164,16 +167,16 @@ const chartData = computed(() => {
 
     <div class="forecast-area">
       <div class="forecast-heading">
-        <span>七日气温流转<small>前两天 · 今天 · 后四天</small></span>
+        <span>气温流转趋势<small>前两天 · 今天 · 未来 7 天</small></span>
         <span role="status">{{ source }}</span>
       </div>
 
       <div v-if="loading && !days.length" class="forecast-grid" aria-label="正在加载">
-        <div v-for="n in 7" :key="n" class="weather-skeleton"></div>
+        <div v-for="n in 10" :key="n" class="weather-skeleton"></div>
       </div>
 
       <div v-else-if="chartData" class="trend-scroll-container">
-        <div class="trend-grid-wrapper">
+        <div class="trend-grid-wrapper" :style="{ gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }">
           <!-- 7 background clickable columns spanning full height -->
           <button
             v-for="(day, idx) in days"
