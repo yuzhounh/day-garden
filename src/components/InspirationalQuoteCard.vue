@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Quote as QuoteIcon, Sparkles, RefreshCw, BookOpen, ArrowUpRight, Copy, Check } from 'lucide-vue-next'
+import { Quote as QuoteIcon, Sparkles, RefreshCw, BookOpen, ArrowUpRight, Copy, Check, Eye } from 'lucide-vue-next'
 import type { InspirationalQuote } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawQuotes from '../data/inspirational-quotes.json'
@@ -59,6 +59,7 @@ function selectQuote(q: InspirationalQuote) {
     </div>
 
     <div class="quote-insight">
+      <Eye :size="16" class="quote-insight-icon" />
       <p>{{ quote.insight }}</p>
     </div>
 

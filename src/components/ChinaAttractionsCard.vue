@@ -45,7 +45,7 @@ const todayFeaturedIndex = computed(() => {
 const previewList = computed(() => {
   const start = (todayFeaturedIndex.value + previewOffset.value) % attractions.length
   const list: ChinaAttraction[] = []
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 2; i++) {
     list.push(attractions[(start + i) % attractions.length]!)
   }
   return list
@@ -53,8 +53,8 @@ const previewList = computed(() => {
 
 function refreshPreview() {
   isRefreshing.value = true
-  // 每次换一批顺延 3 个，触底循环
-  previewOffset.value = (previewOffset.value + 3) % attractions.length
+  // 每次换一批顺延 2 个，触底循环
+  previewOffset.value = (previewOffset.value + 2) % attractions.length
   setTimeout(() => {
     isRefreshing.value = false
   }, 400)
