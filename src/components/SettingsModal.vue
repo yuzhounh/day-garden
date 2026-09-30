@@ -288,111 +288,111 @@ function importData(e: Event) {
         <!-- 2. 生日与纪念日管理 -->
         <div v-if="currentTab === 'events'" class="space-y-4">
           <!-- Add Event Form -->
-          <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3">
-            <div class="text-xs font-medium text-slate-700 dark:text-slate-300">添加新日子 / 备礼提醒</div>
-            <div class="grid grid-cols-2 gap-2">
+          <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3">
+            <div class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">添加新日子 / 备礼提醒</div>
+            <div class="grid grid-cols-2 gap-2.5">
               <input
                 v-model="newEventTitle"
                 type="text"
                 placeholder="事件名 (如: 妈妈生日)"
-                class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
+                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
               />
               <input
                 v-model="newEventDate"
                 type="text"
                 placeholder="日期 MM-DD (如: 10-08)"
-                class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
+                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
               />
             </div>
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2 gap-2.5">
               <input
                 v-model="newEventRole"
                 type="text"
                 placeholder="角色备注 (如: 母亲 / 伴侣)"
-                class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
+                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
               />
               <input
                 v-model="newEventAdvice"
                 type="text"
                 placeholder="备礼备忘 (如: 提前订花)"
-                class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
+                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
               />
             </div>
             <div class="flex items-center justify-between pt-1">
-              <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+              <label class="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500 cursor-pointer">
                 <input type="checkbox" v-model="newEventIsLunar" class="rounded text-emerald-600" />
                 <span>农历日期</span>
               </label>
               <button
                 @click="addEvent"
-                class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition flex items-center gap-1"
+                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5 shadow-sm"
               >
-                <Plus class="w-3.5 h-3.5" />
+                <Plus class="w-4 h-4" />
                 <span>确认添加</span>
               </button>
             </div>
           </div>
 
           <!-- Existing List -->
-          <div class="space-y-2">
+          <div class="space-y-3">
             <template v-for="ev in preferences.customEvents" :key="ev.id">
               <!-- Inline Edit Form -->
               <div
                 v-if="editingId === ev.id"
-                class="p-3.5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-2.5 text-xs transition"
+                class="p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition"
               >
-                <div class="flex items-center justify-between text-[11px] font-semibold text-emerald-800 dark:text-emerald-300">
+                <div class="flex items-center justify-between text-xs font-semibold text-emerald-800 dark:text-emerald-300">
                   <span class="flex items-center gap-1.5">
-                    <Pencil class="w-3.5 h-3.5" />
+                    <Pencil class="w-4 h-4" />
                     <span>编辑纪念日</span>
                   </span>
-                  <span class="text-slate-400 font-mono text-[10px]">{{ ev.id }}</span>
+                  <span class="text-slate-400 font-mono text-[11px]">{{ ev.id }}</span>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-2.5">
                   <input
                     v-model="editForm.title"
                     type="text"
                     placeholder="事件名 (如: 妈妈生日)"
-                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                   <input
                     v-model="editForm.date"
                     type="text"
                     placeholder="YYYY-MM-DD 或 MM-DD"
-                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-2 gap-2.5">
                   <input
                     v-model="editForm.role"
                     type="text"
                     placeholder="角色备注 (如: 侄女 / 伴侣)"
-                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                   <input
                     v-model="editForm.giftAdvice"
                     type="text"
                     placeholder="备忘/备礼建议 (如: 订蛋糕)"
-                    class="px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                    class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
                 <div class="flex items-center justify-between pt-1">
-                  <label class="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                  <label class="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 cursor-pointer">
                     <input type="checkbox" v-model="editForm.isLunar" class="rounded text-emerald-600 focus:ring-emerald-500" />
                     <span>农历日期</span>
                   </label>
                   <div class="flex items-center gap-2">
                     <button
                       @click="cancelEdit"
-                      class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs transition"
+                      class="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs sm:text-sm transition"
                     >
                       取消
                     </button>
                     <button
                       @click="saveEdit(ev.id)"
-                      class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition flex items-center gap-1 shadow-sm"
+                      class="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5 shadow-sm"
                     >
-                      <Check class="w-3.5 h-3.5" />
+                      <Check class="w-4 h-4" />
                       <span>保存</span>
                     </button>
                   </div>
@@ -402,55 +402,55 @@ function importData(e: Event) {
               <!-- Normal Display Row -->
               <div
                 v-else
-                class="group flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-xs transition"
+                class="group flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition"
               >
                 <!-- Title, Role, Date, Advice -->
-                <div class="truncate min-w-0 flex-1 mr-3">
-                  <div class="flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200 truncate">
+                <div class="truncate min-w-0 flex-1 mr-4">
+                  <div class="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200 truncate text-sm sm:text-[15px]">
                     <span class="truncate">{{ ev.title }}</span>
                     <span
                       v-if="ev.role"
-                      class="px-1.5 py-0.2 text-[10px] rounded bg-slate-100 dark:bg-slate-800 text-slate-500 shrink-0 font-normal"
+                      class="px-2 py-0.5 text-xs rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0 font-medium"
                     >
                       {{ ev.role }}
                     </span>
-                    <span class="text-slate-400 font-normal shrink-0">· {{ ev.date }} {{ ev.isLunar ? '(农历)' : '(公历)' }}</span>
+                    <span class="text-xs sm:text-[13px] text-slate-400 font-normal shrink-0">· {{ ev.date }} {{ ev.isLunar ? '(农历)' : '(公历)' }}</span>
                   </div>
-                  <div class="text-[11px] text-slate-400 truncate mt-0.5">
+                  <div class="text-xs sm:text-[13.5px] text-slate-500 dark:text-slate-400 truncate mt-1.5 leading-relaxed">
                     {{ ev.giftAdvice || '无备忘' }}
                   </div>
                 </div>
 
                 <!-- Right Side: Countdown and Action Buttons -->
-                <div class="flex items-center gap-2 shrink-0">
+                <div class="flex items-center gap-3 shrink-0">
                   <!-- 到下一个纪念日的天数 -->
                   <div class="text-right shrink-0">
                     <span
-                      class="inline-block px-2 py-0.5 rounded-full text-[11px]"
+                      class="inline-block px-2.5 py-1 rounded-full text-xs font-medium"
                       :class="getCountdownClass(ev)"
                     >
                       {{ getCountdownText(ev) }}
                     </span>
-                    <div class="text-[10px] text-slate-400 mt-0.5 text-right font-mono">
+                    <div class="text-xs text-slate-400 mt-1 text-right font-mono">
                       {{ getNextDateText(ev) }}
                     </div>
                   </div>
 
                   <!-- 操作按钮组（编辑 + 删除）：默认隐藏，鼠标悬停时显示 -->
-                  <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       @click="startEdit(ev)"
                       title="编辑此纪念日"
-                      class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition"
+                      class="p-2 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition"
                     >
-                      <Pencil class="w-3.5 h-3.5" />
+                      <Pencil class="w-4 h-4" />
                     </button>
                     <button
                       @click="removeEvent(ev.id)"
                       title="删除此纪念日"
-                      class="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                      class="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
                     >
-                      <Trash2 class="w-3.5 h-3.5" />
+                      <Trash2 class="w-4 h-4" />
                     </button>
                   </div>
                 </div>

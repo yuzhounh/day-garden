@@ -1,7 +1,7 @@
 import { reactive, ref } from 'vue'
 import type { User, LifeEvent } from '../types'
 import { localDateKey } from './day'
-import { loadUserPreferences, saveUserPreferences } from './storage'
+import { loadUserPreferences, saveUserPreferences, cleanEventGiftAdvice } from './storage'
 import poems from '../data/poetry-curated.json'
 
 interface Mutation { id: string; path: string; method: 'PUT' | 'DELETE' }
@@ -167,9 +167,10 @@ export async function refreshCloud() {
 
     if (Array.isArray(data.customEvents) && data.customEvents.length > 0) {
       const userPrefs = loadUserPreferences(userId)
-      userPrefs.customEvents = data.customEvents
+      const cleanedEvents = data.customEvents.map(cleanEventGiftAdvice)
+      userPrefs.customEvents = cleanedEvents
       saveUserPreferences(userPrefs, userId)
-      window.dispatchEvent(new CustomEvent('daygarden:prefs-synced', { detail: { userId, customEvents: data.customEvents } }))
+      window.dispatchEvent(new CustomEvent('daygarden:prefs-synced', { detail: { userId, customEvents: cleanedEvents } }))
     }
   } catch {
     if (account.user?.id !== userId) return

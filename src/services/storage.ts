@@ -1,4 +1,4 @@
-import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip, InspirationalQuote, SportExercise } from '../types'
+import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip, InspirationalQuote, SportExercise, LifeEvent } from '../types'
 import { DEFAULT_CITIES } from './weather'
 import rawSeasons from '../data/seasons-bloom.json'
 import rawEvidence from '../data/evidence-guide.json'
@@ -62,6 +62,17 @@ export function getPreferencesKey(userId?: string | null): string {
   return 'daygarden_guest_preferences_v1'
 }
 
+export function cleanEventGiftAdvice(ev: LifeEvent): LifeEvent {
+  if (!ev.giftAdvice) return ev
+  let advice = ev.giftAdvice
+    .replace(/\s*·\s*30岁[以之]?[下上]过[阳公农]历/g, '')
+    .trim()
+  if (!ev.isLunar) {
+    advice = advice.replace(/\s*·\s*农历[^\s\)]+生?/g, '').trim()
+  }
+  return { ...ev, giftAdvice: advice }
+}
+
 export function loadUserPreferences(userId?: string | null): UserPreferences {
   try {
     const key = getPreferencesKey(userId)
@@ -71,11 +82,12 @@ export function loadUserPreferences(userId?: string | null): UserPreferences {
     }
     if (!raw) return { ...DEFAULT_PREFERENCES, customEvents: [...DEFAULT_PREFERENCES.customEvents] }
     const parsed = JSON.parse(raw)
+    const rawEvents = Array.isArray(parsed.customEvents) ? parsed.customEvents : [...DEFAULT_PREFERENCES.customEvents]
     return {
       ...DEFAULT_PREFERENCES,
       ...parsed,
       modules: { ...DEFAULT_PREFERENCES.modules, ...parsed.modules },
-      customEvents: Array.isArray(parsed.customEvents) ? parsed.customEvents : [...DEFAULT_PREFERENCES.customEvents],
+      customEvents: rawEvents.map(cleanEventGiftAdvice),
     }
   } catch (e) {
     console.warn('Failed to parse preferences:', e)
