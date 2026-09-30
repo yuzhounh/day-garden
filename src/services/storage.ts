@@ -113,8 +113,9 @@ export function getTodayEvidenceGuide(date: Date = new Date()): EvidenceGuide {
 export function getTodayPoetry(date: Date = new Date()): CuratedPoetry {
   const month = date.getMonth() + 1
   const season = month >= 3 && month <= 5 ? '春' : month >= 6 && month <= 8 ? '夏' : month >= 9 && month <= 11 ? '秋' : '冬'
-  const seasonal = (rawPoetry as CuratedPoetry[]).filter(poem => poem.season === season)
-  const list = seasonal.length ? seasonal : rawPoetry as CuratedPoetry[]
+  // 兼顾当季时令诗词与豁达通感名篇，增加每日阅读惊喜与深度
+  const eligible = (rawPoetry as CuratedPoetry[]).filter(poem => poem.season === season || poem.season === '通')
+  const list = eligible.length ? eligible : rawPoetry as CuratedPoetry[]
   const idx = getDailyIndex(list.length, 79, date)
   return list[idx]
 }

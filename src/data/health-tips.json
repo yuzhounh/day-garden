@@ -3,15 +3,15 @@
     "id": "move-break",
     "tag": "活动",
     "tip": "工作间隙起来走动一下。少坐一点，多动一点，从自己舒适的活动量开始。",
-    "source": "WHO · 身体活动",
-    "sourceUrl": "https://www.who.int/europe/news-room/fact-sheets/item/physical-activity"
+    "source": "WHO · 身体活动指南",
+    "sourceUrl": "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
   },
   {
     "id": "walk-outdoors",
     "tag": "散步",
     "tip": "把一段短途出行换成步行，或在方便时散步。日常的身体活动也算数。",
-    "source": "WHO · 身体活动",
-    "sourceUrl": "https://www.who.int/europe/news-room/fact-sheets/item/physical-activity"
+    "source": "WHO · 身体活动指南",
+    "sourceUrl": "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
   },
   {
     "id": "eyes-distance",
@@ -38,49 +38,119 @@
     "id": "sleep-regular",
     "tag": "作息",
     "tip": "尽量在相近的时间入睡与起床，周末也保留一份规律。",
-    "source": "CDC · 睡眠",
+    "source": "CDC · 睡眠与作息",
     "sourceUrl": "https://www.cdc.gov/sleep/about/"
   },
   {
     "id": "sleep-space",
     "tag": "睡眠",
     "tip": "把卧室调得安静、舒适、凉爽一点，为入睡留出轻松的环境。",
-    "source": "CDC · 睡眠",
+    "source": "CDC · 睡眠与作息",
     "sourceUrl": "https://www.cdc.gov/sleep/about/"
   },
   {
     "id": "screen-evening",
     "tag": "晚间",
     "tip": "睡前至少半小时放下电子设备，试着用读书或安静的休息收尾。",
-    "source": "CDC · 睡眠",
+    "source": "CDC · 睡眠与作息",
     "sourceUrl": "https://www.cdc.gov/sleep/about/"
   },
   {
     "id": "oral-brush",
     "tag": "口腔",
-    "tip": "每天用含氟牙膏刷牙两次，每次约两分钟。今天也别忘了晚间那一次。",
-    "source": "ADA · 口腔健康",
+    "tip": "用含氟牙膏每天刷牙两次，每次约两分钟，并注意清洁牙齿各个表面。",
+    "source": "ADA · 口腔健康建议",
     "sourceUrl": "https://www.mouthhealthy.org/oral-health-recommendations"
   },
   {
-    "id": "oral-clean",
-    "tag": "齿间清洁",
-    "tip": "每天清洁牙缝，选择适合自己的牙线或齿间清洁工具。",
-    "source": "ADA · 口腔健康",
+    "id": "oral-floss",
+    "tag": "牙缝",
+    "tip": "把牙线或齿间清洁工具放进日常，每天清洁牙刷刷不到的地方。",
+    "source": "ADA · 口腔健康建议",
     "sourceUrl": "https://www.mouthhealthy.org/oral-health-recommendations"
   },
   {
-    "id": "colorful-plate",
-    "tag": "餐盘",
-    "tip": "今天的餐盘添一点不同颜色的蔬菜与水果，让选择更丰富。",
-    "source": "WHO · 健康饮食",
-    "sourceUrl": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+    "id": "water-warm",
+    "tag": "饮水",
+    "tip": "清晨起来喝一杯温开水，唤醒肠胃与身体代谢。",
+    "source": "EFSA · 每日水分建议",
+    "sourceUrl": "https://www.efsa.europa.eu/en/efsajournal/pub/1459"
   },
   {
-    "id": "wholegrain",
-    "tag": "饮食",
-    "tip": "有机会时尝试全谷物、豆类和完整水果，让饮食更有变化。",
-    "source": "WHO · 健康饮食",
-    "sourceUrl": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+    "id": "water-sip",
+    "tag": "喝水",
+    "tip": "小口慢饮，别等到口干舌燥时才大口灌水。温水是身体最好的滋润。",
+    "source": "EFSA · 每日水分建议",
+    "sourceUrl": "https://www.efsa.europa.eu/en/efsajournal/pub/1459"
+  },
+  {
+    "id": "breath-calm",
+    "tag": "呼吸",
+    "tip": "感到紧绷时，慢慢吸气四秒，呼气六秒，给神经系统一个安抚信号。",
+    "source": "Cleveland Clinic · 情绪减压",
+    "sourceUrl": "https://health.clevelandclinic.org/box-breathing-benefits"
+  },
+  {
+    "id": "shoulder-relax",
+    "tag": "肩颈",
+    "tip": "耸一耸肩膀，再慢慢沉下去；感觉颈椎有向上延伸的轻盈感。",
+    "source": "Mayo Clinic · 办公工学",
+    "sourceUrl": "https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/office-ergonomics/art-20047551"
+  },
+  {
+    "id": "sunshine-morning",
+    "tag": "晨光",
+    "tip": "早晨走到窗前或阳台，晒 10 分钟温和的晨光，让身体清晰感知新的一天。",
+    "source": "Sleep Foundation · 昼夜节律",
+    "sourceUrl": "https://www.sleepfoundation.org/bedroom-environment/light-and-sleep"
+  },
+  {
+    "id": "chew-slow",
+    "tag": "进餐",
+    "tip": "吃饭时放下手机，细嚼慢咽，体会食物真正的香味与满足感。",
+    "source": "Harvard Health · 正念饮食",
+    "sourceUrl": "https://www.hsph.harvard.edu/nutritionsource/mindful-eating/"
+  },
+  {
+    "id": "posture-chin",
+    "tag": "体态",
+    "tip": "下巴微微内收，避免头部过度前倾，减少颈椎承受的无形压力。",
+    "source": "Mayo Clinic · 姿势矫正",
+    "sourceUrl": "https://www.mayoclinic.org"
+  },
+  {
+    "id": "nap-power",
+    "tag": "小憩",
+    "tip": "午后如果困倦，闭目养神 15—20 分钟，不宜深睡过久，醒来精神充沛。",
+    "source": "NASA Fatigue Countermeasures",
+    "sourceUrl": "https://www.sleepfoundation.org"
+  },
+  {
+    "id": "air-fresh",
+    "tag": "换气",
+    "tip": "打开窗户通风 5 到 10 分钟，让室内充满流动清新的空气。",
+    "source": "EPA · 室内空气质量",
+    "sourceUrl": "https://www.epa.gov/indoor-air-quality-iaq"
+  },
+  {
+    "id": "evening-unwind",
+    "tag": "晚息",
+    "tip": "睡前把房间光线调柔和，远离刺激性的信息，给大脑安静收工的时间。",
+    "source": "Sleep Foundation · 晚间仪式",
+    "sourceUrl": "https://www.sleepfoundation.org"
+  },
+  {
+    "id": "stretch-spine",
+    "tag": "拉伸",
+    "tip": "站起身，双手向上伸展拉长脊柱，像猫咪一样慵懒地舒展全身。",
+    "source": "AHA · 日常伸展",
+    "sourceUrl": "https://www.heart.org"
+  },
+  {
+    "id": "kind-self",
+    "tag": "心境",
+    "tip": "允许自己今天有小小的偷懒与留白，对自己的每一点进步心怀宽容。",
+    "source": "APA · 心理自我关怀",
+    "sourceUrl": "https://www.apa.org"
   }
 ]

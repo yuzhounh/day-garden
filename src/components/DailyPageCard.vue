@@ -13,7 +13,12 @@ const showLibrary = ref(false)
 const filter = ref('全部')
 const isSaved = computed(() => savedIds.value.includes(props.poetry.id))
 const poems = rawPoetry as CuratedPoetry[]
-const filteredPoems = computed(() => poems.filter(poem => filter.value === '收藏' ? savedIds.value.includes(poem.id) : filter.value === '全部' || poem.season === filter.value))
+const filteredPoems = computed(() => poems.filter(poem => {
+  if (filter.value === '收藏') return savedIds.value.includes(poem.id)
+  if (filter.value === '全部') return true
+  if (filter.value === '豁达励志') return poem.season === '通'
+  return poem.season === filter.value
+}))
 const quoteLines = computed(() => props.poetry.quote.match(/[^。！？]+[。！？]?/g) || [props.poetry.quote])
 const fullLines = computed(() => props.poetry.content.match(/[^。！？]+[。！？]?/g) || [props.poetry.content])
 function toggleSave() {
@@ -33,7 +38,7 @@ function selectPoem(poem: CuratedPoetry) { emit('select-poetry', poem); showLibr
       <blockquote><span v-for="(line, i) in quoteLines" :key="i"><span v-for="(phrase, j) in (line.match(/[^，]+，?/g) || [line])" :key="j" class="poetry-phrase">{{ phrase }}</span></span></blockquote>
       <p class="poetry-credit">{{ poetry.author }}<span>·</span>《{{ poetry.title }}》<span class="poetry-seal">{{ poetry.dynasty }}</span></p>
     </div>
-    <div class="poetry-reading"><p>{{ poetry.reading || poetry.mood }}</p><span class="pill lavender">{{ poetry.season }}日 · {{ poetry.mood }}</span></div>
+    <div class="poetry-reading"><p>{{ poetry.reading || poetry.mood }}</p><span class="pill lavender">{{ poetry.season === '通' ? '常读' : poetry.season + '日' }} · {{ poetry.mood }}</span></div>
     <footer class="card-footer">
       <button class="text-button" @click="showLibrary = true"><BookOpen :size="14" />诗词小集 <span class="muted">{{ poems.length }} 篇</span></button>
       <div class="inline-actions">
@@ -46,8 +51,8 @@ function selectPoem(poem: CuratedPoetry) { emit('select-poetry', poem); showLibr
       <div class="reading-note"><span class="eyebrow">读诗随想</span><p>{{ poetry.reading || poetry.mood }}</p></div>
       <button class="soft-button" :aria-pressed="isSaved" @click="toggleSave()"><Bookmark :size="15" />{{ isSaved ? '已收藏 · 点击取消' : '收藏这首诗' }}</button>
     </DetailModal>
-    <DetailModal v-if="showLibrary" title="把诗意，留在日常" :subtitle="poems.length + ' 篇古典诗词 · 随四季慢慢读'" @close="showLibrary = false">
-      <div class="filter-pills"><button v-for="season in ['全部', '春', '夏', '秋', '冬', '收藏']" :key="season" :class="{ active: filter === season }" :aria-pressed="filter === season" @click="filter = season">{{ season }}</button></div>
+    <DetailModal v-if="showLibrary" title="把诗意，留在日常" :subtitle="poems.length + ' 篇古典诗词 · 随四季与心境慢慢读'" @close="showLibrary = false">
+      <div class="filter-pills"><button v-for="season in ['全部', '春', '夏', '秋', '冬', '豁达励志', '收藏']" :key="season" :class="{ active: filter === season }" :aria-pressed="filter === season" @click="filter = season">{{ season }}</button></div>
       <div class="poem-list"><button v-for="poem in filteredPoems" :key="poem.id" @click="selectPoem(poem)"><span><strong>{{ poem.title }}</strong><small>{{ poem.author }} · {{ poem.dynasty }}</small><p>{{ poem.quote }}</p></span><ArrowUpRight :size="16" /></button><p v-if="!filteredPoems.length" class="empty-state">还没有收藏。遇见喜欢的诗，点一下书签留下它。</p></div>
     </DetailModal>
   </article>
