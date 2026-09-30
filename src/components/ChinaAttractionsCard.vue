@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { MapPin, Compass, CheckCircle2, Heart, CircleDot, ArrowUpRight, Search, Sparkles } from 'lucide-vue-next'
+import { MapPin, Compass, CheckCircle2, Heart, ArrowUpRight, Search, Sparkles, RotateCw } from 'lucide-vue-next'
 import type { ChinaAttraction, AttractionStatusType } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawAttractions from '../data/china-attractions.json'
@@ -14,8 +14,10 @@ const emit = defineEmits<{
 }>()
 
 const showModal = ref(false)
-const filterTab = ref<'all' | 'visited' | 'wishlist' | 'unvisited'>('all')
+const filterTab = ref<'all' | 'visited' | 'wishlist'>('all')
 const searchQuery = ref('')
+const isRefreshing = ref(false)
+const previewOffset = ref(0)
 
 const attractions = rawAttractions as ChinaAttraction[]
 
@@ -29,23 +31,19 @@ const wishlistCount = computed(() => {
   return attractions.filter(a => currentStatusMap.value[a.id] === 'wishlist').length
 })
 
-const unvisitedCount = computed(() => {
-  return attractions.length - visitedCount.value - wishlistCount.value
-})
-
 const progressPercent = computed(() => {
   if (attractions.length === 0) return 0
   return Math.round((visitedCount.value / attractions.length) * 100)
 })
 
-// 首页卡片展示的 3 个推荐景点（轮换展示）
+// 首页卡片展示的 3 个推荐景点（支持点击换一批轮换）
 const todayFeaturedIndex = computed(() => {
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000)
   return dayOfYear % attractions.length
 })
 
 const previewList = computed(() => {
-  const start = todayFeaturedIndex.value
+  const start = (todayFeaturedIndex.value + previewOffset.value) % attractions.length
   const list: ChinaAttraction[] = []
   for (let i = 0; i < 3; i++) {
     list.push(attractions[(start + i) % attractions.length]!)
@@ -53,12 +51,23 @@ const previewList = computed(() => {
   return list
 })
 
+function refreshPreview() {
+  isRefreshing.value = true
+  // 每次换一批顺延 3 个，触底循环
+  previewOffset.value = (previewOffset.value + 3) % attractions.length
+  setTimeout(() => {
+    isRefreshing.value = false
+  }, 400)
+}
+
 function getStatus(id: string): AttractionStatusType {
   return currentStatusMap.value[id] || 'unvisited'
 }
 
-function setStatus(id: string, status: AttractionStatusType) {
-  const updated = { ...currentStatusMap.value, [id]: status }
+function toggleStatus(id: string, targetStatus: 'visited' | 'wishlist') {
+  const current = getStatus(id)
+  const next: AttractionStatusType = current === targetStatus ? 'unvisited' : targetStatus
+  const updated = { ...currentStatusMap.value, [id]: next }
   emit('update:statusMap', updated)
 }
 
@@ -67,7 +76,6 @@ const filteredList = computed(() => {
     const s = getStatus(a.id)
     if (filterTab.value === 'visited' && s !== 'visited') return false
     if (filterTab.value === 'wishlist' && s !== 'wishlist') return false
-    if (filterTab.value === 'unvisited' && s !== 'unvisited') return false
 
     if (searchQuery.value.trim()) {
       const q = searchQuery.value.trim().toLowerCase()
@@ -90,8 +98,13 @@ const filteredList = computed(() => {
         <h2>华夏胜景</h2>
         <span class="eyebrow">MUST-VISIT CHINA</span>
       </div>
-      <button class="text-button" @click="showModal = true">
-        全部 {{ attractions.length }} 景<ArrowUpRight :size="14" />
+      <button
+        class="refresh-icon-btn"
+        title="换一批胜景推荐"
+        @click="refreshPreview"
+      >
+        <RotateCw :size="12" :class="{ 'spin-active': isRefreshing }" />
+        <span>换一批</span>
       </button>
     </header>
 
@@ -103,9 +116,6 @@ const filteredList = computed(() => {
         </span>
         <span class="stat-pill wishlist">
           <Heart :size="13" />想去 <strong>{{ wishlistCount }}</strong>
-        </span>
-        <span class="stat-pill unvisited">
-          <CircleDot :size="13" />待探索 <strong>{{ unvisitedCount }}</strong>
         </span>
       </div>
       <div class="progress-track-wrapper">
@@ -134,26 +144,18 @@ const filteredList = computed(() => {
           <button
             class="status-btn visited"
             :class="{ active: getStatus(spot.id) === 'visited' }"
-            title="去过"
-            @click="setStatus(spot.id, 'visited')"
+            title="点击标记为去过（再次点击取消）"
+            @click="toggleStatus(spot.id, 'visited')"
           >
             去过
           </button>
           <button
             class="status-btn wishlist"
             :class="{ active: getStatus(spot.id) === 'wishlist' }"
-            title="想去"
-            @click="setStatus(spot.id, 'wishlist')"
+            title="点击标记为想去（再次点击取消）"
+            @click="toggleStatus(spot.id, 'wishlist')"
           >
             想去
-          </button>
-          <button
-            class="status-btn unvisited"
-            :class="{ active: getStatus(spot.id) === 'unvisited' }"
-            title="没去过"
-            @click="setStatus(spot.id, 'unvisited')"
-          >
-            没去过
           </button>
         </div>
       </div>
@@ -162,7 +164,7 @@ const filteredList = computed(() => {
     <footer class="card-footer">
       <span class="footer-hint"><Sparkles :size="12" />山河辽阔，步履不停</span>
       <button class="text-button" @click="showModal = true">
-        点亮更多足迹<ArrowUpRight :size="14" />
+        点亮更多足迹 (共 {{ attractions.length }} 景)<ArrowUpRight :size="14" />
       </button>
     </footer>
 
@@ -190,7 +192,6 @@ const filteredList = computed(() => {
         <button :class="{ active: filterTab === 'all' }" @click="filterTab = 'all'">全部 ({{ attractions.length }})</button>
         <button :class="{ active: filterTab === 'visited' }" @click="filterTab = 'visited'">已去过 ({{ visitedCount }})</button>
         <button :class="{ active: filterTab === 'wishlist' }" @click="filterTab = 'wishlist'">想去 ({{ wishlistCount }})</button>
-        <button :class="{ active: filterTab === 'unvisited' }" @click="filterTab = 'unvisited'">没去过 ({{ unvisitedCount }})</button>
       </div>
 
       <!-- 景点列表 -->
@@ -210,23 +211,18 @@ const filteredList = computed(() => {
               <button
                 class="status-btn visited"
                 :class="{ active: getStatus(item.id) === 'visited' }"
-                @click="setStatus(item.id, 'visited')"
+                title="点击标记为去过（再次点击取消）"
+                @click="toggleStatus(item.id, 'visited')"
               >
                 去过
               </button>
               <button
                 class="status-btn wishlist"
                 :class="{ active: getStatus(item.id) === 'wishlist' }"
-                @click="setStatus(item.id, 'wishlist')"
+                title="点击标记为想去（再次点击取消）"
+                @click="toggleStatus(item.id, 'wishlist')"
               >
                 想去
-              </button>
-              <button
-                class="status-btn unvisited"
-                :class="{ active: getStatus(item.id) === 'unvisited' }"
-                @click="setStatus(item.id, 'unvisited')"
-              >
-                没去过
               </button>
             </div>
           </div>
