@@ -152,17 +152,35 @@ const chartData = computed(() => {
 <template>
   <section class="glass-panel weather-panel" aria-label="七日天气">
     <div class="weather-summary">
-      <span class="eyebrow">天气，刚刚好</span>
-      <div v-if="today" class="today-weather">
-        <component :is="icon(today.iconName)" :size="42" :stroke-width="1.3" />
-        <strong>{{ today.tempMax }}<span>°</span></strong>
-        <div>
-          <span>{{ city }}</span>
-          <small>{{ today.weatherText }} · {{ today.tempMin }}° — {{ today.tempMax }}°</small>
+      <div class="summary-header">
+        <span class="eyebrow">天气 · 刚刚好</span>
+        <span class="summary-city">{{ city }}</span>
+      </div>
+
+      <div v-if="today" class="today-content">
+        <div class="today-main">
+          <strong class="today-temp">{{ today.tempMax }}<span>°</span></strong>
+          <component :is="icon(today.iconName)" :size="36" :stroke-width="1.3" class="today-icon" />
+        </div>
+        <div class="today-condition-bar">
+          <span class="today-condition-text">{{ today.weatherText }}</span>
+          <span class="today-range">{{ today.tempMin }}° ~ {{ today.tempMax }}°</span>
+        </div>
+        <div class="today-sub-tags">
+          <span class="today-tag" title="最高体感温度">
+            <Thermometer :size="12" />体感 {{ today.apparentTempMax }}°
+          </span>
+          <span v-if="today.precipProb > 0" class="today-tag" title="降水概率">
+            <Umbrella :size="12" />降水 {{ today.precipProb }}%
+          </span>
+          <span v-else class="today-tag" title="紫外线指数">
+            <Sun :size="12" />UV {{ uvLevel(today.uvIndex) }}
+          </span>
         </div>
       </div>
       <div v-else class="weather-placeholder">{{ loading ? '正在感受城市的天气…' : '天气暂不可用' }}</div>
-      <p>{{ weatherHint }}</p>
+
+      <p class="today-hint">{{ weatherHint }}</p>
     </div>
 
     <div class="forecast-area">
