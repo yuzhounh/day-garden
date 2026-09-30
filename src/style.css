@@ -128,7 +128,15 @@
   transform: none;
 }
 .date-card-primary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.date-solar-wrap { display: flex; align-items: baseline; gap: 9px; }
 .date-solar { font-size: 19px; font-weight: 600; color: var(--ink); letter-spacing: .5px; }
+.date-time {
+  font-size: 16.5px;
+  font-weight: 500;
+  color: var(--secondary);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .5px;
+}
 .date-weekday {
   display: inline-flex;
   align-items: center;
@@ -1143,6 +1151,7 @@
   .hero-intro { gap: 16px; }
   .date-card { width: 100%; max-width: 100%; padding: 14px 16px; border-radius: 16px; }
   .date-solar { font-size: 17px; }
+  .date-time { font-size: 14.5px; }
   .date-card-secondary { font-size: 12.5px; }
   .date-card-term { font-size: 12px; padding: 7px 10px; }
   .cal-cell { aspect-ratio: 1.05; min-height: 42px; }

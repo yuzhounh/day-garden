@@ -256,7 +256,6 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <span class="live-clock">{{ time }}</span>
         <span class="toolbar-divider"></span>
 
         <!-- 账户同步按钮 -->
@@ -300,7 +299,10 @@ onUnmounted(() => {
 
       <div class="date-card glass-panel" aria-label="今日日期与节气时序">
         <div class="date-card-primary">
-          <span class="date-solar">{{ calendar.solarDateStr }}</span>
+          <div class="date-solar-wrap">
+            <span class="date-solar">{{ calendar.solarDateStr }}</span>
+            <span class="date-time">{{ time }}</span>
+          </div>
           <span class="date-weekday">{{ calendar.dayOfWeek }}</span>
         </div>
         <div class="date-card-secondary">
