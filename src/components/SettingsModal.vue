@@ -109,7 +109,7 @@ function importData(e: Event) {
 </script>
 
 <template>
-  <DetailModal title="布置你的日常花园" subtitle="PERSONALIZE YOUR GARDEN" class="settings-content" @close="emit('close')">
+  <DetailModal title="布置你的今日花园" subtitle="PERSONALIZE YOUR GARDEN" class="settings-content" @close="emit('close')">
 
       <!-- Tab Nav -->
       <div class="flex border-b border-slate-100 dark:border-slate-800 px-6 shrink-0 bg-slate-50/50 dark:bg-slate-800/30">

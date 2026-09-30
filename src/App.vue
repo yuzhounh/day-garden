@@ -164,7 +164,7 @@ onUnmounted(() => {
         <HealthTipBar v-if="prefs.modules.healthTip" :tip="currentHealthTip" :date-key="dateKey" @next-tip="handleNextTip" />
         <div v-if="!Object.values(prefs.modules).some(Boolean)" class="glass-panel empty-dashboard"><Sprout :size="32" /><h2>花园留白，随你安排。</h2><button class="soft-button" @click="openSettings()">选择想看的内容</button></div>
       </main>
-      <footer class="garden-footer"><span><Sprout :size="13" />Day Garden · 日常花园</span><p>心有闲田，日有花开。</p><button class="text-button" @click="openSettings()">布置我的花园</button></footer>
+      <footer class="garden-footer"><span><Sprout :size="13" />Day Garden · 今日花园</span><p>心有闲田，日有花开。</p><button class="text-button" @click="openSettings()">布置我的花园</button></footer>
     </div>
     <SettingsModal v-if="showSettings" :preferences="prefs" :initial-tab="settingsTab" @close="showSettings = false" @update:preferences="handleUpdatePreferences" />
     <AccountModal v-if="showAccount" @close="showAccount = false" />
