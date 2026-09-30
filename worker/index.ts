@@ -604,25 +604,33 @@ async function api(request: Request, env: Env): Promise<Response> {
     const data = await body(request)
     const username = typeof data.username === 'string' ? data.username.trim().toLowerCase() : ''
     const password = typeof data.password === 'string' ? data.password : ''
-    if (!/^[a-z0-9_]{3,32}$/.test(username) || password.length < 10 || password.length > 128) {
-      throw new ApiError(400, '用户名需为 3—32 位字母、数字或下划线，密码需为 10—128 位。')
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username) && username.length <= 64
+    const isUsername = /^[a-z0-9_]{3,32}$/.test(username)
+    if ((!isEmail && !isUsername) || password.length < 10 || password.length > 128) {
+      throw new ApiError(400, '账号需为有效邮箱或 3—32 位用户名（字母/数字/下划线），密码需为 10—128 位。')
     }
-    const existing = await env.DB.prepare('SELECT id, username, password_hash, salt FROM users WHERE username = ?').bind(username).first<UserRow>()
+    let existing = await env.DB.prepare('SELECT id, username, password_hash, salt FROM users WHERE username = ?').bind(username).first<UserRow>()
+    if (!existing && isEmail) {
+      const oauthLink = await env.DB.prepare('SELECT user_id FROM oauth_accounts WHERE email = ?').bind(username).first<{ user_id: string }>()
+      if (oauthLink?.user_id) {
+        existing = await env.DB.prepare('SELECT id, username, password_hash, salt FROM users WHERE id = ?').bind(oauthLink.user_id).first<UserRow>()
+      }
+    }
     if (path === '/api/register') {
-      if (existing) throw new ApiError(409, '这个用户名已被使用。')
+      if (existing) throw new ApiError(409, isEmail ? '该邮箱已被注册。' : '这个用户名已被使用。')
       const salt = randomToken()
       const user = { id: crypto.randomUUID(), username }
       const hash = await passwordHash(password, salt, env.PASSWORD_PEPPER)
       try {
         await env.DB.prepare('INSERT INTO users(id, username, password_hash, salt, created_at) VALUES (?, ?, ?, ?, ?)').bind(user.id, username, hash, salt, Date.now()).run()
       } catch (error) {
-        if (String(error).includes('UNIQUE')) throw new ApiError(409, '这个用户名已被使用。')
+        if (String(error).includes('UNIQUE')) throw new ApiError(409, isEmail ? '该邮箱已被注册。' : '这个用户名已被使用。')
         throw error
       }
       return issueSession(request, env, user)
     }
     const hash = await passwordHash(password, existing?.salt || 'day-garden-dummy-salt', env.PASSWORD_PEPPER)
-    if (!existing || !equal(hash, existing.password_hash)) throw new ApiError(401, '用户名或密码不正确。')
+    if (!existing || !equal(hash, existing.password_hash)) throw new ApiError(401, '用户名/邮箱或密码不正确。')
     return issueSession(request, env, { id: existing.id, username: existing.username })
   }
 

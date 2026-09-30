@@ -101,6 +101,18 @@ export interface ChinaAttraction {
 
 export type AttractionStatusType = 'visited' | 'wishlist' | 'unvisited'
 
+export interface SportExercise {
+  id: string
+  name: string
+  category: string
+  intensity: '低强度' | '中等强度' | '高强度'
+  caloriesPerHour: number
+  benefits: string[]
+  targetMuscles: string[]
+  evidenceInsight: string
+  tips: string
+}
+
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'auto'
   selectedCity: CityOption
@@ -113,6 +125,7 @@ export interface UserPreferences {
     dailyPoetry: boolean
     inspirationalQuote?: boolean
     chinaAttractions?: boolean
+    sportsExercise?: boolean
     healthTip: boolean
   }
   customEvents: LifeEvent[]

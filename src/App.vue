@@ -10,19 +10,21 @@ import EvidenceCard from './components/EvidenceCard.vue'
 import DailyPageCard from './components/DailyPageCard.vue'
 import InspirationalQuoteCard from './components/InspirationalQuoteCard.vue'
 import ChinaAttractionsCard from './components/ChinaAttractionsCard.vue'
+import SportsExerciseCard from './components/SportsExerciseCard.vue'
 import HealthTipBar from './components/HealthTipBar.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import AccountModal from './components/AccountModal.vue'
 import { initializeSync, refreshCloud, account, syncCustomEvents } from './services/sync'
-import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide, LifeEvent, InspirationalQuote, AttractionStatusType } from './types'
+import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide, LifeEvent, InspirationalQuote, AttractionStatusType, SportExercise } from './types'
 import { fetch7DayWeather } from './services/weather'
 import { getUpcomingEvents, sendDesktopNotification } from './services/calendar'
-import { loadUserPreferences, saveUserPreferences, getTodaySeasonBloom, getTodayEvidenceGuide, getTodayPoetry, getTodayHealthTip, getTodayQuote } from './services/storage'
+import { loadUserPreferences, saveUserPreferences, getTodaySeasonBloom, getTodayEvidenceGuide, getTodayPoetry, getTodayHealthTip, getTodayQuote, getTodaySportExercise } from './services/storage'
 import { localDateKey } from './services/day'
 import rawPoetry from './data/poetry-curated.json'
 import rawHealthTips from './data/health-tips.json'
 import rawEvidence from './data/evidence-guide.json'
 import rawQuotes from './data/inspirational-quotes.json'
+import rawSports from './data/sports-exercise.json'
 
 const prefs = ref<UserPreferences>(loadUserPreferences(account.user?.id))
 
@@ -42,6 +44,7 @@ const evidenceGuide = ref(getTodayEvidenceGuide())
 const currentPoetry = ref<CuratedPoetry>(getTodayPoetry())
 const currentHealthTip = ref<HealthTip>(getTodayHealthTip())
 const currentQuote = ref<InspirationalQuote>(getTodayQuote())
+const currentSport = ref<SportExercise>(getTodaySportExercise())
 const upcomingEvents = computed(() => {
   void dateKey.value
   return getUpcomingEvents(prefs.value.customEvents, 30)
@@ -97,6 +100,10 @@ function handleNextQuote() {
   const list = rawQuotes as InspirationalQuote[]
   currentQuote.value = list[(list.findIndex(q => q.id === currentQuote.value.id) + 1) % list.length]
 }
+function handleNextSport() {
+  const list = rawSports as SportExercise[]
+  currentSport.value = list[(list.findIndex(s => s.id === currentSport.value.id) + 1) % list.length]
+}
 function handleUpdateAttractionStatus(newMap: Record<string, AttractionStatusType>) {
   prefs.value = {
     ...prefs.value,
@@ -119,6 +126,7 @@ function syncDate() {
   currentPoetry.value = getTodayPoetry()
   currentHealthTip.value = getTodayHealthTip()
   currentQuote.value = getTodayQuote()
+  currentSport.value = getTodaySportExercise()
   loadWeather()
   checkBirthdayAlerts()
 }
@@ -204,6 +212,12 @@ onUnmounted(() => {
             v-if="prefs.modules.chinaAttractions ?? true"
             :status-map="prefs.attractionStatus"
             @update:status-map="handleUpdateAttractionStatus"
+          />
+          <SportsExerciseCard
+            v-if="prefs.modules.sportsExercise ?? true"
+            :sport="currentSport"
+            @next-sport="handleNextSport"
+            @select-sport="currentSport = $event"
           />
         </section>
 

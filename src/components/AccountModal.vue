@@ -28,7 +28,6 @@ const message = computed(() => {
 })
 
 const hasGoogle = computed(() => account.user?.providers?.includes('google'))
-const hasGitHub = computed(() => account.user?.providers?.includes('github'))
 
 async function submit() {
   submitted.value = true
@@ -40,16 +39,16 @@ async function submit() {
   }
 }
 
-function handleOAuth(provider: 'google' | 'github') {
+function handleOAuth(provider: 'google' = 'google') {
   loginWithOAuth(provider, mergeGuest.value)
 }
 
-function handleMock(provider: 'google' | 'github') {
+function handleMock(provider: 'google' = 'google') {
   void loginWithMock(provider, mergeGuest.value)
 }
 
-async function handleUnlink(provider: 'google' | 'github') {
-  if (!confirm(`确定要解除与 ${provider === 'google' ? 'Google' : 'GitHub'} 账户的关联吗？`)) return
+async function handleUnlink(provider: 'google' = 'google') {
+  if (!confirm('确定要解除与 Google 账户的关联吗？')) return
   try {
     await unlinkProvider(provider)
   } catch {
@@ -87,7 +86,6 @@ async function handleUnlink(provider: 'google' | 'github') {
                 <Check :size="12" />{{ account.status === 'synced' ? '已同步' : account.status === 'syncing' ? '同步中' : '本机已保存' }}
               </span>
               <span v-if="hasGoogle" class="pill lavender">Google 绑定</span>
-              <span v-if="hasGitHub" class="pill lavender">GitHub 绑定</span>
             </div>
           </div>
         </div>
@@ -96,14 +94,14 @@ async function handleUnlink(provider: 'google' | 'github') {
 
         <!-- 关联/解绑第三方快捷方式 -->
         <div class="account-link-row">
-          <span>第三方快捷登录：</span>
+          <span>快捷登录绑定：</span>
           <button
             v-if="!hasGoogle"
             class="oauth-mock-btn"
             :disabled="account.busy"
             @click="handleOAuth('google')"
           >
-            <Link2 :size="12" /> 关联 Google
+            <Link2 :size="12" /> 关联 Google 账户
           </button>
           <button
             v-else-if="(account.user.providers && account.user.providers.length > 1)"
@@ -112,23 +110,6 @@ async function handleUnlink(provider: 'google' | 'github') {
             @click="handleUnlink('google')"
           >
             <Unlink :size="12" /> 解绑 Google
-          </button>
-
-          <button
-            v-if="!hasGitHub"
-            class="oauth-mock-btn"
-            :disabled="account.busy"
-            @click="handleOAuth('github')"
-          >
-            <Link2 :size="12" /> 关联 GitHub
-          </button>
-          <button
-            v-else-if="(account.user.providers && account.user.providers.length > 1)"
-            class="oauth-mock-btn"
-            :disabled="account.busy"
-            @click="handleUnlink('github')"
-          >
-            <Unlink :size="12" /> 解绑 GitHub
           </button>
         </div>
       </div>
@@ -151,7 +132,7 @@ async function handleUnlink(provider: 'google' | 'github') {
         <div class="oauth-grid">
           <!-- Google 登录按钮 -->
           <button
-            class="oauth-btn"
+            class="oauth-btn google-oauth-btn"
             type="button"
             :disabled="account.busy"
             aria-label="使用 Google 账户登录"
@@ -163,21 +144,7 @@ async function handleUnlink(provider: 'google' | 'github') {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
             </svg>
-            <span>Google 登录</span>
-          </button>
-
-          <!-- GitHub 登录按钮 -->
-          <button
-            class="oauth-btn"
-            type="button"
-            :disabled="account.busy"
-            aria-label="使用 GitHub 账户登录"
-            @click="handleOAuth('github')"
-          >
-            <svg class="oauth-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
-            </svg>
-            <span>GitHub 登录</span>
+            <span>使用 Google 账户登录</span>
           </button>
         </div>
 
@@ -188,14 +155,11 @@ async function handleUnlink(provider: 'google' | 'github') {
         <!-- 本地调试免配置模拟体验 -->
         <div v-if="authProviders.dev" class="oauth-mock-banner">
           <span>🛠️ 本地开发模拟体验：</span>
-          <div style="display: flex; gap: 6px;">
-            <button class="oauth-mock-btn" type="button" @click="handleMock('google')">模拟 Google</button>
-            <button class="oauth-mock-btn" type="button" @click="handleMock('github')">模拟 GitHub</button>
-          </div>
+          <button class="oauth-mock-btn" type="button" @click="handleMock('google')">模拟 Google 登录</button>
         </div>
       </div>
 
-      <div class="oauth-divider"><span>或使用用户名与密码</span></div>
+      <div class="oauth-divider"><span>或使用邮箱 / 密码登录</span></div>
 
       <div class="filter-pills">
         <button :class="{ active: !register }" :aria-pressed="!register" @click="register = false">登录</button>
@@ -203,17 +167,16 @@ async function handleUnlink(provider: 'google' | 'github') {
       </div>
 
       <form class="account-form" @submit.prevent="submit">
-        <label for="garden-username">用户名<small>3—32 位字母、数字或下划线</small></label>
+        <label for="garden-username">邮箱或用户名<small>支持邮箱地址或 3—32 位字母数字</small></label>
         <input
           id="garden-username"
           v-model="username"
           name="username"
           autocomplete="username"
-          pattern="[A-Za-z0-9_]{3,32}"
           minlength="3"
-          maxlength="32"
+          maxlength="64"
           required
-          placeholder="给花园取一个名字"
+          placeholder="例如 yourname@example.com 或 gardener"
         />
 
         <label for="garden-password">密码<small>至少 10 位，请妥善保存</small></label>
@@ -235,7 +198,7 @@ async function handleUnlink(provider: 'google' | 'github') {
         </button>
       </form>
 
-      <p class="content-footnote">账户用于同步收藏与打卡。支持通过 Google 或 GitHub 快捷登录；使用密码注册请妥善保管。城市与自定义日程仍保存在本机。</p>
+      <p class="content-footnote">账户用于同步收藏与打卡。支持通过 Google 快捷登录，或使用邮箱/用户名密码登录。城市与自定义日程仍保存在本机。</p>
     </template>
 
     <div class="account-backup">

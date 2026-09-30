@@ -274,6 +274,11 @@ function importData(e: Event) {
             </label>
 
             <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200">动健身心 · 运动项目指南</span>
+              <input type="checkbox" :checked="preferences.modules.sportsExercise ?? true" @change="toggleModule('sportsExercise')" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            </label>
+
+            <label class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer">
               <span class="text-xs font-medium text-slate-800 dark:text-slate-200">底部健康微提醒</span>
               <input type="checkbox" :checked="preferences.modules.healthTip" @change="toggleModule('healthTip')" class="rounded text-emerald-600 focus:ring-emerald-500" />
             </label>
