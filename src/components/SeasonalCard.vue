@@ -19,7 +19,7 @@ function monthRange(months: number[]) { return months[0] + '—' + (months[0]! >
     <header class="card-heading"><div class="section-label"><span class="icon-tile peach"><Flower2 :size="17" /></span><h2>四时花信</h2><span class="eyebrow">IN SEASON</span></div><span class="pill peach"><span class="status-dot"></span>{{ bloom.status }}</span></header>
     <div class="bloom-scene">
       <div class="bloom-copy"><p class="eyebrow">{{ monthRange(bloom.months) }} · {{ bloom.solarTerms.join(' / ') }}</p><h3>{{ bloom.name }}</h3><p>{{ bloom.description }}</p></div>
-      <BotanicalArt :color="bloom.color" />
+      <BotanicalArt :name="bloom.name" :color="bloom.color" />
     </div>
     <div class="bloom-observation"><Eye :size="15" /><p>{{ bloom.observation }}</p></div>
     <footer class="card-footer"><span class="bloom-location"><MapPin :size="13" />{{ bloom.bestSpot }}</span><button class="text-button" @click="showCalendar = true">花期日历<ArrowUpRight :size="14" /></button></footer>

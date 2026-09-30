@@ -3,7 +3,6 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Sun, Moon, Settings2, MapPin, ChevronDown, Sprout, Check, Cloud, UserRound } from 'lucide-vue-next'
 import { getTodayCalendarInfo } from '../services/calendar'
 import { DEFAULT_CITIES } from '../services/weather'
-import BotanicalArt from './BotanicalArt.vue'
 import type { CityOption } from '../types'
 import { account } from '../services/sync'
 
@@ -76,7 +75,6 @@ onUnmounted(() => {
         <p class="hero-description">感受四时流转，照顾日常，也收藏一点诗意。</p>
         <div class="season-note"><Sprout :size="14" /><span>{{ calendar.termSummary }}</span></div>
       </div>
-      <div class="hero-botanical"><BotanicalArt /><span>一枝一叶，都是生活。</span></div>
       <div class="date-card glass-panel">
         <span>{{ now.getFullYear() }} / {{ String(now.getMonth() + 1).padStart(2, '0') }}</span>
         <strong>{{ String(now.getDate()).padStart(2, '0') }}</strong>
