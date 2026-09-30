@@ -104,7 +104,7 @@ export function calculateNextEventDate(
     const diffMs = targetDate.getTime() - baseDate.getTime()
     const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
     const turningAge = birthYear ? targetSolar.getLunar().getYear() - birthYear : undefined
-    const ageStr = turningAge ? ` · ${turningAge}岁` : ''
+    const ageStr = turningAge !== undefined ? ` · ${turningAge}岁` : ''
     const nextDateStr = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日 (农历${m}月${d}${ageStr})`
     return { daysLeft, nextDateStr }
   } else {
@@ -120,7 +120,7 @@ export function calculateNextEventDate(
     const diffMs = targetDate.getTime() - baseDate.getTime()
     const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
     const turningAge = birthYear ? targetDate.getFullYear() - birthYear : undefined
-    const ageStr = turningAge ? ` · ${turningAge}岁` : ''
+    const ageStr = turningAge !== undefined ? ` · ${turningAge}岁` : ''
     const nextDateStr = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日${ageStr}`
     return { daysLeft, nextDateStr }
   }
