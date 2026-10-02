@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Sprout, ArrowUpRight, ShieldCheck, RefreshCw, BookOpen, Search } from 'lucide-vue-next'
+import { Sprout, ArrowUpRight, ShieldCheck, RefreshCw, BookOpen, Search, Check } from 'lucide-vue-next'
 import type { EvidenceGuide } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawEvidence from '../data/evidence-guide.json'
@@ -67,12 +67,18 @@ function setAsCurrentGuide(g: EvidenceGuide) {
     </header>
 
     <div class="guide-body">
-      <span class="pill sage">{{ guide.category }}</span>
-      <h3>{{ guide.title }}</h3>
-      <p>{{ guide.coreAction }}</p>
-      <div class="guide-action">
-        <ShieldCheck :size="15" />
-        <span>{{ guide.roi }}</span>
+      <div class="guide-header-row">
+        <span class="pill sage">{{ guide.category }}</span>
+      </div>
+      <h3 class="guide-title">{{ guide.title }}</h3>
+      <p class="guide-core-action">{{ guide.coreAction }}</p>
+
+      <div class="guide-insight-box">
+        <div class="guide-roi">
+          <ShieldCheck :size="15" class="shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <span>{{ guide.roi }}</span>
+        </div>
+        <p class="guide-details-text">{{ guide.details }}</p>
       </div>
     </div>
 
@@ -178,6 +184,62 @@ function setAsCurrentGuide(g: EvidenceGuide) {
 </template>
 
 <style scoped>
+.evidence-card {
+  display: flex;
+  flex-direction: column;
+}
+.guide-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: 13px;
+  margin: 4px 0 10px;
+  flex: 1;
+}
+.guide-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.guide-title {
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--ink);
+  letter-spacing: -0.2px;
+  margin: 0;
+}
+.guide-core-action {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--secondary);
+  margin: 0;
+}
+.guide-insight-box {
+  padding: 12px 15px;
+  border-radius: 13px;
+  background: rgba(90, 158, 106, 0.06);
+  border: 1px solid rgba(90, 158, 106, 0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.guide-roi {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.guide-details-text {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink);
+  opacity: 0.92;
+  margin: 0;
+}
 .modal-search-row {
   margin-bottom: 14px;
 }
