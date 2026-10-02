@@ -619,6 +619,7 @@
 .garden-tabs a:hover { background: var(--sage-bg); }
 .weather-panel { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; border-radius: 22px; padding: 24px 26px; margin-bottom: 20px; transition: box-shadow .25s ease; }
 .weather-panel:hover { box-shadow: var(--card-shadow-hover); }
+.weather-panel > * { min-width: 0; }
 .weather-summary { display: flex; flex-direction: column; border-right: 1px solid var(--line); padding-right: 22px; }
 .summary-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .summary-header > .eyebrow { font-size: 12px; letter-spacing: 1.2px; color: var(--muted); }
@@ -1919,6 +1920,8 @@
 @media (min-width: 1400px) { .garden-shell { padding-top: 10px; } .hero-intro { padding-top: 36px; padding-bottom: 40px; } }
 @media (max-width: 1050px) {
   .garden-shell { width: calc(100% - 48px); }
+  .topbar { flex-wrap: wrap; gap: 14px; }
+  .header-actions { flex-wrap: wrap; }
   .hero-botanical { width: 175px; }
   .section-label > .eyebrow { display: none; }
   .weather-panel { grid-template-columns: 190px minmax(0, 1fr); gap: 16px; padding: 20px; }
@@ -1936,9 +1939,17 @@
   .account-summary { flex-direction: column; align-items: stretch; }
   .account-summary > .account-actions { flex-direction: row; flex-wrap: wrap; }
   .garden-shell { width: calc(100% - 36px); }
-  .topbar { padding-top: 20px; }
+  .topbar { padding-top: 20px; display: grid; gap: 14px; }
   .brand { font-size: 22px; }
-  .header-actions { gap: 7px; }
+  .header-actions { gap: 7px; justify-content: space-between; min-width: 0; }
+  .header-actions .icon-button, .icon-button.small { width: 44px; height: 44px; }
+  .toolbar-button { min-height: 44px; white-space: nowrap; }
+  .city-menu { left: 0; right: auto; width: min(310px, calc(100vw - 28px)); }
+  input:not([type="range"]), select, textarea { font-size: 16px; }
+  .city-pill-btn, .popover-timer-pill { min-height: 44px; }
+  button { min-height: 44px; }
+  .header-actions .header-audio-popover { position: fixed; top: 150px; left: 14px; right: 14px; width: auto; max-width: none; max-height: calc(100dvh - 164px); overflow-y: auto; overscroll-behavior: contain; }
+  .cal-cell { min-height: 44px; }
   .live-clock, .toolbar-divider { display: none; }
   .account-button > span { display: none; }
   .toolbar-button { padding: 8px 11px; }
@@ -1976,7 +1987,7 @@
   .brand { font-size: 20px; gap: 8px; }
   .brand-symbol { width: 36px; height: 36px; }
   .header-actions { gap: 4px; }
-  .header-actions .icon-button { width: 34px; height: 34px; }
+  .header-actions .icon-button { width: 44px; height: 44px; }
   .header-audio-popover { width: calc(100vw - 32px); max-width: 320px; right: -50px; }
   .toolbar-button { padding: 8px; }
   .toolbar-button > svg:last-child { display: none; }
@@ -1990,7 +2001,7 @@
   .date-time { font-size: 14.5px; }
   .date-card-secondary { font-size: 12.5px; }
   .date-card-term { font-size: 12px; padding: 7px 10px; }
-  .cal-cell { aspect-ratio: 1.05; min-height: 42px; }
+  .cal-cell { aspect-ratio: 1.05; min-height: 44px; }
   .cell-solar-num { font-size: 15px; }
   .cell-sub-text { font-size: 10px; }
   .cal-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
