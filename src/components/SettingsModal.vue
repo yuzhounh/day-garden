@@ -2,7 +2,7 @@
 import { ref, watch, computed } from 'vue'
 import { Plus, Trash2, Download, Upload, Check, Pencil, Clock, Bell, Search } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
-import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft, isRedundantMemo, getSafeLunar } from '../services/calendar'
+import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft, isRedundantMemo, getSafeLunar, isAnniversaryEvent } from '../services/calendar'
 import { cleanEventGiftAdvice } from '../services/storage'
 import DetailModal from './DetailModal.vue'
 
@@ -35,6 +35,14 @@ const newEventAdvice = ref('')
 const newEventIsLunar = ref(false)
 const notificationStatus = ref<'idle' | 'success' | 'denied'>('idle')
 
+watch(newEventTitle, (title) => {
+  if (isAnniversaryEvent({ title })) {
+    newEventType.value = 'anniversary'
+  } else if (title.includes('生日') || title.includes('生辰')) {
+    newEventType.value = 'birthday'
+  }
+})
+
 // 编辑事件表单
 const editingId = ref<string | null>(null)
 const editForm = ref<{
@@ -43,12 +51,14 @@ const editForm = ref<{
   role: string
   giftAdvice: string
   isLunar: boolean
+  type: 'birthday' | 'anniversary' | 'custom'
 }>({
   title: '',
   date: '',
   role: '',
   giftAdvice: '',
   isLunar: false,
+  type: 'birthday',
 })
 
 function startEdit(ev: LifeEvent) {
@@ -59,6 +69,7 @@ function startEdit(ev: LifeEvent) {
     role: ev.role || '',
     giftAdvice: ev.giftAdvice || '',
     isLunar: !!ev.isLunar,
+    type: isAnniversaryEvent(ev) ? 'anniversary' : ((ev.type === 'anniversary' || ev.type === 'custom') ? ev.type : 'birthday'),
   }
 }
 
@@ -69,12 +80,14 @@ function cancelEdit() {
 function saveEdit(id: string) {
   if (!editForm.value.title.trim() || !editForm.value.date.trim()) return
 
+  const isAnniv = isAnniversaryEvent({ title: editForm.value.title, type: editForm.value.type })
   const updatedEvents = props.preferences.customEvents.map((ev) => {
     if (ev.id !== id) return ev
     return {
       ...ev,
       title: editForm.value.title.trim(),
       date: editForm.value.date.trim(),
+      type: isAnniv ? 'anniversary' : editForm.value.type,
       role: editForm.value.role.trim() || undefined,
       giftAdvice: editForm.value.giftAdvice.trim() || undefined,
       isLunar: editForm.value.isLunar,
@@ -104,7 +117,7 @@ const sortedEvents = computed(() => {
 
 function getEventCountdown(ev: LifeEvent) {
   try {
-    return calculateNextEventDate(ev?.date || '', !!ev?.isLunar)
+    return calculateNextEventDate(ev?.date || '', !!ev?.isLunar, new Date(), isAnniversaryEvent(ev))
   } catch {
     return {
       daysLeft: -1,
@@ -224,11 +237,12 @@ function toggleModule(key: keyof UserPreferences['modules']) {
 function addEvent() {
   if (!newEventTitle.value.trim() || !newEventDate.value.trim()) return
 
+  const isAnniv = isAnniversaryEvent({ title: newEventTitle.value, type: newEventType.value })
   const newEv: LifeEvent = {
     id: 'evt_' + Date.now(),
     title: newEventTitle.value.trim(),
     date: newEventDate.value.trim(),
-    type: newEventType.value,
+    type: isAnniv ? 'anniversary' : newEventType.value,
     role: newEventRole.value.trim() || undefined,
     giftAdvice: newEventAdvice.value.trim() || undefined,
     isLunar: newEventIsLunar.value,
@@ -244,6 +258,7 @@ function addEvent() {
   newEventDate.value = ''
   newEventRole.value = ''
   newEventAdvice.value = ''
+  newEventType.value = 'birthday'
 }
 
 function removeEvent(id: string) {
@@ -462,10 +477,30 @@ function importData(e: Event) {
               />
             </div>
             <div class="flex items-center justify-between pt-1">
-              <label class="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500 cursor-pointer">
-                <input type="checkbox" v-model="newEventIsLunar" class="rounded text-emerald-600" />
-                <span>农历日期</span>
-              </label>
+              <div class="flex items-center gap-2.5">
+                <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs">
+                  <button
+                    type="button"
+                    class="px-2 py-0.5 rounded-md transition"
+                    :class="newEventType === 'birthday' ? 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                    @click="newEventType = 'birthday'"
+                  >
+                    🎂 生日
+                  </button>
+                  <button
+                    type="button"
+                    class="px-2 py-0.5 rounded-md transition"
+                    :class="newEventType === 'anniversary' ? 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                    @click="newEventType = 'anniversary'"
+                  >
+                    💖 纪念日
+                  </button>
+                </div>
+                <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                  <input type="checkbox" v-model="newEventIsLunar" class="rounded text-emerald-600" />
+                  <span>农历</span>
+                </label>
+              </div>
               <button
                 @click="addEvent"
                 class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5 shadow-sm"
@@ -537,10 +572,30 @@ function importData(e: Event) {
                   />
                 </div>
                 <div class="flex items-center justify-between pt-1">
-                  <label class="flex items-center gap-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 cursor-pointer">
-                    <input type="checkbox" v-model="editForm.isLunar" class="rounded text-emerald-600 focus:ring-emerald-500" />
-                    <span>农历日期</span>
-                  </label>
+                  <div class="flex items-center gap-2.5">
+                    <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs">
+                      <button
+                        type="button"
+                        class="px-2 py-0.5 rounded-md transition"
+                        :class="editForm.type === 'birthday' ? 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                        @click="editForm.type = 'birthday'"
+                      >
+                        🎂 生日
+                      </button>
+                      <button
+                        type="button"
+                        class="px-2 py-0.5 rounded-md transition"
+                        :class="editForm.type === 'anniversary' ? 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                        @click="editForm.type = 'anniversary'"
+                      >
+                        💖 纪念日
+                      </button>
+                    </div>
+                    <label class="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+                      <input type="checkbox" v-model="editForm.isLunar" class="rounded text-emerald-600 focus:ring-emerald-500" />
+                      <span>农历</span>
+                    </label>
+                  </div>
                   <div class="flex items-center gap-2">
                     <button
                       @click="cancelEdit"
@@ -607,15 +662,15 @@ function importData(e: Event) {
                     <span>{{ getCountdownText(ev) }}</span>
                   </div>
                   <div v-if="getEventCountdown(ev).turningAge" class="text-sm font-bold">
-                    {{ ev.type === 'anniversary' ? `${getEventCountdown(ev).turningAge} 周年` : `满 ${getEventCountdown(ev).turningAge} 周岁` }}
+                    {{ isAnniversaryEvent(ev) ? `${getEventCountdown(ev).turningAge} 周年` : `满 ${getEventCountdown(ev).turningAge} 周岁` }}
                   </div>
                 </div>
 
-                <!-- 核心详情信息：出生日期 & 下次过生日日期 -->
+                <!-- 核心详情信息：出生日期 / 纪念起始 & 下次过生日 / 纪念日 -->
                 <div class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
                   <div class="flex items-center justify-between">
                     <span class="text-slate-400 dark:text-slate-500 text-xs">
-                      {{ ev.type === 'anniversary' ? '纪念起始' : '出生日期' }}
+                      {{ isAnniversaryEvent(ev) ? '纪念起始' : '出生日期' }}
                     </span>
                     <span class="font-medium text-slate-700 dark:text-slate-200 text-sm">
                       {{ getBirthDateDisplay(ev) }}
@@ -624,7 +679,7 @@ function importData(e: Event) {
 
                   <div class="flex items-center justify-between">
                     <span class="text-slate-400 dark:text-slate-500 text-xs">
-                      {{ ev.type === 'anniversary' ? '下次纪念日' : '下次生日' }}
+                      {{ isAnniversaryEvent(ev) ? '下次纪念日' : '下次生日' }}
                     </span>
                     <span class="font-medium text-slate-800 dark:text-slate-100 text-sm">
                       {{ getNextDateDisplay(ev) }}

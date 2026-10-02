@@ -102,10 +102,43 @@ export function isRedundantMemo(memo?: unknown): boolean {
   return false
 }
 
+/**
+ * 智能判定一个纪念日/事件是否属于周年纪念日（非生日）
+ */
+export function isAnniversaryEvent(ev?: { type?: string; title?: string } | null): boolean {
+  if (!ev) return false
+  if (ev.type === 'anniversary') return true
+  const title = (ev.title || '').trim().toLowerCase()
+  if (
+    title.includes('纪念') ||
+    title.includes('周年') ||
+    title.includes('结婚') ||
+    title.includes('领证') ||
+    title.includes('相识') ||
+    title.includes('相恋') ||
+    title.includes('在一起') ||
+    title.includes('入职') ||
+    title.includes('入伍') ||
+    title.includes('毕业') ||
+    title.includes('买房') ||
+    title.includes('乔迁') ||
+    title.includes('提车') ||
+    title.includes('开业') ||
+    title.includes('创办')
+  ) {
+    return true
+  }
+  if (ev.type === 'birthday' || title.includes('生日') || title.includes('生辰') || title.includes('出生') || title.includes('诞辰')) {
+    return false
+  }
+  return ev.type === 'custom'
+}
+
 export function calculateNextEventDate(
   eventDateStr: string,
   isLunar: boolean = false,
-  baseDate: Date = new Date()
+  baseDate: Date = new Date(),
+  isAnniversary: boolean = false
 ): NextEventInfo {
   const fallbackInfo: NextEventInfo = {
     daysLeft: 9999,
@@ -164,8 +197,9 @@ export function calculateNextEventDate(
       const targetLunar = targetSolar.getLunar()
       const lunarChineseStr = `农历${targetLunar.getMonthInChinese()}月${targetLunar.getDayInChinese()}`
       const nextDateSolar = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
+      const unit = isAnniversary ? '周年' : '岁'
       const nextDateStr = turningAge !== undefined
-        ? `${nextDateSolar} · ${turningAge}岁 · ${lunarChineseStr}`
+        ? `${nextDateSolar} · ${turningAge}${unit} · ${lunarChineseStr}`
         : `${nextDateSolar} · ${lunarChineseStr}`
       return {
         daysLeft,
@@ -188,8 +222,9 @@ export function calculateNextEventDate(
       const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
       const turningAge = birthYear ? targetDate.getFullYear() - birthYear : undefined
       const nextDateSolar = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
+      const unit = isAnniversary ? '周年' : '岁'
       const nextDateStr = turningAge !== undefined
-        ? `${nextDateSolar} · ${turningAge}岁`
+        ? `${nextDateSolar} · ${turningAge}${unit}`
         : nextDateSolar
       return {
         daysLeft,
@@ -212,8 +247,8 @@ export function sortEventsByDaysLeft(events?: LifeEvent[] | null, baseDate?: Dat
   const base = baseDate || new Date()
   return [...events].sort((a, b) => {
     try {
-      const da = calculateNextEventDate(a?.date || '', !!a?.isLunar, base).daysLeft
-      const db = calculateNextEventDate(b?.date || '', !!b?.isLunar, base).daysLeft
+      const da = calculateNextEventDate(a?.date || '', !!a?.isLunar, base, isAnniversaryEvent(a)).daysLeft
+      const db = calculateNextEventDate(b?.date || '', !!b?.isLunar, base, isAnniversaryEvent(b)).daysLeft
       const safeA = da < 0 ? 999999 : da
       const safeB = db < 0 ? 999999 : db
       return safeA - safeB
@@ -234,7 +269,7 @@ export function getUpcomingEvents(customEvents?: LifeEvent[] | null, daysThresho
   // 1. 节假日
   for (const h of rawHolidays) {
     try {
-      const calc = calculateNextEventDate(h.date, false, new Date(now))
+      const calc = calculateNextEventDate(h.date, false, new Date(now), false)
       if (calc.daysLeft <= daysThreshold) {
         allEvents.push({
           id: h.id,
@@ -255,7 +290,8 @@ export function getUpcomingEvents(customEvents?: LifeEvent[] | null, daysThresho
   // 2. 自定义事件（家人朋友生日、重要纪念日）
   for (const ev of safeEvents) {
     try {
-      const calc = calculateNextEventDate(ev.date, !!ev.isLunar, new Date(now))
+      const isAnniv = isAnniversaryEvent(ev)
+      const calc = calculateNextEventDate(ev.date, !!ev.isLunar, new Date(now), isAnniv)
       if (calc.daysLeft <= daysThreshold) {
         let urgencyLevel: LifeEvent['urgencyLevel'] = 'normal'
         if (calc.daysLeft === 0) urgencyLevel = 'today'
@@ -264,6 +300,7 @@ export function getUpcomingEvents(customEvents?: LifeEvent[] | null, daysThresho
 
         allEvents.push({
           ...ev,
+          type: isAnniv ? 'anniversary' : ev.type,
           giftAdvice: isRedundantMemo(ev.giftAdvice) ? undefined : ev.giftAdvice,
           daysLeft: calc.daysLeft,
           nextDateStr: calc.nextDateStr,

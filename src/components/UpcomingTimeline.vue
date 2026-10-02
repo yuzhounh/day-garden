@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Cake, Gift, Heart, Plus, BookOpen } from 'lucide-vue-next'
 import type { LifeEvent } from '../types'
-import { isRedundantMemo } from '../services/calendar'
+import { isRedundantMemo, isAnniversaryEvent } from '../services/calendar'
 defineProps<{ events: LifeEvent[] }>()
 const emit = defineEmits<{
   (e: 'add-event'): void
@@ -30,9 +30,9 @@ const emit = defineEmits<{
     </div>
     <div v-else class="event-list">
       <div v-for="event in events.slice(0, 4)" :key="event.id" class="event-row">
-        <span class="event-icon" :class="event.type">
-          <Cake v-if="event.type === 'birthday'" :size="17" />
-          <Heart v-else-if="event.type === 'anniversary'" :size="17" />
+        <span class="event-icon" :class="isAnniversaryEvent(event) ? 'anniversary' : event.type">
+          <Heart v-if="isAnniversaryEvent(event) || event.type === 'anniversary'" :size="17" />
+          <Cake v-else-if="event.type === 'birthday'" :size="17" />
           <Gift v-else :size="17" />
         </span>
         <div class="event-info">

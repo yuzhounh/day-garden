@@ -1,6 +1,6 @@
 import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip, InspirationalQuote, SportExercise, LifeEvent, QuickNote } from '../types'
 import { DEFAULT_CITIES } from './weather'
-import { sortEventsByDaysLeft, isRedundantMemo } from './calendar'
+import { sortEventsByDaysLeft, isRedundantMemo, isAnniversaryEvent } from './calendar'
 import rawSeasons from '../data/seasons-bloom.json'
 import rawEvidence from '../data/evidence-guide.json'
 import rawPoetry from '../data/poetry-curated.json'
@@ -89,11 +89,15 @@ export function loadUserPreferences(userId?: string | null): UserPreferences {
     if (!raw) return { ...DEFAULT_PREFERENCES, customEvents: sortEventsByDaysLeft([...DEFAULT_PREFERENCES.customEvents]) }
     const parsed = JSON.parse(raw)
     const rawEvents = Array.isArray(parsed.customEvents) ? parsed.customEvents : [...DEFAULT_PREFERENCES.customEvents]
+    const normalizedEvents = rawEvents.map(cleanEventGiftAdvice).map((ev: LifeEvent) => ({
+      ...ev,
+      type: isAnniversaryEvent(ev) ? 'anniversary' : (ev.type || 'birthday'),
+    }))
     return {
       ...DEFAULT_PREFERENCES,
       ...parsed,
       modules: { ...DEFAULT_PREFERENCES.modules, ...parsed.modules },
-      customEvents: sortEventsByDaysLeft(rawEvents.map(cleanEventGiftAdvice)),
+      customEvents: sortEventsByDaysLeft(normalizedEvents),
     }
   } catch (e) {
     console.warn('Failed to parse preferences:', e)
