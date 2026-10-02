@@ -41,8 +41,10 @@ const cardVolumePercent = computed(() => {
 })
 
 const cardVolumeTooltipLeft = computed(() => {
-  const pct = cardVolumePercent.value / 100
-  return `calc(7px + (100% - 14px) * ${pct})`
+  const pct = cardVolumePercent.value
+  const offset = 7 - 14 * (pct / 100)
+  const sign = offset >= 0 ? '+' : '-'
+  return `calc(${pct}% ${sign} ${Math.abs(offset).toFixed(1)}px)`
 })
 
 function onCardVolInput(e: Event) {

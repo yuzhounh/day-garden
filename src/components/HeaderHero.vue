@@ -105,8 +105,10 @@ const popoverVolumePercent = computed(() => {
 })
 
 const popoverVolumeTooltipLeft = computed(() => {
-  const pct = popoverVolumePercent.value / 100
-  return `calc(7px + (100% - 14px) * ${pct})`
+  const pct = popoverVolumePercent.value
+  const offset = 7 - 14 * (pct / 100)
+  const sign = offset >= 0 ? '+' : '-'
+  return `calc(${pct}% ${sign} ${Math.abs(offset).toFixed(1)}px)`
 })
 
 function onPopoverVolInput(e: Event) {
