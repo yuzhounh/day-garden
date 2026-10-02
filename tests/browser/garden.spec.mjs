@@ -57,7 +57,7 @@ test('Mock sign-in changes account theme and city together; event creation queue
   await page.goto('/')
   await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
   await page.getByRole('button', { name: '模拟 Google 登录', exact: true }).click()
-  await expect(page.getByText('Google 绑定', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= visualViewport.width + 1)).toBe(true)
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   const user = (await (await page.request.get('/api/session')).json()).user
@@ -149,7 +149,7 @@ test('Two accounts and guest apply their own city, weather and theme; an upgrade
   await page.getByRole('button', { name: '云端已同步' }).click()
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
   await page.getByRole('button', { name: '模拟 GitHub 登录', exact: true }).click()
-  await expect(page.getByText('GitHub 绑定', { exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(page.locator('html')).not.toHaveClass(/dark/)
   await expect(page.getByRole('button', { name: '选择或搜索城市' })).toContainText('北京')
