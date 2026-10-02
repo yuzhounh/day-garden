@@ -280,12 +280,14 @@ function getIntensityColor(intensity: string) {
 .sports-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 .sport-main-display {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-top: 4px;
+  flex: 1;
 }
 .sport-title-badge-row {
   display: flex;
