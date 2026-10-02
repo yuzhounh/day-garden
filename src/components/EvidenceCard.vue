@@ -112,6 +112,7 @@ function setAsCurrentGuide(g: EvidenceGuide) {
       v-if="showLibrary"
       title="生活有方 · 科学循证日常指南集"
       subtitle="微小改变，持久滋养 · 汇集日常生活科学改善小切口"
+      class="collection-modal"
       @close="showLibrary = false"
     >
       <!-- 搜索框 -->
@@ -201,12 +202,20 @@ function setAsCurrentGuide(g: EvidenceGuide) {
   color: var(--muted);
 }
 .guide-modal-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 500px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-height: 560px;
   overflow-y: auto;
   margin-top: 14px;
+}
+@media (max-width: 680px) {
+  .guide-modal-list {
+    grid-template-columns: 1fr;
+  }
+}
+.guide-modal-list .empty-state {
+  grid-column: 1 / -1;
 }
 .modal-guide-card {
   padding: 14px 16px;
@@ -215,6 +224,9 @@ function setAsCurrentGuide(g: EvidenceGuide) {
   background: var(--surface);
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .modal-guide-card:hover {
   border-color: var(--accent);
@@ -253,6 +265,7 @@ function setAsCurrentGuide(g: EvidenceGuide) {
   font-size: 12px;
   padding-top: 6px;
   border-top: 1px dashed var(--line);
+  margin-top: auto;
 }
 .modal-guide-roi {
   display: inline-flex;

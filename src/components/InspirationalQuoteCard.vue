@@ -123,6 +123,7 @@ function setAsHomeQuote(q: InspirationalQuote) {
       v-if="showList"
       title="心力之源 · 励志名人名言小集"
       subtitle="经典思想金句 · 向上生长，滋养心力"
+      class="collection-modal"
       @close="showList = false"
     >
       <div class="filter-pills">

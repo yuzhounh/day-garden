@@ -752,12 +752,33 @@
 .poem-list strong { font-family: var(--poetry-font); font-size: 18px; font-weight: 600; }
 .poem-list small { display: block; font-family: inherit; font-size: 13px; color: var(--muted); margin-top: 5px; }
 .poem-list p { font-family: var(--poetry-font); font-size: 15px; color: var(--secondary); line-height: 1.8; margin-top: 10px; }
-.bloom-list > article { display: flex; align-items: flex-start; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.bloom-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-height: 560px;
+  overflow-y: auto;
+}
+@media (max-width: 680px) {
+  .bloom-list {
+    grid-template-columns: 1fr;
+  }
+}
+.bloom-list > article {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  height: 100%;
+}
 .bloom-emoji { font-size: 30px; margin-top: 4px; }
-.bloom-list h3 { font-family: inherit; font-size: 20px; font-weight: 600; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 9px; }
-.bloom-list p { font-size: 14px; color: var(--secondary); line-height: 1.8; }
-.bloom-list .observation-text { color: var(--accent); margin: 8px 0; }
-.bloom-list small { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.bloom-list h3 { font-family: inherit; font-size: 17px; font-weight: 600; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.bloom-list p { font-size: 13.5px; color: var(--secondary); line-height: 1.6; }
+.bloom-list .observation-text { color: var(--accent); margin: 6px 0; }
+.bloom-list small { display: flex; align-items: center; gap: 4px; color: var(--muted); font-size: 12.5px; line-height: 1.6; }
 .content-footnote { font-size: 13px; color: var(--muted); line-height: 1.8; margin-top: 18px; }
 .source-link { display: inline-flex; align-items: center; gap: 7px; color: var(--accent); font-size: 14px; line-height: 1.8; }
 .source-link:hover { text-decoration: underline; }
@@ -771,6 +792,7 @@
 .weather-details small { display: block; color: var(--muted); margin-bottom: 5px; font-size: 13px; }
 .weather-details strong { font-size: 18px; font-weight: 600; }
 .empty-state { text-align: center; padding: 30px 10px; color: var(--muted); line-height: 2; font-size: 14px; }
+.detail-modal.collection-modal { width: min(920px, 100%); }
 .detail-modal.settings-content { width: min(720px, 100%); }
 .settings-content { padding: 0; }
 .settings-content > .modal-content { padding: 0; }
@@ -917,12 +939,17 @@
   color: var(--muted);
 }
 .quote-library-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin-top: 14px;
-  max-height: 520px;
+  max-height: 560px;
   overflow-y: auto;
+}
+@media (max-width: 680px) {
+  .quote-library-list {
+    grid-template-columns: 1fr;
+  }
 }
 .quote-item-card {
   padding: 16px 18px;
@@ -933,6 +960,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  height: 100%;
 }
 .quote-item-card:hover {
   border-color: var(--accent);
@@ -983,6 +1011,7 @@
   justify-content: space-between;
   padding-top: 6px;
   border-top: 1px dashed var(--line);
+  margin-top: auto;
 }
 .set-featured-btn {
   display: inline-flex;
@@ -1202,18 +1231,26 @@
   width: 100%;
 }
 .attraction-modal-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 480px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-height: 560px;
   overflow-y: auto;
   margin-top: 14px;
 }
+@media (max-width: 680px) {
+  .attraction-modal-list {
+    grid-template-columns: 1fr;
+  }
+}
 .modal-spot-card {
-  padding: 14px;
+  padding: 14px 16px;
   border-radius: 16px;
   border: 1px solid var(--line);
   background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .modal-spot-header {
   display: flex;
@@ -1238,6 +1275,7 @@
   line-height: 1.5;
   color: var(--ink);
   margin-bottom: 8px;
+  flex: 1;
 }
 .modal-spot-sub {
   display: flex;
@@ -1247,6 +1285,7 @@
   font-size: 11.5px;
   color: var(--muted);
   flex-wrap: wrap;
+  margin-top: auto;
 }
 .modal-spot-quote {
   font-style: italic;

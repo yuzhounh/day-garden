@@ -153,6 +153,7 @@ function getIntensityColor(intensity: string) {
       v-if="showModal"
       title="运动项目与健康益处大观"
       subtitle="运动健身与身心滋养大观 · 感受身体舒展的生命力"
+      class="collection-modal"
       @close="showModal = false"
     >
       <!-- 搜索框 -->
@@ -373,12 +374,20 @@ function getIntensityColor(intensity: string) {
   font-size: 12px;
 }
 .sports-modal-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 500px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-height: 560px;
   overflow-y: auto;
   margin-top: 14px;
+}
+@media (max-width: 680px) {
+  .sports-modal-list {
+    grid-template-columns: 1fr;
+  }
+}
+.sports-modal-list .empty-state {
+  grid-column: 1 / -1;
 }
 .modal-sport-card {
   padding: 14px;
@@ -387,6 +396,9 @@ function getIntensityColor(intensity: string) {
   background: var(--surface);
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .modal-sport-card:hover {
   border-color: var(--accent);
@@ -447,5 +459,6 @@ function getIntensityColor(intensity: string) {
   font-size: 12.5px;
   padding-top: 6px;
   border-top: 1px dashed var(--line);
+  margin-top: auto;
 }
 </style>

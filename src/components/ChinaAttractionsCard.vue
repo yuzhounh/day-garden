@@ -169,6 +169,7 @@ const filteredList = computed(() => {
       v-if="showModal"
       title="中国最值得去的旅游胜景"
       subtitle="华夏名山大川与文化圣地 · 随心记录足迹与心愿"
+      class="collection-modal"
       @close="showModal = false"
     >
       <!-- 搜索与状态 Tab -->

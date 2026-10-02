@@ -104,6 +104,7 @@ function selectBloomItem(item: SeasonBloom) {
       v-if="showCalendar"
       title="一年花事，慢慢相逢"
       subtitle="FLOWERING CALENDAR · 全年物候指南"
+      class="collection-modal"
       @close="showCalendar = false"
     >
       <div class="filter-pills month-filter">
@@ -121,7 +122,7 @@ function selectBloomItem(item: SeasonBloom) {
         <article
           v-for="item in monthBlooms"
           :key="item.name"
-          class="p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 transition mb-3"
+          class="p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 transition"
         >
           <span class="bloom-emoji">{{ item.icon }}</span>
           <div class="flex-1 min-w-0">

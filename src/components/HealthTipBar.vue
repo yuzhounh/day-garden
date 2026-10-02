@@ -150,6 +150,7 @@ function toggle(id: string) {
     <!-- 全量健康微习惯集弹窗 -->
     <DetailModal
       v-if="showLibrary"
+      class="collection-modal"
       title="好好照顾自己 · 健康微习惯集"
       subtitle="44 条身心照护微习惯 · 温柔对待身体，每日细水长流"
       @close="showLibrary = false"
@@ -263,10 +264,10 @@ function toggle(id: string) {
   color: var(--muted);
 }
 .health-tips-modal-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 500px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  max-height: 560px;
   overflow-y: auto;
   margin-top: 14px;
 }
@@ -277,6 +278,9 @@ function toggle(id: string) {
   background: var(--surface);
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .modal-tip-card:hover {
   border-color: var(--accent);
@@ -293,6 +297,7 @@ function toggle(id: string) {
   line-height: 1.6;
   color: var(--secondary);
   margin-bottom: 10px;
+  flex: 1;
 }
 .modal-tip-footer {
   display: flex;
@@ -302,5 +307,11 @@ function toggle(id: string) {
   font-size: 12px;
   padding-top: 6px;
   border-top: 1px dashed var(--line);
+  margin-top: auto;
+}
+@media (max-width: 680px) {
+  .health-tips-modal-list {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

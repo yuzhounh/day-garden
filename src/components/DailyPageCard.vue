@@ -96,7 +96,7 @@ function setAsHomePoem(poem: CuratedPoetry) {
     </DetailModal>
 
     <!-- 诗词小集全量沉浸浏览弹窗 -->
-    <DetailModal v-if="showLibrary" title="把诗意，留在日常" subtitle="古典诗词典藏 · 随四季与心境慢慢读" @close="showLibrary = false">
+    <DetailModal v-if="showLibrary" title="把诗意，留在日常" subtitle="古典诗词典藏 · 随四季与心境慢慢读" class="collection-modal" @close="showLibrary = false">
       <div class="filter-pills">
         <button v-for="season in ['全部', '春', '夏', '秋', '冬', '豁达励志', '收藏']" :key="season" :class="{ active: filter === season }" :aria-pressed="filter === season" @click="filter = season">
           {{ season }}
