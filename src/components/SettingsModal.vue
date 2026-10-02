@@ -88,17 +88,17 @@ function saveEdit(id: string) {
 }
 
 const sortedEvents = computed(() => {
-  return sortEventsByDaysLeft(props.preferences.customEvents)
+  return sortEventsByDaysLeft(props.preferences?.customEvents || [])
 })
 
 function getEventCountdown(ev: LifeEvent) {
   try {
-    return calculateNextEventDate(ev.date, !!ev.isLunar)
+    return calculateNextEventDate(ev?.date || '', !!ev?.isLunar)
   } catch {
     return {
       daysLeft: -1,
-      nextDateStr: '',
-      nextDateSolar: '',
+      nextDateStr: ev?.date || '',
+      nextDateSolar: ev?.date || '',
       nextDateLunar: undefined,
       turningAge: undefined,
     }
@@ -106,39 +106,53 @@ function getEventCountdown(ev: LifeEvent) {
 }
 
 function getCountdownText(ev: LifeEvent) {
-  const { daysLeft } = getEventCountdown(ev)
-  if (daysLeft === 0) return '今天'
-  if (daysLeft === 1) return '明天'
-  if (daysLeft > 0) return `还有 ${daysLeft} 天`
-  return '已过去'
+  try {
+    const { daysLeft } = getEventCountdown(ev)
+    if (daysLeft === 0) return '今天'
+    if (daysLeft === 1) return '明天'
+    if (daysLeft > 0 && daysLeft <= 999) return `还有 ${daysLeft} 天`
+    if (daysLeft > 999) return '待定'
+    return '已过去'
+  } catch {
+    return '待定'
+  }
 }
 
 function getNextDateDisplay(ev: LifeEvent) {
-  const info = getEventCountdown(ev)
-  if (info.nextDateLunar) {
-    return `${info.nextDateSolar} (${info.nextDateLunar})`
+  try {
+    const info = getEventCountdown(ev)
+    if (info.nextDateLunar) {
+      return `${info.nextDateSolar} (${info.nextDateLunar})`
+    }
+    return info.nextDateSolar || ev?.date || ''
+  } catch {
+    return ev?.date || ''
   }
-  return info.nextDateSolar || ev.date
 }
 
 function getCountdownClass(ev: LifeEvent) {
-  const { daysLeft } = getEventCountdown(ev)
-  if (daysLeft === 0) {
-    return 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-bold'
+  try {
+    const { daysLeft } = getEventCountdown(ev)
+    if (daysLeft === 0) {
+      return 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-bold'
+    }
+    if (daysLeft > 0 && daysLeft <= 7) {
+      return 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 font-bold'
+    }
+    if (daysLeft > 0 && daysLeft <= 30) {
+      return 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-bold'
+    }
+    return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold'
+  } catch {
+    return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold'
   }
-  if (daysLeft <= 7) {
-    return 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 font-bold'
-  }
-  if (daysLeft <= 30) {
-    return 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-bold'
-  }
-  return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold'
 }
 
-function isRedundantMemo(memo?: string) {
-  if (!memo) return true
-  if (memo === '无备忘') return true
-  if (/^\d+岁生日\s*\(.+?\)$/.test(memo.trim())) return true
+function isRedundantMemo(memo?: unknown) {
+  if (!memo || typeof memo !== 'string') return true
+  const trimmed = memo.trim()
+  if (!trimmed || trimmed === '无备忘') return true
+  if (/^\d+岁生日\s*\(.+?\)$/.test(trimmed)) return true
   return false
 }
 

@@ -2,7 +2,10 @@
 import { Cake, Gift, Heart, Plus, BookOpen } from 'lucide-vue-next'
 import type { LifeEvent } from '../types'
 defineProps<{ events: LifeEvent[] }>()
-const emit = defineEmits<{ 'add-event': [] }>()
+const emit = defineEmits<{
+  (e: 'add-event'): void
+  (e: 'manage-events'): void
+}>()
 </script>
 
 <template>
@@ -42,7 +45,7 @@ const emit = defineEmits<{ 'add-event': [] }>()
       </div>
     </div>
     <footer class="card-footer">
-      <button class="text-button" @click="emit('add-event')">
+      <button class="text-button" type="button" @click="emit('manage-events'); emit('add-event')">
         <BookOpen :size="14" />管理纪念日
       </button>
       <span class="muted">未来 30 天 · {{ events.length }} 个日子</span>

@@ -191,6 +191,7 @@ onUnmounted(() => {
             v-if="prefs.modules.upcoming"
             :events="upcomingEvents"
             @add-event="openSettings('events')"
+            @manage-events="openSettings('events')"
           />
           <DailyPageCard
             v-if="prefs.modules.dailyPoetry"
