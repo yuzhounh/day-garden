@@ -83,7 +83,7 @@ function setAsHomePoem(poem: CuratedPoetry) {
           <Bookmark v-else :size="15" />
         </button>
         <button class="text-button" @click="showFull = true">
-          品味全篇<ArrowUpRight :size="14" />
+          品读全篇<ArrowUpRight :size="14" />
         </button>
       </div>
     </footer>
@@ -157,7 +157,7 @@ function setAsHomePoem(poem: CuratedPoetry) {
                 class="text-button text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                 @click="toggleExpandPoem(poem.id)"
               >
-                <span>{{ expandedPoemId === poem.id ? '收起全诗' : '读全篇' }}</span>
+                <span>{{ expandedPoemId === poem.id ? '收起全诗' : '品读全篇' }}</span>
                 <ChevronUp v-if="expandedPoemId === poem.id" :size="12" />
                 <ChevronDown v-else :size="12" />
               </button>
