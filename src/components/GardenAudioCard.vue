@@ -78,39 +78,49 @@ onUnmounted(() => {
     </header>
 
     <div class="audio-card-body">
-      <!-- 播放器主视窗与声波律动 -->
-      <div class="audio-hero-panel" :class="{ 'is-active': audioState.isPlaying }">
-        <div class="audio-meta-left">
-          <div class="track-icon-avatar" :class="{ pulse: audioState.isPlaying }">
-            <CloudRain v-if="currentTrack.icon === 'CloudRain'" :size="22" />
-            <Waves v-else-if="currentTrack.icon === 'Waves'" :size="22" />
-            <Wind v-else-if="currentTrack.icon === 'Wind'" :size="22" />
-            <Bell v-else-if="currentTrack.icon === 'Bell'" :size="22" />
-            <Coffee v-else-if="currentTrack.icon === 'Coffee'" :size="22" />
-            <Sparkles v-else-if="currentTrack.icon === 'Sparkles'" :size="22" />
-            <SunMedium v-else :size="22" />
-          </div>
-          <div class="track-info-wrap">
-            <div class="track-title-row">
-              <h3>{{ currentTrack.name }}</h3>
-              <span class="track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
+      <!-- 胶片唱盘与声景信息展示区域（垂直居中） -->
+      <div class="audio-vinyl-stage">
+        <!-- 左侧：黑胶唱片（播放时持续慢速优雅旋转，暂停时停止） -->
+        <div class="vinyl-record-wrap">
+          <div class="vinyl-disc" :class="{ spinning: audioState.isPlaying }">
+            <div class="vinyl-groove-ring ring-1"></div>
+            <div class="vinyl-groove-ring ring-2"></div>
+            <div class="vinyl-groove-ring ring-3"></div>
+            <div class="vinyl-center-label">
+              <div class="vinyl-icon-inner">
+                <CloudRain v-if="currentTrack.icon === 'CloudRain'" :size="24" />
+                <Waves v-else-if="currentTrack.icon === 'Waves'" :size="24" />
+                <Wind v-else-if="currentTrack.icon === 'Wind'" :size="24" />
+                <Bell v-else-if="currentTrack.icon === 'Bell'" :size="24" />
+                <Coffee v-else-if="currentTrack.icon === 'Coffee'" :size="24" />
+                <Sparkles v-else-if="currentTrack.icon === 'Sparkles'" :size="24" />
+                <SunMedium v-else :size="24" />
+              </div>
+              <span class="vinyl-spindle-hole"></span>
             </div>
-            <p class="track-sub">{{ currentTrack.subtitle }}</p>
           </div>
         </div>
 
-        <!-- 音频律动波形 -->
-        <div class="sound-wave-bars" :class="{ playing: audioState.isPlaying }" aria-hidden="true">
-          <span class="bar bar-1"></span>
-          <span class="bar bar-2"></span>
-          <span class="bar bar-3"></span>
-          <span class="bar bar-4"></span>
-          <span class="bar bar-5"></span>
-          <span class="bar bar-6"></span>
+        <!-- 右侧：展示音乐名、标签、跳动竖线与副标题 -->
+        <div class="vinyl-meta-right">
+          <div class="vinyl-tag-row">
+            <span class="track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
+            <!-- 与小卡片风格一致的跳动竖线 -->
+            <div class="sound-wave-bars" :class="{ playing: audioState.isPlaying }" aria-hidden="true">
+              <span class="bar bar-1"></span>
+              <span class="bar bar-2"></span>
+              <span class="bar bar-3"></span>
+              <span class="bar bar-4"></span>
+              <span class="bar bar-5"></span>
+              <span class="bar bar-6"></span>
+            </div>
+          </div>
+          <h3 class="vinyl-track-title">{{ currentTrack.name }}</h3>
+          <p class="vinyl-track-sub">{{ currentTrack.subtitle }}</p>
         </div>
       </div>
 
-      <!-- 控制器：随机在左、三键居中、音量在右（点击后弹出音量条） -->
+      <!-- 控制器：有边框与背景的圆角胶囊框，与上面小卡片完全一致 -->
       <div class="audio-controls-row">
         <!-- 左侧：随机切换按钮 -->
         <div class="controls-left">
@@ -127,7 +137,6 @@ onUnmounted(() => {
 
         <!-- 中间：后退、播放/暂停、前进三个按键居中显示 -->
         <div class="controls-center">
-          <!-- 后退 / 上一首 -->
           <button
             type="button"
             class="ctrl-icon-btn"
@@ -138,7 +147,6 @@ onUnmounted(() => {
             <SkipBack :size="15" />
           </button>
 
-          <!-- 播放 / 暂停 -->
           <button
             type="button"
             class="play-main-btn"
@@ -150,7 +158,6 @@ onUnmounted(() => {
             <Play v-else :size="19" class="translate-x-0.5" />
           </button>
 
-          <!-- 前进 / 下一首 -->
           <button
             type="button"
             class="ctrl-icon-btn"
@@ -262,73 +269,115 @@ onUnmounted(() => {
 .audio-card-body {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   flex: 1;
   min-height: 0;
   margin-bottom: 4px;
+  gap: 16px;
 }
 
-/* 中间声景主视窗：无背景、无边框、在空白区垂直居中 */
-.audio-hero-panel {
+/* 胶片唱盘与音乐展示区域（在上下间隙中垂直居中） */
+.audio-vinyl-stage {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 8px 6px;
+  margin: auto 0;
+}
+
+/* 黑胶唱片 */
+.vinyl-record-wrap {
+  position: relative;
+  flex-shrink: 0;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.16));
+}
+
+.vinyl-disc {
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.04) 0px,
+      rgba(255, 255, 255, 0.04) 1px,
+      transparent 2px,
+      transparent 4px
+    ),
+    radial-gradient(circle, #2d343b 0%, #1a1e22 65%, #0f1214 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 0 18px rgba(0, 0, 0, 0.7);
+  animation: vinyl-spin 16s linear infinite;
+  animation-play-state: paused;
+}
+
+.vinyl-disc.spinning {
+  animation-play-state: running;
+}
+
+@keyframes vinyl-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.vinyl-groove-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+}
+
+.vinyl-groove-ring.ring-1 { width: 94px; height: 94px; }
+.vinyl-groove-ring.ring-2 { width: 74px; height: 74px; }
+.vinyl-groove-ring.ring-3 { width: 58px; height: 58px; }
+
+.vinyl-center-label {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--sage-bg);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  position: relative;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.28);
+  z-index: 2;
+}
+
+.vinyl-icon-inner {
+  display: grid;
+  place-items: center;
+}
+
+.vinyl-spindle-hole {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1.5px solid rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+/* 右侧信息展示 */
+.vinyl-meta-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.vinyl-tag-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  margin: auto 0;
-  transition: all 0.25s ease;
-}
-
-.audio-meta-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-}
-
-.track-icon-avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: var(--sage-bg);
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
-}
-
-.track-icon-avatar.pulse {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
-  animation: gentlePulse 2.5s infinite ease-in-out;
-}
-
-@keyframes gentlePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.track-info-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.track-title-row {
-  display: flex;
-  align-items: center;
   gap: 8px;
-}
-
-.track-title-row h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--ink);
-  margin: 0;
-  white-space: nowrap;
 }
 
 .track-tag {
@@ -341,10 +390,23 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-.track-sub {
-  font-size: 12px;
+.vinyl-track-title {
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 1px 0 0;
+  line-height: 1.25;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vinyl-track-sub {
+  font-size: 12.5px;
   color: var(--muted);
   margin: 0;
+  line-height: 1.4;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -354,18 +416,17 @@ onUnmounted(() => {
 .sound-wave-bars {
   display: flex;
   align-items: center;
-  gap: 3px;
-  height: 26px;
-  padding-right: 4px;
+  gap: 2.5px;
+  height: 18px;
   flex-shrink: 0;
 }
 
 .sound-wave-bars .bar {
-  width: 3px;
-  height: 6px;
-  border-radius: 2px;
+  width: 2.5px;
+  height: 4px;
+  border-radius: 1.5px;
   background: var(--accent);
-  opacity: 0.32;
+  opacity: 0.35;
   transition: height 0.2s ease, opacity 0.2s ease;
 }
 
@@ -374,25 +435,30 @@ onUnmounted(() => {
   animation: soundBounce 1.2s infinite ease-in-out alternate;
 }
 
-.sound-wave-bars.playing .bar-1 { animation-delay: 0.1s; height: 14px; }
-.sound-wave-bars.playing .bar-2 { animation-delay: 0.3s; height: 22px; }
-.sound-wave-bars.playing .bar-3 { animation-delay: 0.15s; height: 12px; }
-.sound-wave-bars.playing .bar-4 { animation-delay: 0.4s; height: 19px; }
-.sound-wave-bars.playing .bar-5 { animation-delay: 0.25s; height: 11px; }
-.sound-wave-bars.playing .bar-6 { animation-delay: 0.35s; height: 16px; }
+.sound-wave-bars.playing .bar-1 { animation-delay: 0.1s; height: 10px; }
+.sound-wave-bars.playing .bar-2 { animation-delay: 0.3s; height: 16px; }
+.sound-wave-bars.playing .bar-3 { animation-delay: 0.15s; height: 8px; }
+.sound-wave-bars.playing .bar-4 { animation-delay: 0.4s; height: 14px; }
+.sound-wave-bars.playing .bar-5 { animation-delay: 0.25s; height: 7px; }
+.sound-wave-bars.playing .bar-6 { animation-delay: 0.35s; height: 12px; }
 
 @keyframes soundBounce {
   0% { transform: scaleY(0.35); }
   100% { transform: scaleY(1.3); }
 }
 
-/* 播放控制条：三栏 Grid 布局保证中间三个按键绝对居中 */
+/* 播放控制条：与小卡片保持完全一致的边框包裹与居中布局 */
 .audio-controls-row {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   width: 100%;
-  padding: 2px 0;
+  padding: 8px 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
 .controls-left {
@@ -404,7 +470,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .controls-right {
@@ -414,12 +480,12 @@ onUnmounted(() => {
 }
 
 .ctrl-icon-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -428,25 +494,23 @@ onUnmounted(() => {
 }
 
 .ctrl-icon-btn:hover {
-  background: var(--sage-bg);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent);
-  border-color: var(--accent);
 }
 
 .ctrl-icon-btn.random-btn:hover {
   transform: rotate(15deg);
 }
 
-.vol-toggle-btn.is-active {
-  background: var(--sage-bg);
+.ctrl-icon-btn.vol-toggle-btn.is-active {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
-  border-color: var(--accent);
 }
 
 .play-main-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   border: none;
   background: var(--accent);
   color: #ffffff;
@@ -454,17 +518,17 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: all 0.2s ease;
 }
 
 .play-main-btn:hover {
-  transform: scale(1.06);
-  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 45%, transparent);
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .play-main-btn:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
 /* 弹出式音量条浮层 */
@@ -587,5 +651,25 @@ onUnmounted(() => {
   background: var(--accent);
   color: #ffffff;
   border-color: var(--accent);
+}
+
+@media (max-width: 480px) {
+  .audio-vinyl-stage {
+    gap: 16px;
+  }
+  .vinyl-disc {
+    width: 96px;
+    height: 96px;
+  }
+  .vinyl-groove-ring.ring-1 { width: 76px; height: 76px; }
+  .vinyl-groove-ring.ring-2 { width: 60px; height: 60px; }
+  .vinyl-groove-ring.ring-3 { width: 46px; height: 46px; }
+  .vinyl-center-label {
+    width: 38px;
+    height: 38px;
+  }
+  .vinyl-track-title {
+    font-size: 18px;
+  }
 }
 </style>
