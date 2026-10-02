@@ -143,7 +143,7 @@ function getIntensityColor(intensity: string) {
       <div class="inline-actions">
         <span class="footer-hint"><Sparkles :size="12" />科学运动</span>
         <button class="text-button" @click="showDetail = true">
-          动作详解<ArrowUpRight :size="14" />
+          益处详解<ArrowUpRight :size="14" />
         </button>
       </div>
     </footer>
@@ -234,10 +234,10 @@ function getIntensityColor(intensity: string) {
       </div>
     </DetailModal>
 
-    <!-- 单个运动项目动作详解弹窗 -->
+    <!-- 单个运动项目益处详解弹窗 -->
     <DetailModal
       v-if="showDetail"
-      :title="sport.name + ' · 动作与身心益处详解'"
+      :title="sport.name + ' · 身心健康益处详解'"
       :subtitle="sport.category + ' · ' + sport.intensity"
       @close="showDetail = false"
     >
