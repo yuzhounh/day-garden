@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { Plus, Trash2, Download, Upload, Check, Pencil, Clock } from 'lucide-vue-next'
+import { Plus, Trash2, Download, Upload, Check, Pencil, Clock, Bell } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
 import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft } from '../services/calendar'
 import DetailModal from './DetailModal.vue'
@@ -555,31 +555,32 @@ function importData(e: Event) {
 
         <!-- 3. 提醒与数据备份 -->
         <div v-if="currentTab === 'notification'" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3 flex flex-col justify-between">
-            <div class="space-y-1">
-              <div class="text-xs font-medium text-slate-800 dark:text-slate-200">桌面与 PWA 系统级提醒</div>
-              <div class="text-[11px] text-slate-400 leading-relaxed">当命中 14天前/3天前/当天 阈值时触发系统弹窗</div>
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 grid grid-rows-[auto_1fr_auto] gap-3">
+            <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">桌面与 PWA 系统级提醒</div>
+            <div class="text-[11.5px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              当命中 14天前/3天前/当天 阈值时触发系统弹窗通知。
             </div>
-            <div class="pt-1">
+            <div class="flex items-center gap-2.5 pt-1 flex-wrap">
               <button
                 @click="handleTestNotification"
-                class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition"
+                class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition shadow-xs"
               >
-                授权并测试推送
+                <Bell class="w-3.5 h-3.5" />
+                <span>授权并测试推送</span>
               </button>
-            </div>
-            <div v-if="notificationStatus === 'success'" class="text-xs text-emerald-600 flex items-center gap-1">
-              <Check class="w-3.5 h-3.5" /> 已成功发送桌面测试通知！
-            </div>
-            <div v-else-if="notificationStatus === 'denied'" class="text-xs text-rose-500">
-              通知已被浏览器禁止，请在地址栏权限设置中开启。
+              <span v-if="notificationStatus === 'success'" class="text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <Check class="w-3.5 h-3.5" /> 测试通知已发送
+              </span>
+              <span v-else-if="notificationStatus === 'denied'" class="text-xs text-rose-500">
+                权限已被禁止，请在地址栏开启
+              </span>
             </div>
           </div>
 
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3 flex flex-col justify-between">
-            <div class="space-y-1">
-              <div class="text-xs font-medium text-slate-800 dark:text-slate-200">数据备份与迁移</div>
-              <div class="text-[11px] text-slate-400 leading-relaxed">将所有自定义生日、偏好导出为 JSON 文件，随时导入到手机或其他电脑。</div>
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 grid grid-rows-[auto_1fr_auto] gap-3">
+            <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">数据备份与迁移</div>
+            <div class="text-[11.5px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              将所有自定义生日、偏好导出为 JSON 文件，随时导入到手机或其他电脑。
             </div>
             <div class="flex items-center gap-3 pt-1">
               <button
