@@ -336,7 +336,7 @@ watch(
     <!-- 卡片底部统一栏 -->
     <footer class="card-footer">
       <button class="text-button" type="button" @click="showModal = true">
-        <BookOpen :size="14" />全部随想 ({{ notes.length }})
+        <BookOpen :size="14" />全部随想
       </button>
       <div class="inline-actions">
         <span class="muted">{{ notes.length ? '已留存 ' + notes.length + ' 抹心绪' : '随想随记' }}</span>
