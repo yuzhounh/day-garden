@@ -110,12 +110,6 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- 声景随想伴读气泡 -->
-      <div class="audio-mood-bubble">
-        <Sparkles :size="14" class="mood-icon" />
-        <p>{{ currentTrack.quote }}</p>
-      </div>
-
       <!-- 控制器：随机在左、三键居中、音量在右（点击后弹出音量条） -->
       <div class="audio-controls-row">
         <!-- 左侧：随机切换按钮 -->
@@ -268,27 +262,22 @@ onUnmounted(() => {
 .audio-card-body {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
   flex: 1;
+  min-height: 0;
   margin-bottom: 4px;
 }
 
-/* 顶部声景主视窗 */
+/* 中间声景主视窗：无背景、无边框、在空白区垂直居中 */
 .audio-hero-panel {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  padding: 0 4px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  margin: auto 0;
   transition: all 0.25s ease;
-}
-
-.audio-hero-panel.is-active {
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .audio-meta-left {
@@ -395,32 +384,6 @@ onUnmounted(() => {
 @keyframes soundBounce {
   0% { transform: scaleY(0.35); }
   100% { transform: scaleY(1.3); }
-}
-
-/* 声景伴读气泡 */
-.audio-mood-bubble {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--surface) 60%, transparent);
-  border: 1px dashed color-mix(in srgb, var(--line) 90%, transparent);
-  color: var(--secondary);
-  font-size: 13px;
-  line-height: 1.5;
-  transition: all 0.25s ease;
-}
-
-.mood-icon {
-  color: var(--accent);
-  flex-shrink: 0;
-  opacity: 0.85;
-}
-
-.audio-mood-bubble p {
-  margin: 0;
-  letter-spacing: 0.2px;
 }
 
 /* 播放控制条：三栏 Grid 布局保证中间三个按键绝对居中 */
