@@ -97,27 +97,27 @@ onUnmounted(() => {
                 <Sparkles v-else-if="currentTrack.icon === 'Sparkles'" :size="24" />
                 <SunMedium v-else :size="24" />
               </div>
-              <span class="vinyl-spindle-hole"></span>
             </div>
           </div>
         </div>
 
-        <!-- 右侧：展示音乐名、标签、跳动竖线与副标题 -->
+        <!-- 中间：展示音乐名、标签与副标题 -->
         <div class="vinyl-meta-right">
           <div class="vinyl-tag-row">
             <span class="track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
-            <!-- 与小卡片风格一致的跳动竖线 -->
-            <div class="sound-wave-bars" :class="{ playing: audioState.isPlaying }" aria-hidden="true">
-              <span class="bar bar-1"></span>
-              <span class="bar bar-2"></span>
-              <span class="bar bar-3"></span>
-              <span class="bar bar-4"></span>
-              <span class="bar bar-5"></span>
-              <span class="bar bar-6"></span>
-            </div>
           </div>
           <h3 class="vinyl-track-title">{{ currentTrack.name }}</h3>
           <p class="vinyl-track-sub">{{ currentTrack.subtitle }}</p>
+        </div>
+
+        <!-- 右侧：与黑胶唱片垂直居中对齐的律动竖线 -->
+        <div class="sound-wave-bars" :class="{ playing: audioState.isPlaying }" aria-hidden="true">
+          <span class="bar bar-1"></span>
+          <span class="bar bar-2"></span>
+          <span class="bar bar-3"></span>
+          <span class="bar bar-4"></span>
+          <span class="bar bar-5"></span>
+          <span class="bar bar-6"></span>
         </div>
       </div>
 
@@ -132,7 +132,7 @@ onUnmounted(() => {
             aria-label="随机切换"
             @click="randomTrack"
           >
-            <Shuffle :size="17" />
+            <Shuffle :size="16" />
           </button>
         </div>
 
@@ -145,7 +145,7 @@ onUnmounted(() => {
             aria-label="上一首"
             @click="prevTrack"
           >
-            <SkipBack :size="17" />
+            <SkipBack :size="16" />
           </button>
 
           <button
@@ -155,8 +155,8 @@ onUnmounted(() => {
             :aria-label="audioState.isPlaying ? '暂停' : '播放'"
             @click="togglePlay"
           >
-            <Pause v-if="audioState.isPlaying" :size="20" />
-            <Play v-else :size="20" class="translate-x-0.5" />
+            <Pause v-if="audioState.isPlaying" :size="21" />
+            <Play v-else :size="21" class="translate-x-0.5" />
           </button>
 
           <button
@@ -166,7 +166,7 @@ onUnmounted(() => {
             aria-label="下一首"
             @click="nextTrack"
           >
-            <SkipForward :size="17" />
+            <SkipForward :size="16" />
           </button>
         </div>
 
@@ -180,8 +180,8 @@ onUnmounted(() => {
             :aria-label="showVolumeBar ? '收起音量调节' : '展开音量调节'"
             @click.stop="showVolumeBar = !showVolumeBar"
           >
-            <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="17" />
-            <Volume2 v-else :size="17" />
+            <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="16" />
+            <Volume2 v-else :size="16" />
           </button>
 
           <!-- 点击后弹出的毛玻璃音量条浮层 -->
@@ -304,39 +304,39 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   background:
-    /* 真实黑胶唱片经典沙漏型光泽反射 (Conic reflection) */
+    /* 柔和黑胶唱片沙漏型光泽反射 (Soft conic reflection) */
     conic-gradient(
       from 45deg at 50% 50%,
-      rgba(255, 255, 255, 0.16) 0deg,
+      rgba(255, 255, 255, 0.07) 0deg,
       transparent 55deg,
-      rgba(255, 255, 255, 0.25) 90deg,
+      rgba(255, 255, 255, 0.13) 90deg,
       transparent 135deg,
-      rgba(255, 255, 255, 0.16) 180deg,
+      rgba(255, 255, 255, 0.07) 180deg,
       transparent 235deg,
-      rgba(255, 255, 255, 0.25) 270deg,
+      rgba(255, 255, 255, 0.13) 270deg,
       transparent 315deg,
-      rgba(255, 255, 255, 0.16) 360deg
+      rgba(255, 255, 255, 0.07) 360deg
     ),
-    /* 高清晰对比度微纹音轨暗纹 (Crisp micro-grooves) */
+    /* 细腻柔和微纹音轨暗纹 (Subtle micro-grooves) */
     repeating-radial-gradient(
       circle at 50% 50%,
-      rgba(255, 255, 255, 0.16) 0px,
-      rgba(255, 255, 255, 0.16) 1.5px,
-      transparent 2px,
-      transparent 5.5px
+      rgba(255, 255, 255, 0.07) 0px,
+      rgba(255, 255, 255, 0.07) 1px,
+      transparent 1.5px,
+      transparent 4.5px
     ),
     /* 黑胶唱片本体渐变底色 */
     radial-gradient(
       circle at 50% 50%,
-      #3a434c 0%,
-      #24292e 35%,
-      #16191c 70%,
+      #323a42 0%,
+      #22272c 35%,
+      #15181b 70%,
       #0b0d0f 100%
     );
   box-shadow:
-    inset 0 0 0 1.5px rgba(255, 255, 255, 0.24),
-    inset 0 0 22px rgba(0, 0, 0, 0.8),
-    0 10px 24px rgba(0, 0, 0, 0.25);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 0 20px rgba(0, 0, 0, 0.7),
+    0 10px 24px rgba(0, 0, 0, 0.22);
   animation: vinyl-spin 16s linear infinite;
   animation-play-state: paused;
 }
@@ -359,26 +359,22 @@ onUnmounted(() => {
 .vinyl-groove-ring.ring-1 {
   width: 126px;
   height: 126px;
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.11);
 }
 .vinyl-groove-ring.ring-2 {
   width: 108px;
   height: 108px;
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 }
 .vinyl-groove-ring.ring-3 {
   width: 90px;
   height: 90px;
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.11);
 }
 .vinyl-groove-ring.ring-4 {
   width: 72px;
   height: 72px;
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
-  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 .vinyl-center-label {
@@ -390,24 +386,14 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   position: relative;
-  border: 2.5px solid rgba(255, 255, 255, 0.28);
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
   z-index: 2;
 }
 
 .vinyl-icon-inner {
   display: grid;
   place-items: center;
-}
-
-.vinyl-spindle-hole {
-  position: absolute;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 1.5px solid rgba(0, 0, 0, 0.28);
-  pointer-events: none;
 }
 
 /* 右侧信息展示 */
@@ -422,7 +408,7 @@ onUnmounted(() => {
 .vinyl-tag-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
 }
 
@@ -458,13 +444,14 @@ onUnmounted(() => {
   text-overflow: ellipsis;
 }
 
-/* 律动音波 */
+/* 律动音波：与黑胶唱片垂直居中对齐 */
 .sound-wave-bars {
   display: flex;
   align-items: center;
-  gap: 2.5px;
-  height: 18px;
+  gap: 3px;
+  height: 24px;
   flex-shrink: 0;
+  padding: 0 4px;
 }
 
 .sound-wave-bars .bar {
@@ -493,42 +480,48 @@ onUnmounted(() => {
   100% { transform: scaleY(1.3); }
 }
 
-/* 播放控制条：与小卡片保持完全一致的边框包裹与居中布局 */
+/* 播放控制条：精简卡片高度，主播放键直径超出卡片边界 */
 .audio-controls-row {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   width: 100%;
-  padding: 8px 16px;
-  border-radius: 16px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 20px;
   background: var(--surface);
   border: 1px solid var(--line);
   position: relative;
+  overflow: visible;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
 .controls-left {
   display: flex;
   justify-content: flex-start;
+  align-items: center;
 }
 
 .controls-center {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
 }
 
 .controls-right {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   position: relative;
 }
 
 .ctrl-icon-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: none;
   background: transparent;
   color: var(--secondary);
@@ -550,8 +543,8 @@ onUnmounted(() => {
 }
 
 .play-main-btn {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: none;
   background: var(--accent);
@@ -560,17 +553,19 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 38%, transparent);
   transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin: -4px 0;
 }
 
 .play-main-btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 45%, transparent);
+  transform: scale(1.06);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 48%, transparent);
 }
 
 .play-main-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 /* 弹出式音量条浮层 */
