@@ -26,10 +26,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm run build
+      - run: npm run build:landing
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: dist_pages
       - id: deployment
         uses: actions/deploy-pages@v4
