@@ -244,14 +244,13 @@ function removeEvent(id: string) {
     <template #actions>
       <button
         type="button"
-        class="toolbar-button text-xs font-medium"
+        class="icon-button"
         :class="{ active: showAddForm }"
-        :title="showAddForm ? '收起新增条目' : '新增'"
-        :aria-label="showAddForm ? '收起新增条目' : '新增'"
+        :title="showAddForm ? '收起新增面板' : '新增日子/纪念日'"
+        :aria-label="showAddForm ? '收起新增面板' : '新增日子/纪念日'"
         @click="showAddForm = !showAddForm"
       >
-        <Plus :size="15" class="transition-transform duration-200" :class="{ 'rotate-45': showAddForm }" />
-        <span>{{ showAddForm ? '收起' : '新增' }}</span>
+        <Plus :size="18" class="transition-transform duration-200" :class="{ 'rotate-45': showAddForm }" />
       </button>
     </template>
 
@@ -568,7 +567,8 @@ function removeEvent(id: string) {
   transform: translateY(-8px);
 }
 
-.toolbar-button.active {
+.toolbar-button.active,
+.icon-button.active {
   background: var(--sage-bg);
   color: var(--accent);
   border-color: rgba(90, 158, 106, 0.4);
