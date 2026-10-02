@@ -92,11 +92,11 @@ function getIntensityColor(intensity: string) {
       <div class="sport-title-badge-row">
         <div class="sport-headline">
           <strong class="sport-name">{{ sport.name }}</strong>
-          <span class="pill sage mini">{{ sport.category }}</span>
-          <span class="pill mini" :class="getIntensityColor(sport.intensity)">{{ sport.intensity }}</span>
+          <span class="pill sage">{{ sport.category }}</span>
+          <span class="pill" :class="getIntensityColor(sport.intensity)">{{ sport.intensity }}</span>
         </div>
         <div class="sport-calorie-chip" title="每小时约消耗能量">
-          <Flame :size="13" class="text-orange-500" />
+          <Flame :size="14" class="text-orange-500" />
           <span>{{ sport.caloriesPerHour }} kcal/h</span>
         </div>
       </div>
@@ -108,7 +108,7 @@ function getIntensityColor(intensity: string) {
           :key="idx"
           class="benefit-pill"
         >
-          <ShieldCheck :size="13" class="text-emerald-500 shrink-0" />
+          <ShieldCheck :size="15" class="text-emerald-500 shrink-0" />
           <span>{{ benefit }}</span>
         </span>
       </div>
@@ -116,7 +116,7 @@ function getIntensityColor(intensity: string) {
       <!-- 循证科学解析 -->
       <div class="sport-insight-box">
         <p class="sport-insight-text">
-          <HeartPulse :size="14" class="text-rose-500 shrink-0 inline-block mr-1" />
+          <HeartPulse :size="16" class="text-rose-500 shrink-0 inline-block mr-1.5 align-text-bottom" />
           <span>{{ sport.evidenceInsight }}</span>
         </p>
       </div>
@@ -286,36 +286,38 @@ function getIntensityColor(intensity: string) {
 .sport-main-display {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 4px;
+  justify-content: space-evenly;
+  gap: 14px;
+  margin: 4px 0 8px;
   flex: 1;
 }
 .sport-title-badge-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 .sport-headline {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 .sport-name {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   color: var(--ink);
+  letter-spacing: -0.2px;
 }
 .sport-calorie-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 9px;
+  gap: 5px;
+  padding: 4px 11px;
   border-radius: 999px;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   background: rgba(249, 115, 22, 0.08);
   color: #ea580c;
   border: 1px solid rgba(249, 115, 22, 0.2);
@@ -323,55 +325,56 @@ function getIntensityColor(intensity: string) {
 .sport-benefits-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 .benefit-pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 9px;
-  border-radius: 8px;
-  font-size: 12px;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.45;
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--ink);
 }
 .sport-insight-box {
-  padding: 9px 12px;
-  border-radius: 10px;
+  padding: 12px 15px;
+  border-radius: 13px;
   background: rgba(16, 185, 129, 0.05);
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.16);
 }
 .sport-insight-text {
-  font-size: 13.5px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.7;
   color: var(--ink);
 }
 .sport-muscles-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
+  gap: 8px;
+  font-size: 13.5px;
   flex-wrap: wrap;
 }
 .muscles-label {
   color: var(--muted);
   flex-shrink: 0;
-  font-size: 12.5px;
+  font-size: 13.5px;
   font-weight: 500;
 }
 .muscle-tags-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 6px;
 }
 .muscle-tag {
-  padding: 2px 8px;
-  border-radius: 6px;
+  padding: 3px 9px;
+  border-radius: 7px;
   background: var(--surface);
   border: 1px solid var(--line);
   color: var(--secondary);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .sports-modal-list {
   display: grid;
