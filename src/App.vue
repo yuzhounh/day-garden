@@ -176,7 +176,7 @@ onUnmounted(() => {
 
 <template>
   <div id="today" class="garden-app">
-    <div class="ambient-background" aria-hidden="true"><span class="ambient-sage"></span><span class="ambient-peach"></span><span class="ambient-lavender"></span></div>
+    <div class="ambient-background" aria-hidden="true"><span class="ambient-sage"></span><span class="ambient-peach"></span><span class="ambient-lavender"></span><span class="ambient-sky"></span></div>
     <div class="garden-shell">
       <HeaderHero :selected-city="prefs.selectedCity" :theme="prefs.theme" @update:city="handleCityChange" @toggle-theme="toggleTheme" @open-settings="openSettings()" @open-account="showAccount = true" />
       <main>

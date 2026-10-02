@@ -19,6 +19,8 @@
   --rose-bg: rgba(251, 238, 238, 0.85);
   --sky-bg: rgba(237, 243, 248, 0.85);
   --poetry-font: "STKaiti", "KaiTi", "楷体", "Songti SC", "SimSun", "宋体", serif;
+  --card-shadow: 0 8px 28px -4px rgba(20, 35, 25, 0.08), 0 2px 8px -1px rgba(0, 0, 0, 0.04);
+  --card-shadow-hover: 0 20px 42px -6px rgba(20, 35, 25, 0.14), 0 8px 18px -2px rgba(0, 0, 0, 0.06);
 }
 .dark {
   color-scheme: dark;
@@ -38,6 +40,8 @@
   --rose-bg: rgba(208, 153, 150, .18);
   --sky-bg: rgba(141, 172, 198, .18);
   --poetry-font: "STKaiti", "KaiTi", "楷体", "Songti SC", "SimSun", "宋体", serif;
+  --card-shadow: 0 10px 32px -4px rgba(0, 0, 0, 0.45), 0 2px 10px -1px rgba(0, 0, 0, 0.30);
+  --card-shadow-hover: 0 22px 50px -6px rgba(0, 0, 0, 0.65), 0 10px 22px -2px rgba(0, 0, 0, 0.40);
 }
 @layer base {
   * { box-sizing: border-box; }
@@ -74,46 +78,101 @@
 .ambient-background > span {
   position: absolute;
   border-radius: 50%;
-  filter: blur(100px);
+  filter: blur(125px);
   pointer-events: none;
+  will-change: transform;
 }
 .ambient-sage {
-  width: 520px;
-  height: 520px;
-  left: -60px;
-  top: 5%;
-  background: radial-gradient(circle, rgba(135, 185, 152, 0.40) 0%, rgba(135, 185, 152, 0) 70%);
+  width: 720px;
+  height: 720px;
+  left: -80px;
+  top: 4%;
+  background: radial-gradient(circle, rgba(135, 185, 152, 0.45) 0%, rgba(135, 185, 152, 0.12) 55%, rgba(135, 185, 152, 0) 75%);
+  animation: float-drift-1 28s ease-in-out infinite alternate;
 }
 .ambient-peach {
-  width: 600px;
-  height: 600px;
-  right: -80px;
-  top: 25%;
-  background: radial-gradient(circle, rgba(227, 172, 111, 0.35) 0%, rgba(227, 172, 111, 0) 70%);
+  width: 820px;
+  height: 820px;
+  right: -100px;
+  top: 18%;
+  background: radial-gradient(circle, rgba(227, 172, 111, 0.40) 0%, rgba(227, 172, 111, 0.10) 55%, rgba(227, 172, 111, 0) 75%);
+  animation: float-drift-2 35s ease-in-out infinite alternate -9s;
 }
 .ambient-lavender {
-  width: 560px;
-  height: 560px;
-  left: 20%;
-  bottom: 8%;
-  background: radial-gradient(circle, rgba(171, 154, 209, 0.30) 0%, rgba(171, 154, 209, 0) 70%);
+  width: 760px;
+  height: 760px;
+  left: 15%;
+  bottom: 4%;
+  background: radial-gradient(circle, rgba(171, 154, 209, 0.38) 0%, rgba(171, 154, 209, 0.10) 55%, rgba(171, 154, 209, 0) 75%);
+  animation: float-drift-3 42s ease-in-out infinite alternate -17s;
+}
+.ambient-sky {
+  width: 700px;
+  height: 700px;
+  right: 18%;
+  bottom: 12%;
+  background: radial-gradient(circle, rgba(141, 172, 198, 0.35) 0%, rgba(141, 172, 198, 0.08) 55%, rgba(141, 172, 198, 0) 75%);
+  animation: float-drift-4 31s ease-in-out infinite alternate -23s;
 }
 .dark .ambient-sage {
-  background: radial-gradient(circle, rgba(75, 135, 95, 0.28) 0%, rgba(75, 135, 95, 0) 70%);
+  background: radial-gradient(circle, rgba(75, 135, 95, 0.32) 0%, rgba(75, 135, 95, 0.08) 55%, rgba(75, 135, 95, 0) 75%);
 }
 .dark .ambient-peach {
-  background: radial-gradient(circle, rgba(185, 125, 60, 0.20) 0%, rgba(185, 125, 60, 0) 70%);
+  background: radial-gradient(circle, rgba(185, 125, 60, 0.25) 0%, rgba(185, 125, 60, 0.06) 55%, rgba(185, 125, 60, 0) 75%);
 }
 .dark .ambient-lavender {
-  background: radial-gradient(circle, rgba(125, 105, 165, 0.20) 0%, rgba(125, 105, 165, 0) 70%);
+  background: radial-gradient(circle, rgba(125, 105, 165, 0.25) 0%, rgba(125, 105, 165, 0.06) 55%, rgba(125, 105, 165, 0) 75%);
 }
+.dark .ambient-sky {
+  background: radial-gradient(circle, rgba(90, 135, 170, 0.24) 0%, rgba(90, 135, 170, 0.06) 55%, rgba(90, 135, 170, 0) 75%);
+}
+
+@keyframes float-drift-1 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  28% { transform: translate3d(95px, 65px, 0) scale(1.08); }
+  58% { transform: translate3d(40px, 130px, 0) scale(0.95); }
+  84% { transform: translate3d(-75px, 75px, 0) scale(1.04); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes float-drift-2 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  24% { transform: translate3d(-85px, -75px, 0) scale(0.96); }
+  52% { transform: translate3d(-130px, 65px, 0) scale(1.09); }
+  78% { transform: translate3d(55px, 95px, 0) scale(1.03); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes float-drift-3 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  32% { transform: translate3d(110px, -95px, 0) scale(1.08); }
+  64% { transform: translate3d(-95px, -55px, 0) scale(0.94); }
+  86% { transform: translate3d(55px, 65px, 0) scale(1.04); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes float-drift-4 {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  26% { transform: translate3d(-105px, -65px, 0) scale(1.06); }
+  56% { transform: translate3d(-55px, 85px, 0) scale(0.95); }
+  82% { transform: translate3d(85px, 45px, 0) scale(1.05); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-background > span {
+    animation: none !important;
+  }
+}
+
 .garden-shell { width: min(1120px, calc(100% - 80px)); margin: 0 auto; }
 .glass-panel {
   background: var(--glass);
   border: 1px solid var(--glass-edge);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--card-shadow);
+  transition: box-shadow .25s ease, border-color .25s ease;
 }
 .topbar { display: flex; align-items: center; justify-content: space-between; padding: 26px 0 16px; }
 .brand { display: flex; align-items: center; gap: 11px; font-family: inherit; font-size: 24px; font-weight: 600; letter-spacing: -.5px; }
@@ -160,13 +219,19 @@
   width: 330px;
   border-radius: 20px;
   padding: 16px 20px 18px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: var(--card-shadow);
   display: flex;
   flex-direction: column;
   gap: 10px;
   transform: none;
+  transition: box-shadow .25s ease;
+}
+.date-card:hover {
+  box-shadow: var(--card-shadow-hover);
 }
 .date-card-primary { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .date-solar-wrap { display: flex; align-items: baseline; gap: 9px; }
@@ -221,8 +286,8 @@
 .garden-tabs a { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; font-size: 14px; font-weight: 500; color: var(--secondary); border-radius: 10px; transition: background .2s; }
 .garden-tabs a.active { color: var(--accent); background: var(--surface); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
 .garden-tabs a:hover { background: var(--sage-bg); }
-.dashboard-caption { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 7px; letter-spacing: .5px; }
-.weather-panel { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; border-radius: 22px; padding: 24px 26px; margin-bottom: 20px; }
+.weather-panel { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; border-radius: 22px; padding: 24px 26px; margin-bottom: 20px; transition: box-shadow .25s ease; }
+.weather-panel:hover { box-shadow: var(--card-shadow-hover); }
 .weather-summary { display: flex; flex-direction: column; border-right: 1px solid var(--line); padding-right: 22px; }
 .summary-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .summary-header > .eyebrow { font-size: 12px; letter-spacing: 1.2px; color: var(--muted); }
@@ -434,8 +499,8 @@
   width: 100%;
 }
 .dashboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.dashboard-card { border-radius: 22px; padding: 24px 26px 0; min-width: 0; display: flex; flex-direction: column; height: 100%; transition: box-shadow .25s; }
-.dashboard-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 16px 36px -16px rgba(0, 0, 0, 0.08); }
+.dashboard-card { border-radius: 22px; padding: 24px 26px 0; min-width: 0; display: flex; flex-direction: column; height: 100%; transition: box-shadow .25s ease; }
+.dashboard-card:hover { box-shadow: var(--card-shadow-hover); }
 .card-heading { display: flex; justify-content: space-between; align-items: center; gap: 9px; margin-bottom: 20px; }
 .card-footer {
   display: flex;
