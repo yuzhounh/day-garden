@@ -260,13 +260,14 @@ onUnmounted(() => {
 
         <!-- 账户同步按钮 -->
         <button
-          class="toolbar-button account-button"
-          aria-label="账户与云端同步"
+          class="icon-button account-button"
+          :aria-label="account.user ? (account.status === 'synced' ? '云端已同步' : account.status === 'syncing' ? '同步中' : '本机已保存') : '我的花园 · 账户与云端同步'"
+          :title="account.user ? (account.status === 'synced' ? '云端已同步' : account.status === 'syncing' ? '同步中' : '本机已保存') : '我的花园 · 账户与云端同步'"
           @click="emit('open-account')"
         >
-          <Cloud v-if="account.user" :size="15" />
-          <UserRound v-else :size="15" />
-          <span>{{ account.user ? account.status === 'synced' ? '已同步' : '本机已保存' : '我的花园' }}</span>
+          <Loader2 v-if="account.status === 'syncing'" :size="17" class="animate-spin text-emerald-600 dark:text-emerald-400" />
+          <Cloud v-else-if="account.user" :size="17" />
+          <UserRound v-else :size="17" />
         </button>
 
         <!-- 主题切换 -->
