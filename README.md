@@ -91,3 +91,11 @@ API 使用密码加盐及服务端密钥、HttpOnly / SameSite / Secure 会话 C
 ## 内容出处
 
 健康内容核对 WHO、CDC、ADA 和 AAO EyeWiki 官方资料，来源链接可在卡片内打开。古典诗词为公版作品，读诗随想为本项目原创文字。物候为中国温带及江南常见植物的一般参考。
+
+## 辅助平台入口
+
+Cloudflare Pages 承载完整网页、账户 API 与 D1 数据库。GitHub Pages、Firebase Hosting 和 Vercel 提供入口跳转，统一进入 `https://day-garden.pages.dev/`；它们不单独保存账户或同步数据。执行 `npm run build:landing` 生成 `dist_pages`，GitHub 入口保留路径、查询参数和片段。Firebase 与 Vercel 使用配置中的临时重定向。
+
+## 许可证
+
+本项目的软件代码与构建脚本采用 [MIT License](LICENSE)。原创读诗随想及其他原创内容保留权利；公版诗词原文和第三方内容不纳入软件 MIT 授权，具体范围见 [CONTENT-NOTICE.md](CONTENT-NOTICE.md)。

@@ -1,15 +1,16 @@
 {
   "hosting": {
-    "public": "dist",
+    "public": "dist_pages",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
-    "rewrites": [
+    "redirects": [
       {
-        "source": "**",
-        "destination": "/index.html"
+        "source": "/:path*",
+        "destination": "https://day-garden.pages.dev/:path",
+        "type": 302
       }
     ]
   }

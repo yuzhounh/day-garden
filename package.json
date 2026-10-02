@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build:landing": "node scripts/build-landing.mjs",
     "build": "node scripts/content-index.mjs && vue-tsc -b && tsc -p tsconfig.worker.json && vite build && esbuild worker/index.ts --bundle --format=esm --platform=browser --target=es2022 --outfile=dist/_worker.js",
     "test": "npm run build && node tests/run.mjs",
     "test:unit": "node --test tests/*.test.mjs",

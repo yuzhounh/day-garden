@@ -34,3 +34,4 @@ playwright-report/
 .vercel
 .firebase
 .env*
+dist_pages/

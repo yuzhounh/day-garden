@@ -1,5 +1,8 @@
 {
   "buildCommand": null,
-  "outputDirectory": "dist",
-  "cleanUrls": true
+  "outputDirectory": "dist_pages",
+  "cleanUrls": true,
+  "redirects": [
+    { "source": "/:path*", "destination": "https://day-garden.pages.dev/:path*", "permanent": false }
+  ]
 }
