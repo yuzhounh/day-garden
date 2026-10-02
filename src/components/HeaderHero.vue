@@ -422,7 +422,7 @@ onUnmounted(() => {
 
                 <!-- 点击音量键后弹出的滑块浮层 -->
                 <Transition name="fade-slide">
-                  <div v-if="showPopoverVolume" class="popover-volume-pop glass-panel" @click.stop>
+                  <div v-if="showPopoverVolume" class="popover-volume-pop" @click.stop>
                     <button
                       class="popover-mute-mini-btn"
                       :title="audioState.isMuted ? '取消静音' : '静音'"

@@ -220,7 +220,7 @@ onUnmounted(() => {
 
           <!-- 点击后弹出的毛玻璃音量条浮层 -->
           <Transition name="fade-slide">
-            <div v-if="showVolumeBar" class="volume-slider-popover glass-panel" @click.stop>
+            <div v-if="showVolumeBar" class="volume-slider-popover" @click.stop>
               <button
                 type="button"
                 class="vol-mute-btn"
@@ -624,16 +624,21 @@ onUnmounted(() => {
   width: 140px;
   padding: 8px 12px;
   border-radius: 14px;
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.96);
   border: 1px solid var(--line);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
   display: flex;
   align-items: center;
   gap: 8px;
   z-index: 50;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   overflow: visible;
+}
+
+:global(.dark) .volume-slider-popover {
+  background: rgba(30, 33, 40, 0.96);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
 .vol-mute-btn {
