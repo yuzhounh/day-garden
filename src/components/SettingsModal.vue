@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { Download, Upload, Check, Bell } from 'lucide-vue-next'
 import type { UserPreferences } from '../types'
 import { requestNotificationPermission, sendDesktopNotification, sortEventsByDaysLeft } from '../services/calendar'
-import { cleanEventGiftAdvice } from '../services/storage'
+import { cleanEventGiftAdvice, DEFAULT_CARD_ORDER } from '../services/storage'
 import DetailModal from './DetailModal.vue'
 
 const props = defineProps<{
@@ -38,6 +38,13 @@ function toggleModule(key: keyof UserPreferences['modules']) {
     },
   }
   emit('update:preferences', updated)
+}
+
+function resetCardOrder() {
+  emit('update:preferences', {
+    ...props.preferences,
+    cardOrder: [...DEFAULT_CARD_ORDER],
+  })
 }
 
 async function handleTestNotification() {
@@ -203,6 +210,17 @@ function importData(e: Event) {
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">底部健康微提醒</span>
             <input type="checkbox" :checked="preferences.modules.healthTip ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
+        </div>
+
+        <div class="flex items-center justify-between pt-3 px-1 border-t border-slate-200/60 dark:border-slate-700/60 text-xs">
+          <span class="text-slate-500">卡片排版顺序</span>
+          <button
+            type="button"
+            class="text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+            @click="resetCardOrder"
+          >
+            恢复默认排序
+          </button>
         </div>
       </div>
 

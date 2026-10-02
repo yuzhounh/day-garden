@@ -273,6 +273,8 @@
 .icon-button { width: 38px; height: 38px; flex: 0 0 auto; }
 .icon-button.small { width: 32px; height: 32px; border-color: transparent; background: transparent; border-radius: 10px; }
 .icon-button:hover:not(:disabled), .toolbar-button:hover:not(:disabled) { background: var(--sage-bg); color: var(--accent); }
+.icon-button.is-active, .toolbar-button.is-active { background: var(--sage-bg); color: var(--accent); border-color: var(--accent); }
+.sort-active-check { color: var(--accent); }
 .icon-button:disabled, .toolbar-button:disabled { opacity: 0.38; cursor: not-allowed; }
 .live-clock { padding: 9px 13px; font-size: 14px; font-variant-numeric: tabular-nums; font-weight: 500; letter-spacing: .5px; user-select: none; }
 .toolbar-divider { height: 18px; width: 1px; background: var(--line); margin: 0 2px; }
@@ -587,6 +589,119 @@
 .two-column-cards-grid > * {
   width: 100%;
 }
+
+/* 卡片排序模式 Banner 与拖拽排版样式 */
+.sort-mode-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.sort-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.sort-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.sort-banner-btn {
+  padding: 6px 14px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.sort-reset-btn {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+.sort-reset-btn:hover {
+  background: var(--sage-bg);
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.sort-done-btn {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.sort-done-btn:hover {
+  opacity: .92;
+}
+
+.dashboard-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+}
+.dashboard-card-wrapper > article.dashboard-card {
+  flex: 1;
+  height: 100%;
+}
+.dashboard-card-wrapper.is-sort-mode {
+  cursor: grab;
+  user-select: none;
+}
+.dashboard-card-wrapper.is-sort-mode:active {
+  cursor: grabbing;
+}
+.dashboard-card-wrapper.is-dragging {
+  opacity: .42;
+  transform: scale(0.98);
+}
+.dashboard-card-wrapper.is-drop-target {
+  transform: scale(1.015);
+}
+.dashboard-card-wrapper.is-drop-target > article.dashboard-card {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--accent) 35%, transparent), var(--card-shadow-hover) !important;
+}
+
+.card-drag-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: grab;
+  user-select: none;
+  transition: background .15s ease, border-color .15s ease;
+}
+.card-drag-indicator:hover,
+.card-drag-indicator:focus-visible {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-color: var(--accent);
+  outline: none;
+}
+.dashboard-card-wrapper.is-dragging .card-drag-indicator {
+  cursor: grabbing;
+}
+
 .dashboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 .dashboard-card { border-radius: 22px; padding: 24px 26px 0; min-width: 0; display: flex; flex-direction: column; height: 100%; transition: box-shadow .25s ease; }
 .dashboard-card:hover { box-shadow: var(--card-shadow-hover); }
@@ -1622,6 +1737,8 @@
   .hero-copy > .eyebrow { max-width: 100%; font-size: 10px; }
   .hero-copy h1 { font-size: 24px; max-width: 100%; }
   .hero-intro { gap: 16px; }
+  .sort-mode-banner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 14px; }
+  .sort-banner-actions { width: 100%; justify-content: flex-end; }
   .date-card { width: 100%; max-width: 100%; padding: 14px 16px; border-radius: 16px; }
   .date-solar { font-size: 17px; }
   .date-time { font-size: 14.5px; }

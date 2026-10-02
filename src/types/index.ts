@@ -136,6 +136,7 @@ export interface UserPreferences {
     quickNotes?: boolean
     healthTip: boolean
   }
+  cardOrder?: string[]
   customEvents: LifeEvent[]
   attractionStatus?: Record<string, AttractionStatusType>
   notificationEnabled: boolean

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
-import { Sprout } from 'lucide-vue-next'
+import { Sprout, GripVertical } from 'lucide-vue-next'
 import HeaderHero from './components/HeaderHero.vue'
 import WeatherTimeline from './components/WeatherTimeline.vue'
 import MonthCalendarCard from './components/MonthCalendarCard.vue'
@@ -19,7 +19,7 @@ import { initializeSync, refreshCloud, account, syncCustomEvents } from './servi
 import type { UserPreferences, WeatherDay, CityOption, CuratedPoetry, HealthTip, EvidenceGuide, LifeEvent, InspirationalQuote, AttractionStatusType, SportExercise, SeasonBloom } from './types'
 import { fetch7DayWeather } from './services/weather'
 import { getUpcomingEvents, sendDesktopNotification } from './services/calendar'
-import { loadUserPreferences, saveUserPreferences, getTodaySeasonBloom, getTodayEvidenceGuide, getTodayPoetry, getTodayHealthTip, getTodayQuote, getTodaySportExercise } from './services/storage'
+import { loadUserPreferences, saveUserPreferences, DEFAULT_CARD_ORDER, getNormalizedCardOrder, getTodaySeasonBloom, getTodayEvidenceGuide, getTodayPoetry, getTodayHealthTip, getTodayQuote, getTodaySportExercise } from './services/storage'
 import { localDateKey } from './services/day'
 import rawPoetry from './data/poetry-curated.json'
 import rawHealthTips from './data/health-tips.json'
@@ -134,6 +134,105 @@ function handleUpdateCustomEvents(events: LifeEvent[]) {
   saveUserPreferences(prefs.value, account.user?.id)
 }
 
+const isSortMode = ref(false)
+const draggingCard = ref<string | null>(null)
+const dropTargetCard = ref<string | null>(null)
+
+const effectiveCardOrder = computed(() => getNormalizedCardOrder(prefs.value.cardOrder))
+const visibleCards = computed(() =>
+  effectiveCardOrder.value.filter(id => prefs.value.modules[id as keyof UserPreferences['modules']] ?? true)
+)
+
+function onDragStart(event: DragEvent, cardId: string) {
+  if (!isSortMode.value) return
+  draggingCard.value = cardId
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', cardId)
+  }
+}
+
+function onDragOver(event: DragEvent, cardId: string) {
+  if (!isSortMode.value) return
+  event.preventDefault()
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = 'move'
+  }
+  if (draggingCard.value && draggingCard.value !== cardId) {
+    dropTargetCard.value = cardId
+  }
+}
+
+function onDragLeave(event: DragEvent, cardId: string) {
+  if (!isSortMode.value) return
+  const related = event.relatedTarget as HTMLElement | null
+  const currentTarget = event.currentTarget as HTMLElement | null
+  if (!currentTarget || !related || !currentTarget.contains(related)) {
+    if (dropTargetCard.value === cardId) {
+      dropTargetCard.value = null
+    }
+  }
+}
+
+function reorderCards(source: string, target: string) {
+  if (source === target) return
+  const current = getNormalizedCardOrder(prefs.value.cardOrder)
+  const next = current.filter(id => id !== source)
+  const targetIndex = next.indexOf(target)
+  if (targetIndex === -1) return
+  next.splice(targetIndex, 0, source)
+  prefs.value = {
+    ...prefs.value,
+    cardOrder: next,
+  }
+  saveUserPreferences(prefs.value, account.user?.id)
+}
+
+function onDrop(event: DragEvent, cardId: string) {
+  if (!isSortMode.value) return
+  event.preventDefault()
+  const source = draggingCard.value
+  if (source && source !== cardId) {
+    reorderCards(source, cardId)
+  }
+  draggingCard.value = null
+  dropTargetCard.value = null
+}
+
+function onDragEnd() {
+  draggingCard.value = null
+  dropTargetCard.value = null
+}
+
+function resetCardOrder() {
+  prefs.value = {
+    ...prefs.value,
+    cardOrder: [...DEFAULT_CARD_ORDER],
+  }
+  saveUserPreferences(prefs.value, account.user?.id)
+}
+
+function moveCard(cardId: string, direction: -1 | 1) {
+  const current = visibleCards.value
+  const index = current.indexOf(cardId)
+  if (index === -1) return
+  const targetIndex = index + direction
+  if (targetIndex < 0 || targetIndex >= current.length) return
+  const target = current[targetIndex]
+  if (target) reorderCards(cardId, target)
+}
+
+function onCardKeydown(event: KeyboardEvent, cardId: string) {
+  if (!event.altKey) return
+  if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+    event.preventDefault()
+    moveCard(cardId, -1)
+  } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+    event.preventDefault()
+    moveCard(cardId, 1)
+  }
+}
+
 function openSettings(tab?: 'modules' | 'notification' | unknown) {
   if (tab === 'notification' || tab === 'modules') {
     settingsTab.value = tab
@@ -194,60 +293,111 @@ onUnmounted(() => {
   <div id="today" class="garden-app">
     <div class="ambient-background" aria-hidden="true"><span class="ambient-sage"></span><span class="ambient-peach"></span><span class="ambient-lavender"></span><span class="ambient-sky"></span></div>
     <div class="garden-shell">
-      <HeaderHero :selected-city="prefs.selectedCity" :theme="prefs.theme" @update:city="handleCityChange" @toggle-theme="toggleTheme" @open-settings="openSettings()" @open-account="showAccount = true" />
+      <HeaderHero
+        :selected-city="prefs.selectedCity"
+        :theme="prefs.theme"
+        :sort-mode="isSortMode"
+        @update:city="handleCityChange"
+        @toggle-theme="toggleTheme"
+        @toggle-sort-mode="isSortMode = !isSortMode"
+        @open-settings="openSettings()"
+        @open-account="showAccount = true"
+      />
       <main>
         <WeatherTimeline v-if="prefs.modules.weather" :days="weatherDays" :loading="weatherLoading" :city="prefs.selectedCity.name" />
 
+        <!-- 排序模式提示栏 -->
+        <div v-if="isSortMode" class="sort-mode-banner glass-panel" role="status">
+          <div class="sort-banner-content">
+            <GripVertical :size="16" class="text-emerald-600 dark:text-emerald-400" />
+            <span>排序模式已开启：按住卡片拖动调整位置，或聚焦把手按 Alt+方向键</span>
+          </div>
+          <div class="sort-banner-actions">
+            <button class="sort-banner-btn sort-reset-btn" type="button" @click="resetCardOrder">恢复默认排序</button>
+            <button class="sort-banner-btn sort-done-btn" type="button" @click="isSortMode = false">完成排序</button>
+          </div>
+        </div>
+
         <!-- 中间卡片网格：除最顶部天气与最底部好好照顾自己外，其余卡片均占页面宽度的一半（两列排布） -->
-        <section class="two-column-cards-grid" aria-label="核心生活卡片">
-          <MonthCalendarCard
-            v-if="prefs.modules.calendar ?? true"
-            :events="prefs.customEvents"
-          />
-          <UpcomingTimeline
-            v-if="prefs.modules.upcoming"
-            :events="upcomingEvents"
-            :custom-events="prefs.customEvents"
-            @update:custom-events="handleUpdateCustomEvents"
-          />
-          <DailyPageCard
-            v-if="prefs.modules.dailyPoetry"
-            :poetry="currentPoetry"
-            @next-poetry="handleNextPoetry"
-            @select-poetry="currentPoetry = $event"
-          />
-          <InspirationalQuoteCard
-            v-if="prefs.modules.inspirationalQuote ?? true"
-            :quote="currentQuote"
-            @next-quote="handleNextQuote"
-            @select-quote="currentQuote = $event"
-          />
-          <QuickNoteCard
-            v-if="prefs.modules.quickNotes ?? true"
-          />
-          <SeasonalCard
-            v-if="prefs.modules.seasonal"
-            :bloom="seasonBloom"
-            @next-bloom="handleNextBloom"
-            @select-bloom="seasonBloom = $event"
-          />
-          <EvidenceCard
-            v-if="prefs.modules.evidence"
-            :guide="evidenceGuide"
-            @next-guide="handleNextGuide"
-            @select-guide="evidenceGuide = $event"
-          />
-          <ChinaAttractionsCard
-            v-if="prefs.modules.chinaAttractions ?? true"
-            :status-map="prefs.attractionStatus"
-            @update:status-map="handleUpdateAttractionStatus"
-          />
-          <SportsExerciseCard
-            v-if="prefs.modules.sportsExercise ?? true"
-            :sport="currentSport"
-            @next-sport="handleNextSport"
-            @select-sport="currentSport = $event"
-          />
+        <section class="two-column-cards-grid" :class="{ 'in-sort-mode': isSortMode }" aria-label="核心生活卡片">
+          <div
+            v-for="cardId in visibleCards"
+            :key="cardId"
+            class="dashboard-card-wrapper"
+            :class="{
+              'is-sort-mode': isSortMode,
+              'is-dragging': isSortMode && draggingCard === cardId,
+              'is-drop-target': isSortMode && dropTargetCard === cardId,
+            }"
+            :draggable="isSortMode"
+            @dragstart="onDragStart($event, cardId)"
+            @dragover="onDragOver($event, cardId)"
+            @dragleave="onDragLeave($event, cardId)"
+            @drop="onDrop($event, cardId)"
+            @dragend="onDragEnd"
+          >
+            <!-- 排序模式把手与说明 -->
+            <div
+              v-if="isSortMode"
+              class="card-drag-indicator"
+              tabindex="0"
+              role="button"
+              aria-label="拖动或按 Alt+方向键排序"
+              @keydown="onCardKeydown($event, cardId)"
+            >
+              <GripVertical :size="14" />
+              <span>拖动卡片排序 · Alt+方向键移动</span>
+            </div>
+
+            <MonthCalendarCard
+              v-if="cardId === 'calendar'"
+              :events="prefs.customEvents"
+            />
+            <UpcomingTimeline
+              v-else-if="cardId === 'upcoming'"
+              :events="upcomingEvents"
+              :custom-events="prefs.customEvents"
+              @update:custom-events="handleUpdateCustomEvents"
+            />
+            <DailyPageCard
+              v-else-if="cardId === 'dailyPoetry'"
+              :poetry="currentPoetry"
+              @next-poetry="handleNextPoetry"
+              @select-poetry="currentPoetry = $event"
+            />
+            <InspirationalQuoteCard
+              v-else-if="cardId === 'inspirationalQuote'"
+              :quote="currentQuote"
+              @next-quote="handleNextQuote"
+              @select-quote="currentQuote = $event"
+            />
+            <QuickNoteCard
+              v-else-if="cardId === 'quickNotes'"
+            />
+            <SeasonalCard
+              v-else-if="cardId === 'seasonal'"
+              :bloom="seasonBloom"
+              @next-bloom="handleNextBloom"
+              @select-bloom="seasonBloom = $event"
+            />
+            <EvidenceCard
+              v-else-if="cardId === 'evidence'"
+              :guide="evidenceGuide"
+              @next-guide="handleNextGuide"
+              @select-guide="evidenceGuide = $event"
+            />
+            <ChinaAttractionsCard
+              v-else-if="cardId === 'chinaAttractions'"
+              :status-map="prefs.attractionStatus"
+              @update:status-map="handleUpdateAttractionStatus"
+            />
+            <SportsExerciseCard
+              v-else-if="cardId === 'sportsExercise'"
+              :sport="currentSport"
+              @next-sport="handleNextSport"
+              @select-sport="currentSport = $event"
+            />
+          </div>
         </section>
 
         <!-- 最下面：好好照顾自己卡片（全宽） -->

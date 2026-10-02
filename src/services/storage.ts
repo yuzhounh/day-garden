@@ -12,6 +12,27 @@ const STORAGE_KEY = 'daygarden_user_preferences_v1'
 const LEGACY_STORAGE_KEY = 'daybloom_user_preferences_v1'
 const NOTES_STORAGE_KEY = 'daygarden_quick_notes_v1'
 
+export const DEFAULT_CARD_ORDER: string[] = [
+  'calendar',
+  'upcoming',
+  'dailyPoetry',
+  'inspirationalQuote',
+  'quickNotes',
+  'seasonal',
+  'evidence',
+  'chinaAttractions',
+  'sportsExercise',
+]
+
+export function getNormalizedCardOrder(customOrder?: string[]): string[] {
+  if (!customOrder || !Array.isArray(customOrder)) return [...DEFAULT_CARD_ORDER]
+  const validSet = new Set(DEFAULT_CARD_ORDER)
+  const existing = customOrder.filter(k => validSet.has(k))
+  const existingSet = new Set(existing)
+  const missing = DEFAULT_CARD_ORDER.filter(k => !existingSet.has(k))
+  return [...existing, ...missing]
+}
+
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'auto',
   selectedCity: DEFAULT_CITIES[4], // 默认杭州（或可根据需要切换）
@@ -28,6 +49,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     quickNotes: true,
     healthTip: true,
   },
+  cardOrder: [...DEFAULT_CARD_ORDER],
   attractionStatus: {},
   customEvents: [
     {
@@ -97,6 +119,7 @@ export function loadUserPreferences(userId?: string | null): UserPreferences {
       ...DEFAULT_PREFERENCES,
       ...parsed,
       modules: { ...DEFAULT_PREFERENCES.modules, ...parsed.modules },
+      cardOrder: getNormalizedCardOrder(parsed.cardOrder),
       customEvents: sortEventsByDaysLeft(normalizedEvents),
     }
   } catch (e) {
@@ -110,6 +133,7 @@ export function saveUserPreferences(prefs: UserPreferences, userId?: string | nu
     const key = getPreferencesKey(userId)
     const toSave: UserPreferences = {
       ...prefs,
+      cardOrder: getNormalizedCardOrder(prefs.cardOrder),
       customEvents: sortEventsByDaysLeft(prefs.customEvents),
     }
     localStorage.setItem(key, JSON.stringify(toSave))

@@ -13,6 +13,7 @@ import {
   Search,
   X,
   Loader2,
+  GripVertical,
 } from 'lucide-vue-next'
 import { getTodayCalendarInfo } from '../services/calendar'
 import {
@@ -24,8 +25,18 @@ import {
 import type { CityOption } from '../types'
 import { account } from '../services/sync'
 
-const props = defineProps<{ selectedCity: CityOption; theme: 'light' | 'dark' | 'auto' }>()
-const emit = defineEmits<{ 'update:city': [city: CityOption]; 'toggle-theme': []; 'open-settings': []; 'open-account': [] }>()
+const props = defineProps<{
+  selectedCity: CityOption
+  theme: 'light' | 'dark' | 'auto'
+  sortMode?: boolean
+}>()
+const emit = defineEmits<{
+  'update:city': [city: CityOption]
+  'toggle-theme': []
+  'open-settings': []
+  'open-account': []
+  'toggle-sort-mode': []
+}>()
 
 const now = ref(new Date())
 const calendar = computed(() => getTodayCalendarInfo(now.value))
@@ -257,6 +268,19 @@ onUnmounted(() => {
         </div>
 
         <span class="toolbar-divider"></span>
+
+        <!-- 开启/退出卡片排序模式 -->
+        <button
+          class="icon-button sort-mode-toggle"
+          :class="{ 'is-active': sortMode }"
+          :aria-label="sortMode ? '退出排序模式' : '开启排序模式'"
+          :title="sortMode ? '退出排序模式' : '开启排序模式'"
+          :aria-pressed="Boolean(sortMode)"
+          @click="emit('toggle-sort-mode')"
+        >
+          <Check v-if="sortMode" :size="17" class="sort-active-check" />
+          <GripVertical v-else :size="17" />
+        </button>
 
         <!-- 账户同步按钮 -->
         <button
