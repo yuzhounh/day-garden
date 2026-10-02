@@ -655,6 +655,7 @@
 .dashboard-card-wrapper > article.dashboard-card {
   flex: 1;
   height: 100%;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 .dashboard-card-wrapper.is-sort-mode {
   cursor: grab;
@@ -663,43 +664,25 @@
 .dashboard-card-wrapper.is-sort-mode:active {
   cursor: grabbing;
 }
+.dashboard-card-wrapper.is-sort-mode > article.dashboard-card {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--accent) 36%, var(--line));
+}
+.dashboard-card-wrapper.is-sort-mode:hover > article.dashboard-card {
+  border-color: var(--accent);
+  box-shadow: 0 4px 18px color-mix(in srgb, var(--accent) 15%, transparent);
+}
 .dashboard-card-wrapper.is-dragging {
-  opacity: .42;
-  transform: scale(0.98);
+  opacity: .36;
+  transform: scale(0.985);
 }
 .dashboard-card-wrapper.is-drop-target {
   transform: scale(1.015);
 }
 .dashboard-card-wrapper.is-drop-target > article.dashboard-card {
+  border-style: solid;
   border-color: var(--accent) !important;
-  box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--accent) 35%, transparent), var(--card-shadow-hover) !important;
-}
-
-.card-drag-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px 12px;
-  margin-bottom: 10px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-  border: 1px dashed color-mix(in srgb, var(--accent) 35%, transparent);
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: grab;
-  user-select: none;
-  transition: background .15s ease, border-color .15s ease;
-}
-.card-drag-indicator:hover,
-.card-drag-indicator:focus-visible {
-  background: color-mix(in srgb, var(--accent) 22%, transparent);
-  border-color: var(--accent);
-  outline: none;
-}
-.dashboard-card-wrapper.is-dragging .card-drag-indicator {
-  cursor: grabbing;
+  box-shadow: 0 0 0 2.5px color-mix(in srgb, var(--accent) 40%, transparent), var(--card-shadow-hover) !important;
 }
 
 .dashboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }

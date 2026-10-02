@@ -212,27 +212,6 @@ function resetCardOrder() {
   saveUserPreferences(prefs.value, account.user?.id)
 }
 
-function moveCard(cardId: string, direction: -1 | 1) {
-  const current = visibleCards.value
-  const index = current.indexOf(cardId)
-  if (index === -1) return
-  const targetIndex = index + direction
-  if (targetIndex < 0 || targetIndex >= current.length) return
-  const target = current[targetIndex]
-  if (target) reorderCards(cardId, target)
-}
-
-function onCardKeydown(event: KeyboardEvent, cardId: string) {
-  if (!event.altKey) return
-  if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
-    event.preventDefault()
-    moveCard(cardId, -1)
-  } else if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
-    event.preventDefault()
-    moveCard(cardId, 1)
-  }
-}
-
 function openSettings(tab?: 'modules' | 'notification' | unknown) {
   if (tab === 'notification' || tab === 'modules') {
     settingsTab.value = tab
@@ -310,7 +289,7 @@ onUnmounted(() => {
         <div v-if="isSortMode" class="sort-mode-banner glass-panel" role="status">
           <div class="sort-banner-content">
             <GripVertical :size="16" class="text-emerald-600 dark:text-emerald-400" />
-            <span>排序模式已开启：按住卡片拖动调整位置，或聚焦把手按 Alt+方向键</span>
+            <span>排序模式已开启：按住任意卡片拖拽即可调整位置</span>
           </div>
           <div class="sort-banner-actions">
             <button class="sort-banner-btn sort-reset-btn" type="button" @click="resetCardOrder">恢复默认排序</button>
@@ -336,19 +315,6 @@ onUnmounted(() => {
             @drop="onDrop($event, cardId)"
             @dragend="onDragEnd"
           >
-            <!-- 排序模式把手与说明 -->
-            <div
-              v-if="isSortMode"
-              class="card-drag-indicator"
-              tabindex="0"
-              role="button"
-              aria-label="拖动或按 Alt+方向键排序"
-              @keydown="onCardKeydown($event, cardId)"
-            >
-              <GripVertical :size="14" />
-              <span>拖动卡片排序 · Alt+方向键移动</span>
-            </div>
-
             <MonthCalendarCard
               v-if="cardId === 'calendar'"
               :events="prefs.customEvents"
