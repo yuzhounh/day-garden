@@ -12,6 +12,7 @@ import {
   Feather,
   Clock,
   Plus,
+  Shuffle,
 } from 'lucide-vue-next'
 import type { QuickNote } from '../types'
 import DetailModal from './DetailModal.vue'
@@ -59,6 +60,7 @@ function submitNote() {
 
   notes.value = [newNote, ...notes.value]
   saveQuickNotes(notes.value, account.user?.id)
+  displayedNote.value = newNote
   draft.value = ''
   showModalInput.value = false
 }
@@ -73,6 +75,9 @@ function handleKeydown(e: KeyboardEvent) {
 function deleteNote(id: string) {
   notes.value = notes.value.filter(n => n.id !== id)
   saveQuickNotes(notes.value, account.user?.id)
+  if (displayedNote.value?.id === id) {
+    pickRandomNote()
+  }
 }
 
 function copyNoteText(note: QuickNote) {
@@ -159,9 +164,35 @@ const filteredNotes = computed(() => {
   return notes.value.filter(n => n.content.toLowerCase().includes(q))
 })
 
-const recentNotes = computed(() => {
-  return notes.value.slice(0, 2)
-})
+const displayedNote = ref<QuickNote | null>(null)
+
+function pickRandomNote() {
+  if (!notes.value.length) {
+    displayedNote.value = null
+    return
+  }
+  if (notes.value.length === 1) {
+    displayedNote.value = notes.value[0]
+    return
+  }
+  const currentId = displayedNote.value?.id
+  const pool = notes.value.filter(n => n.id !== currentId)
+  const candidates = pool.length > 0 ? pool : notes.value
+  const randomIndex = Math.floor(Math.random() * candidates.length)
+  displayedNote.value = candidates[randomIndex] || null
+}
+
+watch(
+  () => notes.value,
+  (newNotes) => {
+    if (!newNotes.length) {
+      displayedNote.value = null
+    } else if (!displayedNote.value || !newNotes.some(n => n.id === displayedNote.value?.id)) {
+      pickRandomNote()
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -188,14 +219,14 @@ const recentNotes = computed(() => {
       <div class="quick-input-box">
         <textarea
           v-model="draft"
-          rows="2"
+          rows="3"
           class="note-textarea"
-          placeholder="简单记一笔此刻的所思所想、灵感或心境... (Ctrl+Enter 快速记录)"
+          placeholder="简单记一笔此刻的所思所想、灵感或心境..."
           @keydown="handleKeydown"
         ></textarea>
 
         <div class="quick-input-bar">
-          <span class="note-input-hint">Ctrl + Enter 快捷记下</span>
+          <span class="note-input-hint">Ctrl + Enter 记录</span>
           <button
             type="button"
             class="note-submit-btn"
@@ -208,41 +239,50 @@ const recentNotes = computed(() => {
         </div>
       </div>
 
-      <!-- 最近随想流 -->
+      <!-- 随机随想展示 (仅展示 1 条) -->
       <div class="recent-notes-container">
-        <div v-if="recentNotes.length" class="recent-notes-list">
+        <div v-if="displayedNote" class="recent-notes-list">
           <div
-            v-for="item in recentNotes"
-            :key="item.id"
+            :key="displayedNote.id"
             class="recent-note-item group"
           >
             <div class="note-item-header">
               <span class="note-time-label">
                 <Clock :size="11" />
-                {{ formatRelativeTime(item.createdAt) }}
+                {{ formatRelativeTime(displayedNote.createdAt) }}
               </span>
               <div class="note-actions">
                 <button
+                  v-if="notes.length > 1"
                   type="button"
                   class="note-action-btn"
-                  :title="copiedId === item.id ? '已复制' : '复制内容'"
-                  @click="copyNoteText(item)"
+                  title="随机换一条笔记"
+                  aria-label="随机换一条笔记"
+                  @click="pickRandomNote"
                 >
-                  <Check v-if="copiedId === item.id" :size="12" class="text-emerald-500" />
+                  <Shuffle :size="12" />
+                </button>
+                <button
+                  type="button"
+                  class="note-action-btn"
+                  :title="copiedId === displayedNote.id ? '已复制' : '复制内容'"
+                  @click="copyNoteText(displayedNote)"
+                >
+                  <Check v-if="copiedId === displayedNote.id" :size="12" class="text-emerald-500" />
                   <Copy v-else :size="12" />
                 </button>
                 <button
                   type="button"
                   class="note-action-btn delete"
                   title="删除此笔"
-                  @click="deleteNote(item.id)"
+                  @click="deleteNote(displayedNote.id)"
                 >
                   <Trash2 :size="12" />
                 </button>
               </div>
             </div>
             <p class="note-content-preview" @click="showModal = true">
-              {{ item.content }}
+              {{ displayedNote.content }}
             </p>
           </div>
         </div>
@@ -315,13 +355,13 @@ const recentNotes = computed(() => {
           <textarea
             ref="modalTextareaRef"
             v-model="draft"
-            rows="2"
+            rows="3"
             class="modal-textarea"
-            placeholder="记下此时此刻的新想法... (Ctrl+Enter 记录)"
+            placeholder="记下此时此刻的新想法..."
             @keydown="handleKeydown"
           ></textarea>
           <div class="modal-input-footer">
-            <span class="note-input-hint">随心随记，无需刻意分类</span>
+            <span class="note-input-hint">Ctrl + Enter 记录</span>
             <div class="modal-input-btns">
               <button
                 type="button"
@@ -430,6 +470,7 @@ const recentNotes = computed(() => {
 
 .note-textarea {
   width: 100%;
+  min-height: 72px;
   border: none;
   background: transparent;
   color: var(--ink);
