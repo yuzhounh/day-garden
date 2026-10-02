@@ -308,7 +308,7 @@ function importData(e: Event) {
               class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
               @click.prevent="toggleModule('upcoming')"
             >
-              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">节日与重要纪念日</span>
+              <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">岁月里程 · 节日与纪念日</span>
               <input type="checkbox" :checked="preferences.modules.upcoming ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
             </label>
 

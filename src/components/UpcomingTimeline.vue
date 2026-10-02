@@ -14,7 +14,7 @@ const emit = defineEmits<{
     <header class="card-heading">
       <div class="section-label">
         <span class="icon-tile sky"><Heart :size="17" /></span>
-        <h2>纪念日与重要日子</h2>
+        <h2>岁月里程</h2>
         <span class="eyebrow">MILESTONES</span>
       </div>
       <button class="icon-button small" aria-label="添加纪念日" @click="emit('add-event')">
