@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import {
   PenLine,
   Send,
@@ -11,6 +11,7 @@ import {
   Download,
   Feather,
   Clock,
+  Plus,
 } from 'lucide-vue-next'
 import type { QuickNote } from '../types'
 import DetailModal from './DetailModal.vue'
@@ -25,9 +26,26 @@ watch(() => account.user?.id, (uid) => {
 
 const draft = ref('')
 const showModal = ref(false)
+const showModalInput = ref(false)
+const modalTextareaRef = ref<HTMLTextAreaElement | null>(null)
 const searchQuery = ref('')
 const copiedId = ref<string | null>(null)
 const copiedAll = ref(false)
+
+function toggleModalInput() {
+  showModalInput.value = !showModalInput.value
+  if (showModalInput.value) {
+    nextTick(() => {
+      modalTextareaRef.value?.focus()
+    })
+  }
+}
+
+watch(showModal, (val) => {
+  if (!val) {
+    showModalInput.value = false
+  }
+})
 
 function submitNote() {
   const text = draft.value.trim()
@@ -42,6 +60,7 @@ function submitNote() {
   notes.value = [newNote, ...notes.value]
   saveQuickNotes(notes.value, account.user?.id)
   draft.value = ''
+  showModalInput.value = false
 }
 
 function handleKeydown(e: KeyboardEvent) {
@@ -259,6 +278,16 @@ const recentNotes = computed(() => {
         <button
           type="button"
           class="icon-button"
+          :class="{ active: showModalInput }"
+          :title="showModalInput ? '收起输入框' : '新增笔记'"
+          :aria-label="showModalInput ? '收起输入框' : '新增笔记'"
+          @click="toggleModalInput"
+        >
+          <Plus :size="18" />
+        </button>
+        <button
+          type="button"
+          class="icon-button"
           :class="{ active: copiedAll }"
           :disabled="!notes.length"
           :title="copiedAll ? '已复制全部随想' : '复制全部随想'"
@@ -280,28 +309,40 @@ const recentNotes = computed(() => {
         </button>
       </template>
 
-      <!-- 弹窗内部快捷记录 -->
-      <div class="modal-input-wrap">
-        <textarea
-          v-model="draft"
-          rows="2"
-          class="modal-textarea"
-          placeholder="记下此时此刻的新想法... (Ctrl+Enter 记录)"
-          @keydown="handleKeydown"
-        ></textarea>
-        <div class="modal-input-footer">
-          <span class="note-input-hint">随心随记，无需刻意分类</span>
-          <button
-            type="button"
-            class="note-submit-btn"
-            :disabled="!draft.trim()"
-            @click="submitNote"
-          >
-            <Send :size="12" />
-            <span>记一笔</span>
-          </button>
+      <!-- 弹窗内部快捷记录 (默认隐藏，点击右上角“新增笔记”按钮展开) -->
+      <Transition name="fade-slide">
+        <div v-if="showModalInput" class="modal-input-wrap">
+          <textarea
+            ref="modalTextareaRef"
+            v-model="draft"
+            rows="2"
+            class="modal-textarea"
+            placeholder="记下此时此刻的新想法... (Ctrl+Enter 记录)"
+            @keydown="handleKeydown"
+          ></textarea>
+          <div class="modal-input-footer">
+            <span class="note-input-hint">随心随记，无需刻意分类</span>
+            <div class="modal-input-btns">
+              <button
+                type="button"
+                class="modal-cancel-btn"
+                @click="showModalInput = false"
+              >
+                收起
+              </button>
+              <button
+                type="button"
+                class="note-submit-btn"
+                :disabled="!draft.trim()"
+                @click="submitNote"
+              >
+                <Send :size="12" />
+                <span>记一笔</span>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </Transition>
 
       <!-- 搜索框 -->
       <div class="modal-search-row">
@@ -612,6 +653,40 @@ const recentNotes = computed(() => {
   border-top: 1px dashed var(--line);
   margin-top: 8px;
   gap: 10px;
+}
+
+.modal-input-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-cancel-btn {
+  font-size: 12.5px;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 5px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-cancel-btn:hover {
+  color: var(--ink);
+  background: var(--surface);
+  border-color: rgba(68, 107, 78, 0.3);
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 
 .notes-modal-grid {
