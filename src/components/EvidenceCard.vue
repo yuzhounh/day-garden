@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Sprout, ArrowUpRight, ShieldCheck, RefreshCw, BookOpen, Search, Check } from 'lucide-vue-next'
+import { BadgeCheck, ArrowUpRight, ShieldCheck, RefreshCw, BookOpen, Search, Check } from 'lucide-vue-next'
 import type { EvidenceGuide } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawEvidence from '../data/evidence-guide.json'
@@ -52,7 +52,7 @@ function setAsCurrentGuide(g: EvidenceGuide) {
   <article class="glass-panel dashboard-card evidence-card">
     <header class="card-heading">
       <div class="section-label">
-        <span class="icon-tile sage"><Sprout :size="17" /></span>
+        <span class="icon-tile sage"><BadgeCheck :size="17" /></span>
         <h2>生活有方</h2>
         <span class="eyebrow">LIVE A LITTLE BETTER</span>
       </div>
@@ -165,7 +165,7 @@ function setAsCurrentGuide(g: EvidenceGuide) {
               @click.stop="setAsCurrentGuide(item)"
             >
               <Check v-if="(activeGuideId || guide.id) === item.id" :size="12" />
-              <Sprout v-else :size="12" />
+              <BadgeCheck v-else :size="12" />
               <span>{{ (activeGuideId || guide.id) === item.id ? '当前主页展示中' : '设为今日推荐' }}</span>
             </button>
           </div>
