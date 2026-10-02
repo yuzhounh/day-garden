@@ -800,9 +800,15 @@
 .weather-details svg { color: var(--accent); margin-bottom: 13px; }
 .weather-details small { display: block; color: var(--muted); margin-bottom: 5px; font-size: 13px; }
 .weather-details strong { font-size: 18px; font-weight: 600; }
-.empty-state { text-align: center; padding: 30px 10px; color: var(--muted); line-height: 2; font-size: 14px; }
 .detail-modal.collection-modal { width: min(920px, 100%); }
-.detail-modal.settings-content { width: min(720px, 100%); }
+.detail-modal.settings-content {
+  width: min(920px, 100%);
+  font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.settings-content,
+.settings-content * {
+  font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+}
 .settings-content { padding: 0; }
 .settings-content > .modal-content { padding: 0; }
 .settings-content .modal-heading { padding-bottom: 18px; }

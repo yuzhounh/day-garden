@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { Plus, Trash2, Download, Upload, Check, Pencil } from 'lucide-vue-next'
+import { Plus, Trash2, Download, Upload, Check, Pencil, Clock } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
 import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft } from '../services/calendar'
 import DetailModal from './DetailModal.vue'
@@ -95,7 +95,13 @@ function getEventCountdown(ev: LifeEvent) {
   try {
     return calculateNextEventDate(ev.date, !!ev.isLunar)
   } catch {
-    return { daysLeft: -1, nextDateStr: '' }
+    return {
+      daysLeft: -1,
+      nextDateStr: '',
+      nextDateSolar: '',
+      nextDateLunar: undefined,
+      turningAge: undefined,
+    }
   }
 }
 
@@ -107,9 +113,12 @@ function getCountdownText(ev: LifeEvent) {
   return '已过去'
 }
 
-function getNextDateText(ev: LifeEvent) {
-  const { nextDateStr } = getEventCountdown(ev)
-  return nextDateStr
+function getNextDateDisplay(ev: LifeEvent) {
+  const info = getEventCountdown(ev)
+  if (info.nextDateLunar) {
+    return `${info.nextDateSolar} (${info.nextDateLunar})`
+  }
+  return info.nextDateSolar || ev.date
 }
 
 function getCountdownClass(ev: LifeEvent) {
@@ -118,12 +127,19 @@ function getCountdownClass(ev: LifeEvent) {
     return 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 font-bold'
   }
   if (daysLeft <= 7) {
-    return 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 font-semibold'
+    return 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 font-bold'
   }
   if (daysLeft <= 30) {
-    return 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-medium'
+    return 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 font-bold'
   }
-  return 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+  return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold'
+}
+
+function isRedundantMemo(memo?: string) {
+  if (!memo) return true
+  if (memo === '无备忘') return true
+  if (/^\d+岁生日\s*\(.+?\)$/.test(memo.trim())) return true
+  return false
 }
 
 function toggleModule(key: keyof UserPreferences['modules']) {
@@ -379,13 +395,13 @@ function importData(e: Event) {
             </div>
           </div>
 
-          <!-- Existing List -->
-          <div class="space-y-3">
+          <!-- Existing List in 2-Column Responsive Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             <template v-for="ev in sortedEvents" :key="ev.id">
-              <!-- Inline Edit Form -->
+              <!-- Inline Edit Form (spans 2 columns if in grid) -->
               <div
                 v-if="editingId === ev.id"
-                class="p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition"
+                class="md:col-span-2 p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition"
               >
                 <div class="flex items-center justify-between text-xs font-semibold text-emerald-800 dark:text-emerald-300">
                   <span class="flex items-center gap-1.5">
@@ -445,64 +461,86 @@ function importData(e: Event) {
                 </div>
               </div>
 
-              <!-- Normal Display Row -->
+              <!-- Normal Display Card (Clean 4-Core Info Card) -->
               <div
                 v-else
-                class="group flex items-stretch justify-between p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition gap-3"
+                class="group relative flex flex-col justify-between p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-600 shadow-xs hover:shadow-md transition-all duration-200"
               >
-                <!-- Column 1: Title (Row 1), Role & Date (Row 2), Gift Advice (Row 3) -->
-                <div class="min-w-0 flex-1 flex flex-col justify-center gap-1">
-                  <!-- Row 1: Title -->
-                  <div class="font-semibold text-slate-800 dark:text-slate-200 text-sm sm:text-base tracking-tight truncate">
-                    {{ ev.title }}
-                  </div>
-                  <!-- Row 2: Role & Date -->
-                  <div class="flex items-center gap-2 text-xs sm:text-[13px] text-slate-400">
+                <!-- 顶部：姓名 + 角色标签，右侧为悬停操作按钮 -->
+                <div class="flex items-center justify-between gap-2 mb-2.5">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="font-bold text-slate-800 dark:text-slate-100 text-[15px] sm:text-base tracking-tight truncate">
+                      {{ ev.title }}
+                    </span>
                     <span
                       v-if="ev.role"
                       class="px-2 py-0.5 text-xs rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium shrink-0"
                     >
                       {{ ev.role }}
                     </span>
-                    <span class="truncate">{{ ev.role ? '· ' : '' }}{{ ev.date }} {{ ev.isLunar ? '(农历)' : '(公历)' }}</span>
                   </div>
-                  <!-- Row 3: Advice -->
-                  <div class="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 truncate leading-relaxed">
-                    {{ ev.giftAdvice || '无备忘' }}
+
+                  <!-- 悬停操作按钮 (编辑 + 删除) -->
+                  <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      @click="startEdit(ev)"
+                      title="编辑此生日"
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition"
+                    >
+                      <Pencil class="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      @click="removeEvent(ev.id)"
+                      title="删除此生日"
+                      class="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                    >
+                      <Trash2 class="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
 
-                <!-- Column 2: Countdown Badge (Spanning Rows 1 & 2) + Target Date (Row 3) -->
-                <div class="flex flex-col items-end justify-between shrink-0 py-0.5">
-                  <div class="flex items-center flex-1">
-                    <span
-                      class="inline-flex items-center justify-center px-3.5 py-1 rounded-full text-sm sm:text-base font-bold shadow-xs tracking-wide"
-                      :class="getCountdownClass(ev)"
-                    >
-                      {{ getCountdownText(ev) }}
+                <!-- 突出倒数高亮条：天数突出 + 下次周岁 -->
+                <div
+                  class="flex items-center justify-between px-3.5 py-2 rounded-xl mb-3"
+                  :class="getCountdownClass(ev)"
+                >
+                  <div class="flex items-center gap-1.5 font-bold text-[15px] sm:text-base tracking-wide">
+                    <Clock :size="16" />
+                    <span>{{ getCountdownText(ev) }}</span>
+                  </div>
+                  <div v-if="getEventCountdown(ev).turningAge" class="text-sm font-bold">
+                    {{ ev.type === 'anniversary' ? `${getEventCountdown(ev).turningAge} 周年` : `满 ${getEventCountdown(ev).turningAge} 周岁` }}
+                  </div>
+                </div>
+
+                <!-- 核心详情信息：出生日期 & 下次过生日日期 -->
+                <div class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400 dark:text-slate-500 text-xs">
+                      {{ ev.type === 'anniversary' ? '纪念起始' : '出生日期' }}
+                    </span>
+                    <span class="font-medium text-slate-700 dark:text-slate-200 text-sm">
+                      {{ ev.date }} <span class="text-xs text-slate-400">({{ ev.isLunar ? '农历' : '公历' }})</span>
                     </span>
                   </div>
-                  <div class="text-xs text-slate-400 font-mono text-right mt-1">
-                    {{ getNextDateText(ev) }}
-                  </div>
-                </div>
 
-                <!-- Column 3: Actions (Edit + Delete arranged vertically, hidden by default, shown on hover) -->
-                <div class="flex flex-col items-center justify-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    @click="startEdit(ev)"
-                    title="编辑此纪念日"
-                    class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition"
+                  <div class="flex items-center justify-between">
+                    <span class="text-slate-400 dark:text-slate-500 text-xs">
+                      {{ ev.type === 'anniversary' ? '下次纪念日' : '下次生日' }}
+                    </span>
+                    <span class="font-medium text-slate-800 dark:text-slate-100 text-sm">
+                      {{ getNextDateDisplay(ev) }}
+                    </span>
+                  </div>
+
+                  <!-- 真实备忘/备礼提示（仅当非自动重复生成的文案时展示） -->
+                  <div
+                    v-if="ev.giftAdvice && !isRedundantMemo(ev.giftAdvice)"
+                    class="flex items-center justify-between pt-1.5 text-xs text-amber-600 dark:text-amber-400 border-t border-dashed border-slate-100 dark:border-slate-800"
                   >
-                    <Pencil class="w-4 h-4" />
-                  </button>
-                  <button
-                    @click="removeEvent(ev.id)"
-                    title="删除此纪念日"
-                    class="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
-                  >
-                    <Trash2 class="w-4 h-4" />
-                  </button>
+                    <span class="text-slate-400 dark:text-slate-500">备忘</span>
+                    <span class="truncate font-normal">{{ ev.giftAdvice }}</span>
+                  </div>
                 </div>
               </div>
             </template>
@@ -510,7 +548,7 @@ function importData(e: Event) {
         </div>
 
         <!-- 3. 提醒与数据备份 -->
-        <div v-if="currentTab === 'notification'" class="space-y-4">
+        <div v-if="currentTab === 'notification'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3">
             <div class="flex items-center justify-between">
               <div>

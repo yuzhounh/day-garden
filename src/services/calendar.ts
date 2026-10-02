@@ -66,11 +66,19 @@ export function getTodayCalendarInfo(date: Date = new Date()): TodayCalendarInfo
 /**
  * 计算事件下一个发生日期及距今天数
  */
+export interface NextEventInfo {
+  daysLeft: number
+  nextDateStr: string
+  nextDateSolar: string
+  nextDateLunar?: string
+  turningAge?: number
+}
+
 export function calculateNextEventDate(
   eventDateStr: string,
   isLunar: boolean = false,
   baseDate: Date = new Date()
-): { daysLeft: number; nextDateStr: string } {
+): NextEventInfo {
   const baseYear = baseDate.getFullYear()
   baseDate.setHours(0, 0, 0, 0)
 
@@ -105,8 +113,17 @@ export function calculateNextEventDate(
     const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
     const turningAge = birthYear ? targetSolar.getLunar().getYear() - birthYear : undefined
     const ageStr = turningAge !== undefined ? ` · ${turningAge}岁` : ''
-    const nextDateStr = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日 (农历${m}月${d}${ageStr})`
-    return { daysLeft, nextDateStr }
+    const targetLunar = targetSolar.getLunar()
+    const lunarChineseStr = `农历${targetLunar.getMonthInChinese()}月${targetLunar.getDayInChinese()}`
+    const nextDateSolar = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
+    const nextDateStr = `${nextDateSolar} (${lunarChineseStr}${ageStr})`
+    return {
+      daysLeft,
+      nextDateStr,
+      nextDateSolar,
+      nextDateLunar: lunarChineseStr,
+      turningAge,
+    }
   } else {
     // 公历
     let targetDate = new Date(baseYear, m - 1, d)
@@ -121,8 +138,14 @@ export function calculateNextEventDate(
     const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
     const turningAge = birthYear ? targetDate.getFullYear() - birthYear : undefined
     const ageStr = turningAge !== undefined ? ` · ${turningAge}岁` : ''
-    const nextDateStr = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日${ageStr}`
-    return { daysLeft, nextDateStr }
+    const nextDateSolar = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
+    const nextDateStr = `${nextDateSolar}${ageStr}`
+    return {
+      daysLeft,
+      nextDateStr,
+      nextDateSolar,
+      turningAge,
+    }
   }
 }
 
