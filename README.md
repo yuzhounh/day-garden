@@ -1,6 +1,20 @@
-# Day Garden · 日常花园
+<p align="center">
+  <img src="src/assets/logo.svg" width="112" alt="Day Garden · 日常花园 logo">
+</p>
 
-一个轻盈、安静的生活首页：看看天气，读一首诗，感受四季，也照顾自己。
+<h1 align="center">Day Garden · 日常花园</h1>
+
+<p align="center"><strong>天气、诗词、四季与日常提醒，组成一个轻盈安静的生活首页。</strong></p>
+
+<p align="center">
+  <a href="https://day-garden.pages.dev/"><img src="https://img.shields.io/badge/Website-Cloudflare%20Pages-f38020?style=flat&amp;logo=cloudflare&amp;logoColor=white" alt="Website: Cloudflare Pages"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-f59e0b?style=flat" alt="License: MIT"></a>
+  <img src="https://img.shields.io/badge/Vue-3-42b883?style=flat&amp;logo=vuedotjs&amp;logoColor=white" alt="Vue: 3">
+</p>
+
+<p align="center">
+  <a href="https://day-garden.pages.dev/">在线体验</a> · <a href="#本地开发">快速开始</a> · <a href="LICENSE">开源协议</a>
+</p>
 
 ## 已实现
 
@@ -96,6 +110,6 @@ API 使用密码加盐及服务端密钥、HttpOnly / SameSite / Secure 会话 C
 
 Cloudflare Pages 承载完整网页、账户 API 与 D1 数据库。GitHub Pages、Firebase Hosting 和 Vercel 提供入口跳转，统一进入 `https://day-garden.pages.dev/`；它们不单独保存账户或同步数据。执行 `npm run build:landing` 生成 `dist_pages`，GitHub 入口保留路径、查询参数和片段。Firebase 与 Vercel 使用配置中的临时重定向。
 
-## 许可证
+## 开源协议
 
 本项目的软件代码与构建脚本采用 [MIT License](LICENSE)。原创读诗随想及其他原创内容保留权利；公版诗词原文和第三方内容不纳入软件 MIT 授权，具体范围见 [CONTENT-NOTICE.md](CONTENT-NOTICE.md)。
