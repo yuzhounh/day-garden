@@ -83,7 +83,7 @@ function setAsHomePoem(poem: CuratedPoetry) {
           <Bookmark v-else :size="15" />
         </button>
         <button class="text-button" @click="showFull = true">
-          读全篇<ArrowUpRight :size="14" />
+          品味全篇<ArrowUpRight :size="14" />
         </button>
       </div>
     </footer>
