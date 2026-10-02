@@ -517,7 +517,7 @@ function removeEvent(id: string) {
                 <span>{{ getCountdownText(ev) }}</span>
               </div>
               <div v-if="getEventCountdown(ev).turningAge" class="text-sm font-bold">
-                {{ isAnniversaryEvent(ev) ? `${getEventCountdown(ev).turningAge} 周年` : `满 ${getEventCountdown(ev).turningAge} 周岁` }}
+                {{ isAnniversaryEvent(ev) ? `满 ${getEventCountdown(ev).turningAge} 周年` : `满 ${getEventCountdown(ev).turningAge} 周岁` }}
               </div>
             </div>
 
