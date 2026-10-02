@@ -205,6 +205,8 @@
 .weather-placeholder { padding: 20px 0; color: var(--secondary); font-size: 14px; }
 .forecast-heading { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--secondary); margin-bottom: 11px; gap: 8px; }
 .forecast-heading small { color: var(--muted); font-size: 12px; font-weight: normal; margin-left: 10px; }
+.weather-source-link { display: inline-flex; align-items: center; gap: 3px; color: var(--secondary); text-decoration: none; transition: color .15s ease; }
+.weather-source-link:hover { color: var(--accent); text-decoration: underline; }
 .forecast-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; min-width: 620px; padding: 4px 2px; }
 .weather-skeleton { height: 236px; border-radius: 14px; background: var(--sage-bg); animation: breathe 1.5s ease-in-out infinite alternate; }
 

@@ -12,6 +12,7 @@ import {
   Umbrella,
   Thermometer,
   Wind,
+  ArrowUpRight,
 } from 'lucide-vue-next'
 import type { WeatherDay } from '../types'
 import DetailModal from './DetailModal.vue'
@@ -190,7 +191,20 @@ const chartData = computed(() => {
     <div class="forecast-area">
       <div class="forecast-heading">
         <span>气温流转趋势<small>前两天 · 今天 · 未来 7 天</small></span>
-        <span role="status">{{ source }}</span>
+        <span role="status">
+          <a
+            v-if="source === 'Open-Meteo'"
+            href="https://open-meteo.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="weather-source-link"
+            title="数据来源于 Open-Meteo 气象预报服务（点击访问官方网站）"
+          >
+            Open-Meteo
+            <ArrowUpRight :size="12" />
+          </a>
+          <span v-else>{{ source }}</span>
+        </span>
       </div>
 
       <div v-if="loading && !days.length" class="trend-scroll-container" aria-label="正在加载">
@@ -308,6 +322,17 @@ const chartData = computed(() => {
       <p class="content-footnote">
         {{ selected.isPast ? '历史天气供回顾参考。' : '日级预报供出行参考，实际天气可能变化。' }}
         {{ selected.dataSource === 'demo' ? '当前为示例数据，不能作为出行依据。' : '' }}
+        气象数据源自
+        <a
+          href="https://open-meteo.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="weather-source-link"
+          title="访问 Open-Meteo 官方网站"
+        >
+          Open-Meteo
+          <ArrowUpRight :size="12" />
+        </a>。
       </p>
     </DetailModal>
   </section>
