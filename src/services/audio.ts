@@ -364,13 +364,13 @@ export function playTrack(trackId: string) {
       audioState.isPlaying = true
     } else if (track.type === 'stream' && track.streamUrl) {
       const audio = new Audio()
-      audio.crossOrigin = 'anonymous'
       audio.src = track.streamUrl
       audio.preload = 'none'
       audio.volume = audioState.isMuted ? 0 : audioState.volume / 100
 
       audio.addEventListener('error', () => {
-        audioState.error = '音频流连接中，请稍候或切换其他曲目'
+        audioState.isPlaying = false
+        audioState.error = audio.error?.code === 2 ? '电台网络连接失败，请稍后重试或切换曲目。' : audio.error?.code === 3 ? '这段音频暂时无法解码，请切换曲目。' : '这首曲目暂时不可用，可能受到访问限制，请切换其他曲目。'
       })
 
       currentStreamAudio = audio
@@ -378,7 +378,7 @@ export function playTrack(trackId: string) {
         audioState.isPlaying = true
       }).catch((err) => {
         console.warn('Audio stream autoplay blocked or error:', err)
-        audioState.error = '点击播放即可聆听'
+        audioState.error = err?.name === 'NotAllowedError' ? '浏览器需要你点击播放后才能聆听。' : audioState.error || '电台连接失败，请稍后重试或切换曲目。'
         audioState.isPlaying = false
       })
     }

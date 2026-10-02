@@ -1,6 +1,7 @@
 import { Solar, Lunar } from 'lunar-javascript'
 import type { LifeEvent } from '../types'
 import rawHolidays from '../data/holidays.json'
+import { parseEventDate } from './validation'
 
 export interface TodayCalendarInfo {
   solarDateStr: string
@@ -88,6 +89,34 @@ export function getSafeLunar(year: number, month: number, day: number) {
   return Lunar.fromYmd(year, safeMonth, 1)
 }
 
+/** Recurrences use the regular lunar month; a missing lunar day 30 uses day 29. */
+export function eventDateInYear(date: string, isLunar: boolean, year: number): Date | null {
+  const parsed = parseEventDate(date, isLunar)
+  if (!parsed || (parsed.year !== undefined && parsed.year > year)) return null
+  if (isLunar) {
+    const solar = getSafeLunar(year, parsed.month, parsed.day).getSolar()
+    return new Date(solar.getYear(), solar.getMonth() - 1, solar.getDay())
+  }
+  const target = new Date(year, parsed.month - 1, parsed.day)
+  return target.getMonth() === parsed.month - 1 && target.getDate() === parsed.day ? target : null
+}
+
+export function eventsBySolarDate(events: LifeEvent[], years: number[]): Map<string, LifeEvent[]> {
+  const result = new Map<string, LifeEvent[]>()
+  const lunarYears = [...new Set(years.flatMap(year => [year - 1, year, year + 1]))]
+  for (const event of events) {
+    for (const year of event.isLunar ? lunarYears : years) {
+      const date = eventDateInYear(event.date, !!event.isLunar, year)
+      if (!date || !years.includes(date.getFullYear())) continue
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+      const list = result.get(key) || []
+      if (!list.some(item => item.id === event.id)) list.push(event)
+      result.set(key, list)
+    }
+  }
+  return result
+}
+
 /**
  * 判断是否为机械式重复生成的年龄/生日/出生日期备注
  */
@@ -156,40 +185,19 @@ export function calculateNextEventDate(
     safeBaseDate.setHours(0, 0, 0, 0)
 
     // 标准化分隔符（支持 "-"、"/"、"."、"年/月/日"、空格）
-    const cleanStr = eventDateStr.trim().replace(/[/. 年月]/g, '-').replace(/日$/, '')
-    const parts = cleanStr.split('-').filter(Boolean)
-
-    let m = 0
-    let d = 0
-    let birthYear: number | undefined
-
-    if (parts.length === 2) {
-      m = parseInt(parts[0], 10)
-      d = parseInt(parts[1], 10)
-    } else if (parts.length >= 3) {
-      const y = parseInt(parts[0], 10)
-      if (!Number.isNaN(y) && y > 1900 && y < 2200) birthYear = y
-      m = parseInt(parts[1], 10)
-      d = parseInt(parts[2], 10)
-    }
-
-    if (Number.isNaN(m) || Number.isNaN(d) || m < 1 || m > 12 || d < 1 || d > 31) {
-      return fallbackInfo
-    }
+    const parsed = parseEventDate(eventDateStr, isLunar)
+    if (!parsed) return fallbackInfo
+    const { year: birthYear } = parsed
 
     if (isLunar) {
       // 农历生日计算今年或明年的公历对应日
-      let lunarObj = getSafeLunar(baseYear, m, d)
-      let targetSolar = lunarObj.getSolar()
-      let targetDate = new Date(targetSolar.getYear(), targetSolar.getMonth() - 1, targetSolar.getDay())
-      targetDate.setHours(0, 0, 0, 0)
-
-      if (targetDate.getTime() < safeBaseDate.getTime()) {
-        lunarObj = getSafeLunar(baseYear + 1, m, d)
-        targetSolar = lunarObj.getSolar()
-        targetDate = new Date(targetSolar.getYear(), targetSolar.getMonth() - 1, targetSolar.getDay())
-        targetDate.setHours(0, 0, 0, 0)
-      }
+      const candidates = [baseYear - 1, baseYear, baseYear + 1, baseYear + 2]
+        .map(year => eventDateInYear(eventDateStr, true, year))
+        .filter((date): date is Date => !!date && date.getTime() >= safeBaseDate.getTime())
+        .sort((a, b) => a.getTime() - b.getTime())
+      const targetDate = candidates[0]
+      if (!targetDate) return fallbackInfo
+      const targetSolar = Solar.fromDate(targetDate)
 
       const diffMs = targetDate.getTime() - safeBaseDate.getTime()
       const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
@@ -210,13 +218,12 @@ export function calculateNextEventDate(
       }
     } else {
       // 公历
-      let targetDate = new Date(baseYear, m - 1, d)
-      targetDate.setHours(0, 0, 0, 0)
-
-      if (targetDate.getTime() < safeBaseDate.getTime()) {
-        targetDate = new Date(baseYear + 1, m - 1, d)
-        targetDate.setHours(0, 0, 0, 0)
+      let targetDate: Date | null = null
+      for (let year = Math.max(baseYear, birthYear ?? baseYear); year <= Math.max(baseYear, birthYear ?? baseYear) + 8; year++) {
+        const candidate = eventDateInYear(eventDateStr, false, year)
+        if (candidate && candidate.getTime() >= safeBaseDate.getTime()) { targetDate = candidate; break }
       }
+      if (!targetDate) return fallbackInfo
 
       const diffMs = targetDate.getTime() - safeBaseDate.getTime()
       const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
@@ -327,14 +334,16 @@ export async function requestNotificationPermission(): Promise<boolean> {
 }
 
 export function sendDesktopNotification(title: string, body: string) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return
+  if (!('Notification' in window) || Notification.permission !== 'granted') return false
   try {
     new Notification(title, {
       body,
-      icon: '/pwa-192x192.png',
-      badge: '/favicon.ico',
+      icon: '/favicon.svg',
+      badge: '/favicon.svg',
     })
+    return true
   } catch (err) {
     console.warn('Failed to send notification:', err)
+    return false
   }
 }

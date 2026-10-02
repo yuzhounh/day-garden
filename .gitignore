@@ -14,6 +14,8 @@ dist-ssr
 .wrangler/
 .dev.vars*
 tmp/
+private/
+playwright-report/
 
 # Editor directories and files
 .vscode/*
@@ -25,3 +27,9 @@ tmp/
 *.njsproj
 *.sln
 *.sw?
+
+# Local Netlify folder
+.netlify
+
+.vercel
+.env*

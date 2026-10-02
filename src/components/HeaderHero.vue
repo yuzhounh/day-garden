@@ -25,6 +25,7 @@ import {
   Timer,
 } from 'lucide-vue-next'
 import { getTodayCalendarInfo } from '../services/calendar'
+import { useCurrentTime } from '../services/day'
 import {
   DEFAULT_CITIES,
   getRecentCities,
@@ -64,7 +65,7 @@ const emit = defineEmits<{
   'toggle-sort-mode': []
 }>()
 
-const now = ref(new Date())
+const now = useCurrentTime()
 const calendar = computed(() => getTodayCalendarInfo(now.value))
 const time = computed(() => now.value.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }))
 const greeting = computed(() => {
@@ -91,7 +92,6 @@ const searchResults = ref<CityOption[]>([])
 const searchLoading = ref(false)
 const recentCities = ref<CityOption[]>(getRecentCities())
 let searchTimer: number | undefined
-let timer: number | undefined
 
 const showAudioPopover = ref(false)
 const showPopoverVolume = ref(false)
@@ -222,14 +222,12 @@ onMounted(() => {
   const query = window.matchMedia('(prefers-color-scheme: dark)')
   systemDark.value = query.matches
   query.addEventListener('change', updateSystem)
-  timer = window.setInterval(() => { now.value = new Date() }, 30000)
   document.addEventListener('click', closeCities)
   document.addEventListener('click', closeAudioPopover)
   document.addEventListener('keydown', onKey)
 })
 
 onUnmounted(() => {
-  clearInterval(timer)
   clearTimeout(searchTimer)
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', updateSystem)
   document.removeEventListener('click', closeCities)

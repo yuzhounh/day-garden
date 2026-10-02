@@ -1,4 +1,5 @@
-import poetry from '../src/data/poetry-curated.json'
+import poetry from '../src/data/poetry-ids.json'
+import { validateEventList, validateLifeEvent } from '../src/services/validation'
 
 interface Env {
   DB: D1Database
@@ -23,7 +24,7 @@ interface UserRow extends User {
   salt: string
 }
 
-const poemIds = new Set(poetry.map(poem => poem.id))
+const poemIds = new Set(poetry)
 const actionIds = new Set(['move', 'eyes', 'sleep'])
 const encoder = new TextEncoder()
 const sessionAge = 30 * 24 * 60 * 60
@@ -94,19 +95,25 @@ function getOauthState(request: Request) {
   return request.headers.get('Cookie')?.match(/(?:^|;\s*)dg_oauth_state=([^;]+)(?:;|$)/)?.[1]
 }
 
-function getRedirectUri(request: Request, provider: string): string {
+interface OAuthContext { user_id: string | null; old_session_hash: string | null; origin: string; redirect_uri: string; attempt: string }
+type Provider = 'google' | 'github'
+
+function oauthOrigin(request: Request): string {
   const url = new URL(request.url)
-  const proto = request.headers.get('x-forwarded-proto') || url.protocol.replace(':', '')
-  let host = request.headers.get('x-forwarded-host') || request.headers.get('host') || url.host
-  if (host.includes('127.0.0.1') || host.includes('localhost')) {
-    return `http://localhost:8787/api/auth/${provider}/callback`
-  }
-  return `${proto}://${host}/api/auth/${provider}/callback`
+  const origin = url.searchParams.get('return_origin') || url.origin
+  const local = ['127.0.0.1', 'localhost'].includes(url.hostname)
+  const localOrigins = ['http://127.0.0.1:5180', 'http://localhost:5180', 'http://127.0.0.1:8787', 'http://localhost:8787']
+  if (origin !== url.origin && !(local && localOrigins.includes(origin))) throw new ApiError(400, '登录返回地址无效。')
+  return origin
 }
 
-function oauthHtml(title: string, success: boolean, message: string, provider: string) {
+function oauthHtml(title: string, success: boolean, message: string, provider: string, origin: string, attempt = '') {
   const safeTitle = escapeHtml(title)
   const safeMessage = escapeHtml(message)
+  const nonce = randomToken()
+  const payload = JSON.stringify({ type: success ? 'daygarden-oauth-success' : 'daygarden-oauth-error', provider, message, attempt }).replace(/</g, '\\u003c')
+  const target = JSON.stringify(origin)
+  const returnUrl = JSON.stringify('/?' + new URLSearchParams({ oauth: success ? 'success' : 'error', attempt }))
   return new Response(`<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -163,22 +170,18 @@ function oauthHtml(title: string, success: boolean, message: string, provider: s
   <div class="card">
     <h2>${safeTitle}</h2>
     <p>${safeMessage}</p>
-    ${!success ? '<button onclick="window.close() || (window.location.href = \'/\')">返回页面</button>' : ''}
+    ${!success ? `<a href="/?oauth=error&amp;attempt=${encodeURIComponent(attempt)}">返回花园</a>` : ''}
   </div>
-  <script>
+  <script nonce="${nonce}">
     try {
       if (window.opener && !window.opener.closed) {
-        window.opener.postMessage({
-          type: '${success ? 'daygarden-oauth-success' : 'daygarden-oauth-error'}',
-          provider: '${escapeHtml(provider)}',
-          message: '${safeMessage}'
-        }, '*');
+        window.opener.postMessage(${payload}, ${target});
         ${success ? 'setTimeout(function() { window.close(); }, 350);' : ''}
       } else {
-        ${success ? 'setTimeout(function() { window.location.href = \'/\'; }, 500);' : ''}
+        ${success ? `setTimeout(function() { window.location.href = ${returnUrl}; }, 500);` : ''}
       }
     } catch (e) {
-      ${success ? 'window.location.href = \'/\';' : ''}
+      ${success ? `window.location.href = ${returnUrl};` : ''}
     }
   </script>
 </body>
@@ -187,6 +190,8 @@ function oauthHtml(title: string, success: boolean, message: string, provider: s
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-store',
+      'Content-Security-Policy': `default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'`,
+      'X-Content-Type-Options': 'nosniff',
     }
   })
 }
@@ -259,13 +264,15 @@ async function handleOAuthUser(
   email: string | null,
   displayName: string | null,
   avatarUrl: string | null,
-  suggestedUsername?: string
+  suggestedUsername: string | undefined,
+  context: OAuthContext
 ): Promise<Response> {
   const existing = await env.DB.prepare(
     'SELECT user_id FROM oauth_accounts WHERE provider = ? AND provider_user_id = ?'
   ).bind(provider, providerUserId).first<{ user_id: string }>()
 
   let targetUserId = existing?.user_id || null
+  if (context.user_id && targetUserId && targetUserId !== context.user_id) throw new ApiError(409, '此第三方账户已绑定另一个花园账户。')
 
   if (targetUserId) {
     await env.DB.prepare(`
@@ -274,9 +281,10 @@ async function handleOAuthUser(
       WHERE provider = ? AND provider_user_id = ?
     `).bind(email, displayName, avatarUrl, provider, providerUserId).run()
   } else {
-    const currentLoggedUser = await userFor(request, env)
-    if (currentLoggedUser) {
-      targetUserId = currentLoggedUser.id
+    if (context.user_id) {
+      const bound = await env.DB.prepare('SELECT provider_user_id FROM oauth_accounts WHERE provider = ? AND user_id = ?').bind(provider, context.user_id).first()
+      if (bound) throw new ApiError(409, '此账户已绑定该登录方式，请先解除原绑定。')
+      targetUserId = context.user_id
     } else {
       const baseRaw = (suggestedUsername || displayName || email?.split('@')[0] || `${provider}_user`).toLowerCase()
       let base = baseRaw.replace(/[^a-z0-9_]/g, '')
@@ -312,15 +320,74 @@ async function handleOAuthUser(
   const token = randomToken()
   const oldToken = sessionToken(request)
   const statements = [env.DB.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(Date.now())]
-  if (oldToken) statements.push(env.DB.prepare('DELETE FROM sessions WHERE token_hash = ?').bind(await digest(oldToken)))
+  const oldHash = context.old_session_hash || (oldToken ? await digest(oldToken) : null)
+  if (oldHash) statements.push(env.DB.prepare('DELETE FROM sessions WHERE token_hash = ?').bind(oldHash))
   statements.push(env.DB.prepare('INSERT INTO sessions(token_hash, user_id, expires_at) VALUES (?, ?, ?)').bind(await digest(token), user.id, Date.now() + sessionAge * 1000))
   await env.DB.batch(statements)
 
-  const resp = oauthHtml('登录成功', true, `欢迎进入日常花园，${displayName || user.username}！`, provider)
+  const resp = oauthHtml('登录成功', true, `欢迎进入日常花园，${displayName || user.username}！`, provider, context.origin, context.attempt)
   const secure = new URL(request.url).protocol === 'https:' ? '; Secure' : ''
   resp.headers.set('Set-Cookie', cookie(request, token, sessionAge))
   resp.headers.append('Set-Cookie', `dg_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`)
   return resp
+}
+
+async function startOAuth(request: Request, env: Env, provider: Provider): Promise<Response> {
+  const url = new URL(request.url)
+  const origin = oauthOrigin(request)
+  const attempt = url.searchParams.get('attempt') || ''
+  if (attempt && !/^[a-zA-Z0-9_-]{1,64}$/.test(attempt)) throw new ApiError(400, '登录请求编号无效。')
+  const clientId = provider === 'google' ? env.GOOGLE_CLIENT_ID : env.GITHUB_CLIENT_ID
+  const clientSecret = provider === 'google' ? env.GOOGLE_CLIENT_SECRET : env.GITHUB_CLIENT_SECRET
+  if (!clientId || !clientSecret) return oauthHtml('登录暂不可用', false, '此登录方式尚未配置，请使用其他方式。', provider, origin, attempt)
+  const link = url.searchParams.get('mode') === 'link'
+  const user = await userFor(request, env)
+  if (link && !user) return oauthHtml('请先登录', false, '登录当前账户后才能关联其他登录方式。', provider, origin, attempt)
+  const state = randomToken()
+  const token = sessionToken(request)
+  const redirectUri = `${origin}/api/auth/${provider}/callback`
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM oauth_states WHERE expires_at <= ?').bind(Date.now()),
+    env.DB.prepare('INSERT INTO oauth_states(state_hash, provider, user_id, old_session_hash, origin, redirect_uri, attempt, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(await digest(state), provider, link ? user!.id : null, token ? await digest(token) : null, origin, redirectUri, attempt, Date.now() + 600000),
+  ])
+  const authUrl = new URL(provider === 'google' ? 'https://accounts.google.com/o/oauth2/v2/auth' : 'https://github.com/login/oauth/authorize')
+  authUrl.search = new URLSearchParams({ client_id: clientId, redirect_uri: redirectUri, response_type: 'code', scope: provider === 'google' ? 'openid email profile' : 'read:user user:email', state, ...(provider === 'google' ? { prompt: 'select_account' } : {}) }).toString()
+  return new Response(null, { status: 302, headers: { Location: authUrl.href, 'Set-Cookie': oauthStateCookie(request, state, 600), 'Cache-Control': 'no-store' } })
+}
+
+async function oauthCallback(request: Request, env: Env, provider: Provider): Promise<Response> {
+  const url = new URL(request.url)
+  const state = url.searchParams.get('state')
+  const cookieState = getOauthState(request)
+  if (!state || !cookieState || !equal(state, cookieState)) return oauthHtml('安全校验未通过', false, '授权状态已失效，请关闭窗口后重新登录。', provider, url.origin)
+  const context = await env.DB.prepare('DELETE FROM oauth_states WHERE state_hash = ? AND provider = ? AND expires_at > ? RETURNING user_id, old_session_hash, origin, redirect_uri, attempt')
+    .bind(await digest(state), provider, Date.now()).first<OAuthContext>()
+  if (!context) return oauthHtml('安全校验未通过', false, '授权已过期或已使用，请关闭窗口后重新登录。', provider, url.origin)
+  const fail = (title: string, message: string) => oauthHtml(title, false, message, provider, context.origin, context.attempt)
+  if (url.searchParams.has('error')) return fail('授权已取消', '授权已取消或被拒绝，你可以重新登录。')
+  const code = url.searchParams.get('code')
+  if (!code) return fail('安全校验未通过', '授权凭据缺失，请重新登录。')
+  const clientId = provider === 'google' ? env.GOOGLE_CLIENT_ID : env.GITHUB_CLIENT_ID
+  const clientSecret = provider === 'google' ? env.GOOGLE_CLIENT_SECRET : env.GITHUB_CLIENT_SECRET
+  if (!clientId || !clientSecret) return fail('登录暂不可用', '此登录方式尚未配置，请使用其他方式。')
+  try {
+    const tokenRes = await fetch(provider === 'google' ? 'https://oauth2.googleapis.com/token' : 'https://github.com/login/oauth/access_token', {
+      method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json', 'User-Agent': 'DayGardenApp/1.0' },
+      body: new URLSearchParams({ code, client_id: clientId, client_secret: clientSecret, redirect_uri: context.redirect_uri, grant_type: 'authorization_code' }), signal: AbortSignal.timeout(10000),
+    })
+    if (!tokenRes.ok) return fail('凭据交换失败', '授权服务暂时不可用，请重新登录。')
+    const tokenData = await tokenRes.json<{ access_token?: string }>()
+    if (!tokenData.access_token) return fail('凭据交换失败', '未能取得授权凭据，请重新登录。')
+    const profileRes = await fetch(provider === 'google' ? 'https://www.googleapis.com/oauth2/v2/userinfo' : 'https://api.github.com/user', { headers: { Authorization: `Bearer ${tokenData.access_token}`, 'User-Agent': 'DayGardenApp/1.0' }, signal: AbortSignal.timeout(10000) })
+    if (!profileRes.ok) return fail('信息获取失败', '无法读取授权账户，请稍后重试。')
+    const profile = await profileRes.json<{ id: string | number; email?: string; name?: string; picture?: string; avatar_url?: string; login?: string }>()
+    if (!profile.id) return fail('信息获取失败', '授权账户信息不完整，请重新登录。')
+    return await handleOAuthUser(request, env, provider, String(profile.id), profile.email || null, profile.name || profile.login || null, profile.picture || profile.avatar_url || null, profile.login, context)
+  } catch (error) {
+    console.error('OAuth callback failed', error instanceof ApiError ? error.status : 'network or service error')
+    return fail('登录处理出错', error instanceof ApiError ? error.message : '授权服务连接失败，请稍后重试。')
+  }
 }
 
 async function allowAuth(request: Request, env: Env) {
@@ -372,193 +439,10 @@ async function api(request: Request, env: Env): Promise<Response> {
     })
   }
 
-  // 4. Google OAuth Redirect
-  if (path === '/api/auth/google' && request.method === 'GET') {
-    if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
-      return oauthHtml(
-        'Google 登录未配置',
-        false,
-        '服务端尚未配置 GOOGLE_CLIENT_ID 与 GOOGLE_CLIENT_SECRET 凭据。请在 Cloudflare Pages 环境变量或本地 .dev.vars 中设置。',
-        'google'
-      )
-    }
-    const state = randomToken()
-    const redirectUri = getRedirectUri(request, 'google')
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${encodeURIComponent(env.GOOGLE_CLIENT_ID)}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&response_type=code` +
-      `&scope=${encodeURIComponent('openid email profile')}` +
-      `&state=${state}` +
-      `&prompt=select_account`
-
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: authUrl,
-        'Set-Cookie': oauthStateCookie(request, state, 600),
-      },
-    })
-  }
-
-  // 5. Google OAuth Callback
-  if (path === '/api/auth/google/callback' && request.method === 'GET') {
-    const errorParam = url.searchParams.get('error')
-    if (errorParam) {
-      return oauthHtml('Google 授权已取消', false, '你已取消 Google 授权登录，或授权被拒绝。', 'google')
-    }
-    const code = url.searchParams.get('code')
-    const state = url.searchParams.get('state')
-    const cookieState = getOauthState(request)
-
-    if (!code || !state || !cookieState || !equal(state, cookieState)) {
-      return oauthHtml('安全校验未通过', false, '授权状态校验失效（可能已过期），请返回重试。', 'google')
-    }
-    if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET) {
-      return oauthHtml('配置缺失', false, '未找到 Google OAuth 服务端配置凭据。', 'google')
-    }
-
-    try {
-      const redirectUri = getRedirectUri(request, 'google')
-      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          code,
-          client_id: env.GOOGLE_CLIENT_ID,
-          client_secret: env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: redirectUri,
-          grant_type: 'authorization_code',
-        }),
-      })
-
-      if (!tokenRes.ok) {
-        const errText = await tokenRes.text()
-        console.error('Google token exchange error', errText)
-        return oauthHtml('凭据交换失败', false, '向 Google 兑换访问令牌失败，请检查 Redirect URI 配置。', 'google')
-      }
-
-      const tokenData = await tokenRes.json<{ access_token: string }>()
-      const profileRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: { Authorization: `Bearer ${tokenData.access_token}` },
-      })
-      if (!profileRes.ok) {
-        return oauthHtml('信息获取失败', false, '获取 Google 用户基本资料失败。', 'google')
-      }
-
-      const profile = await profileRes.json<{ id: string; email?: string; name?: string; picture?: string }>()
-      return await handleOAuthUser(request, env, 'google', profile.id, profile.email || null, profile.name || null, profile.picture || null)
-    } catch (e) {
-      console.error('Google OAuth callback error', e)
-      return oauthHtml('登录处理出错', false, '处理 Google 登录时发生网络或服务异常。', 'google')
-    }
-  }
-
-  // 6. GitHub OAuth Redirect
-  if (path === '/api/auth/github' && request.method === 'GET') {
-    if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
-      return oauthHtml(
-        'GitHub 登录未配置',
-        false,
-        '服务端尚未配置 GITHUB_CLIENT_ID 与 GITHUB_CLIENT_SECRET 凭据。请在 Cloudflare Pages 环境变量或本地 .dev.vars 中设置。',
-        'github'
-      )
-    }
-    const state = randomToken()
-    const redirectUri = getRedirectUri(request, 'github')
-    const authUrl = `https://github.com/login/oauth/authorize?` +
-      `client_id=${encodeURIComponent(env.GITHUB_CLIENT_ID)}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&scope=${encodeURIComponent('read:user user:email')}` +
-      `&state=${state}`
-
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: authUrl,
-        'Set-Cookie': oauthStateCookie(request, state, 600),
-      },
-    })
-  }
-
-  // 7. GitHub OAuth Callback
-  if (path === '/api/auth/github/callback' && request.method === 'GET') {
-    const errorParam = url.searchParams.get('error')
-    if (errorParam) {
-      return oauthHtml('GitHub 授权已取消', false, '你已取消 GitHub 授权登录，或授权被拒绝。', 'github')
-    }
-    const code = url.searchParams.get('code')
-    const state = url.searchParams.get('state')
-    const cookieState = getOauthState(request)
-
-    if (!code || !state || !cookieState || !equal(state, cookieState)) {
-      return oauthHtml('安全校验未通过', false, '授权状态校验失效（可能已过期），请返回重试。', 'github')
-    }
-    if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
-      return oauthHtml('配置缺失', false, '未找到 GitHub OAuth 服务端配置凭据。', 'github')
-    }
-
-    try {
-      const redirectUri = getRedirectUri(request, 'github')
-      const tokenRes = await fetch('https://github.com/login/oauth/access_token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          'User-Agent': 'DayGardenApp/1.0',
-        },
-        body: JSON.stringify({
-          client_id: env.GITHUB_CLIENT_ID,
-          client_secret: env.GITHUB_CLIENT_SECRET,
-          code,
-          redirect_uri: redirectUri,
-        }),
-      })
-
-      const tokenData = await tokenRes.json<{ access_token?: string; error?: string; error_description?: string }>()
-      if (!tokenData.access_token) {
-        console.error('GitHub token exchange error', tokenData)
-        return oauthHtml('凭据交换失败', false, tokenData.error_description || '向 GitHub 兑换访问令牌失败。', 'github')
-      }
-
-      const userRes = await fetch('https://api.github.com/user', {
-        headers: {
-          Authorization: `Bearer ${tokenData.access_token}`,
-          'User-Agent': 'DayGardenApp/1.0',
-        },
-      })
-      if (!userRes.ok) {
-        return oauthHtml('信息获取失败', false, '获取 GitHub 用户资料失败。', 'github')
-      }
-      const ghProfile = await userRes.json<{ id: number; login: string; name?: string; avatar_url?: string; email?: string }>()
-
-      let email = ghProfile.email || null
-      if (!email) {
-        try {
-          const emailsRes = await fetch('https://api.github.com/user/emails', {
-            headers: { Authorization: `Bearer ${tokenData.access_token}`, 'User-Agent': 'DayGardenApp/1.0' },
-          })
-          if (emailsRes.ok) {
-            const emails = await emailsRes.json<Array<{ email: string; primary: boolean; verified: boolean }>>()
-            email = emails.find(e => e.primary && e.verified)?.email || emails[0]?.email || null
-          }
-        } catch {}
-      }
-
-      return await handleOAuthUser(
-        request,
-        env,
-        'github',
-        String(ghProfile.id),
-        email,
-        ghProfile.name || ghProfile.login,
-        ghProfile.avatar_url || null,
-        ghProfile.login
-      )
-    } catch (e) {
-      console.error('GitHub OAuth callback error', e)
-      return oauthHtml('登录处理出错', false, '处理 GitHub 登录时发生网络或服务异常。', 'github')
-    }
+  const oauthRoute = path.match(/^\/api\/auth\/(google|github)(\/callback)?$/)
+  if (oauthRoute && request.method === 'GET') {
+    const provider = oauthRoute[1] as Provider
+    return oauthRoute[2] ? oauthCallback(request, env, provider) : startOAuth(request, env, provider)
   }
 
   // 8. Local Dev Mock OAuth Login (Useful for local testing without cloud credentials)
@@ -575,7 +459,14 @@ async function api(request: Request, env: Env): Promise<Response> {
       : 'https://avatars.githubusercontent.com/u/9919?v=4'
     const mockUsername = provider === 'google' ? 'google_gardener' : 'github_gardener'
 
-    return await handleOAuthUser(request, env, provider, mockId, mockEmail, mockName, mockAvatar, mockUsername)
+    const currentUser = data.link === true ? await userFor(request, env) : null
+    if (data.link === true && !currentUser) throw new ApiError(401, '请先登录再关联账户。')
+    const token = sessionToken(request)
+    const result = await handleOAuthUser(request, env, provider, mockId, mockEmail, mockName, mockAvatar, mockUsername, { user_id: currentUser?.id || null, old_session_hash: token ? await digest(token) : null, origin: url.origin, redirect_uri: '', attempt: '' })
+    const headers = new Headers(result.headers)
+    headers.set('Content-Type', 'application/json; charset=utf-8')
+    headers.delete('Content-Security-Policy')
+    return new Response(JSON.stringify({ ok: true }), { status: result.status, headers })
   }
 
   // 9. Unlink OAuth provider
@@ -669,50 +560,21 @@ async function api(request: Request, env: Env): Promise<Response> {
   // 14. Custom events sync and mutations
   if (path === '/api/events' && request.method === 'PUT') {
     const data = await body(request)
-    const list = Array.isArray(data.events) ? data.events : []
-    const stmts: D1PreparedStatement[] = [
-      env.DB.prepare('DELETE FROM custom_events WHERE user_id = ?').bind(user.id),
-    ]
-    const now = Date.now()
-    for (const item of list) {
-      const ev = item as Record<string, unknown>
-      if (!ev || typeof ev.id !== 'string' || typeof ev.title !== 'string' || typeof ev.date !== 'string') continue
-      const role = typeof ev.role === 'string' ? ev.role.slice(0, 32) : null
-      const giftAdvice = typeof ev.giftAdvice === 'string' ? ev.giftAdvice.slice(0, 128) : null
-      stmts.push(
-        env.DB.prepare('INSERT INTO custom_events(id, user_id, title, date, is_lunar, type, role, gift_advice, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-          .bind(
-            ev.id,
-            user.id,
-            ev.title.slice(0, 64),
-            ev.date.slice(0, 32),
-            ev.isLunar ? 1 : 0,
-            typeof ev.type === 'string' ? ev.type : 'birthday',
-            role,
-            giftAdvice,
-            now
-          )
-      )
-    }
-    if (stmts.length > 0) {
-      await env.DB.batch(stmts)
-    }
-    return json({ ok: true })
+    try { validateEventList(data.events) } catch (error) { throw new ApiError(400, (error as Error).message) }
+    throw new ApiError(405, '整份日程替换已停用，请使用单项日程接口。')
   }
 
-  if (path === '/api/events' && request.method === 'POST') {
-    const ev = await body(request)
-    const id = typeof ev.id === 'string' ? ev.id : ''
-    const title = typeof ev.title === 'string' ? ev.title : ''
-    const date = typeof ev.date === 'string' ? ev.date : ''
-    const isLunar = Boolean(ev.isLunar)
-    const type = typeof ev.type === 'string' ? ev.type : 'birthday'
-    const role = typeof ev.role === 'string' ? ev.role.slice(0, 32) : null
-    const giftAdvice = typeof ev.giftAdvice === 'string' ? ev.giftAdvice.slice(0, 128) : null
-
-    if (!id || !title || !date) {
-      throw new ApiError(400, '事件数据不完整。')
+  const singleEventMatch = path.match(/^\/api\/events\/([a-zA-Z0-9_-]{1,128})$/)
+  if ((path === '/api/events' && request.method === 'POST') || (singleEventMatch && request.method === 'PUT')) {
+    let ev
+    try { ev = validateLifeEvent(await body(request)) } catch (error) {
+      if (error instanceof ApiError) throw error
+      throw new ApiError(400, (error as Error).message)
     }
+    if (singleEventMatch && singleEventMatch[1] !== ev.id) throw new ApiError(400, '日程编号与路径不一致。')
+    const { id, title, date, isLunar, type } = ev
+    const role = ev.role || null
+    const giftAdvice = ev.giftAdvice || null
     await env.DB.prepare(`
       INSERT INTO custom_events(id, user_id, title, date, is_lunar, type, role, gift_advice, created_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -737,7 +599,6 @@ async function api(request: Request, env: Env): Promise<Response> {
     return json({ ok: true })
   }
 
-  const singleEventMatch = path.match(/^\/api\/events\/([a-zA-Z0-9_-]+)$/)
   if (singleEventMatch && request.method === 'DELETE') {
     const id = singleEventMatch[1]!
     await env.DB.prepare('DELETE FROM custom_events WHERE user_id = ? AND id = ?').bind(user.id, id).run()

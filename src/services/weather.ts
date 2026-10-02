@@ -1,6 +1,5 @@
 import type { CityOption, WeatherDay } from '../types'
 import { localDateKey } from './day'
-import rawCities from '../data/chinese-cities.json'
 
 export const DEFAULT_CITIES: CityOption[] = [
   { name: '北京', province: '北京', lat: 39.9042, lon: 116.4074 },
@@ -59,7 +58,7 @@ export async function searchCities(query: string): Promise<CityOption[]> {
   const cleanQ = q.replace(/市$/, '')
 
   // 1. 本地国内全量城市库精确与模糊匹配（优先权威地级市）
-  const allKnown = rawCities as Array<CityOption & { pinyin?: string }>
+  const allKnown = (await import('../data/chinese-cities.json')).default as Array<CityOption & { pinyin?: string }>
   const localMatches = allKnown.filter(c => {
     return (
       c.name === q ||

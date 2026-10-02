@@ -1,22 +1,27 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-vue-next'
 import { Solar, HolidayUtil } from 'lunar-javascript'
 import type { LifeEvent } from '../types'
+import { useCurrentTime, localDateKey, currentDate } from '../services/day'
+import { eventsBySolarDate } from '../services/calendar'
 
 const props = defineProps<{
   events?: LifeEvent[]
 }>()
 
-const now = new Date()
-const currentYear = ref(now.getFullYear())
-const currentMonth = ref(now.getMonth() + 1)
+const now = useCurrentTime()
+const currentYear = ref(now.value.getFullYear())
+const currentMonth = ref(now.value.getMonth() + 1)
 const selectedDateStr = ref<string>(
-  `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  localDateKey(now.value)
 )
+watch(currentDate, (next, previous) => {
+  if (selectedDateStr.value === previous) { selectedDateStr.value = next; currentYear.value = now.value.getFullYear(); currentMonth.value = now.value.getMonth() + 1 }
+})
 
 const isCurrentViewToday = computed(() => {
-  return currentYear.value === now.getFullYear() && currentMonth.value === (now.getMonth() + 1)
+  return currentYear.value === now.value.getFullYear() && currentMonth.value === (now.value.getMonth() + 1)
 })
 
 const WEEKDAYS = [
@@ -80,20 +85,10 @@ const calendarCells = computed<CalendarCell[]>(() => {
     rawList.push({ year: nextY, month: nextM, day: d, isCurrentMonth: false })
   }
 
-  const todayY = now.getFullYear()
-  const todayM = now.getMonth() + 1
-  const todayD = now.getDate()
-
-  const eventsMap = new Map<string, string>()
-  if (props.events) {
-    for (const ev of props.events) {
-      if (ev.date) {
-        // e.g. "10-08" or "2026-10-08"
-        const clean = ev.date.length === 5 ? ev.date : ev.date.slice(-5)
-        eventsMap.set(clean, ev.title)
-      }
-    }
-  }
+  const todayY = now.value.getFullYear()
+  const todayM = now.value.getMonth() + 1
+  const todayD = now.value.getDate()
+  const eventsMap = eventsBySolarDate(props.events || [], [...new Set(rawList.map(item => item.year))])
 
   return rawList.map((item) => {
     const dateStr = `${item.year}-${String(item.month).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`
@@ -136,9 +131,9 @@ const calendarCells = computed<CalendarCell[]>(() => {
       subType = 'lunar'
     }
 
-    const monthDayKey = `${String(item.month).padStart(2, '0')}-${String(item.day).padStart(2, '0')}`
-    const hasEvent = eventsMap.has(monthDayKey)
-    const eventTitle = eventsMap.get(monthDayKey)
+    const events = eventsMap.get(dateStr) || []
+    const hasEvent = events.length > 0
+    const eventTitle = events.map(event => event.title).join('、')
 
     const lunarFullStr = `${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}`
 
@@ -204,9 +199,9 @@ function nextMonth() {
 }
 
 function goToday() {
-  currentYear.value = now.getFullYear()
-  currentMonth.value = now.getMonth() + 1
-  selectedDateStr.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  currentYear.value = now.value.getFullYear()
+  currentMonth.value = now.value.getMonth() + 1
+  selectedDateStr.value = localDateKey(now.value)
 }
 
 function selectCell(cell: CalendarCell) {

@@ -10,6 +10,7 @@ import {
   isAnniversaryEvent,
 } from '../services/calendar'
 import DetailModal from './DetailModal.vue'
+import { validateLifeEvent, validateEventList, parseEventDate } from '../services/validation'
 
 const props = withDefaults(
   defineProps<{
@@ -80,6 +81,8 @@ function cancelEdit() {
 
 function saveEdit(id: string) {
   if (!editForm.value.title.trim() || !editForm.value.date.trim()) return
+  try { validateLifeEvent({ ...editForm.value, id }) } catch (error) { formError.value = (error as Error).message; return }
+  formError.value = ''
 
   const isAnniv = isAnniversaryEvent({ title: editForm.value.title, type: editForm.value.type })
   const updatedEvents = props.customEvents.map((ev) => {
@@ -87,7 +90,7 @@ function saveEdit(id: string) {
     return {
       ...ev,
       title: editForm.value.title.trim(),
-      date: editForm.value.date.trim(),
+      date: parseEventDate(editForm.value.date, editForm.value.isLunar)!.date,
       type: isAnniv ? 'anniversary' : editForm.value.type,
       role: editForm.value.role.trim() || undefined,
       giftAdvice: editForm.value.giftAdvice.trim() || undefined,
@@ -207,7 +210,7 @@ function addEvent() {
 
   const isAnniv = isAnniversaryEvent({ title: newEventTitle.value, type: newEventType.value })
   const newEv: LifeEvent = {
-    id: 'evt_' + Date.now(),
+    id: 'evt_' + crypto.randomUUID(),
     title: newEventTitle.value.trim(),
     date: newEventDate.value.trim(),
     type: isAnniv ? 'anniversary' : newEventType.value,
@@ -215,7 +218,8 @@ function addEvent() {
     giftAdvice: newEventAdvice.value.trim() || undefined,
     isLunar: newEventIsLunar.value,
   }
-
+  try { Object.assign(newEv, validateLifeEvent(newEv)); validateEventList([newEv, ...props.customEvents]) } catch (error) { formError.value = (error as Error).message; return }
+  formError.value = ''
   const updated = sortEventsByDaysLeft([newEv, ...props.customEvents])
   emit('update:customEvents', updated)
 
@@ -232,6 +236,7 @@ function removeEvent(id: string) {
   const updated = props.customEvents.filter((e) => e.id !== id)
   emit('update:customEvents', updated)
 }
+const formError = ref('')
 </script>
 
 <template>
@@ -255,6 +260,8 @@ function removeEvent(id: string) {
     </template>
 
     <div class="p-6 overflow-y-auto grow space-y-4">
+      <p v-if="formError" class="account-error" role="alert">{{ formError }}</p>
+      <p class="text-xs text-slate-500">农历日程按常规月份计算；当年没有三十日时取廿九，不在闰月重复提醒。公历 2 月 29 日在下一闰年提醒。</p>
       <!-- Add Event Form (默认隐藏，点击右上角“新增”按钮后展示) -->
       <Transition name="fade-slide">
         <div
