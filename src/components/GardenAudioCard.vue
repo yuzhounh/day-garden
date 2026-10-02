@@ -86,6 +86,7 @@ onUnmounted(() => {
             <div class="vinyl-groove-ring ring-1"></div>
             <div class="vinyl-groove-ring ring-2"></div>
             <div class="vinyl-groove-ring ring-3"></div>
+            <div class="vinyl-groove-ring ring-4"></div>
             <div class="vinyl-center-label">
               <div class="vinyl-icon-inner">
                 <CloudRain v-if="currentTrack.icon === 'CloudRain'" :size="24" />
@@ -280,8 +281,8 @@ onUnmounted(() => {
 .audio-vinyl-stage {
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 8px 6px;
+  gap: 26px;
+  padding: 10px 8px;
   margin: auto 0;
 }
 
@@ -289,28 +290,50 @@ onUnmounted(() => {
 .vinyl-record-wrap {
   position: relative;
   flex-shrink: 0;
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.16));
+  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.22));
 }
 
 .vinyl-disc {
-  width: 118px;
-  height: 118px;
+  width: 142px;
+  height: 142px;
   border-radius: 50%;
   position: relative;
   display: grid;
   place-items: center;
   background:
+    /* 真实黑胶唱片经典沙漏型光泽反射 (Conic reflection) */
+    conic-gradient(
+      from 45deg at 50% 50%,
+      rgba(255, 255, 255, 0.16) 0deg,
+      transparent 55deg,
+      rgba(255, 255, 255, 0.25) 90deg,
+      transparent 135deg,
+      rgba(255, 255, 255, 0.16) 180deg,
+      transparent 235deg,
+      rgba(255, 255, 255, 0.25) 270deg,
+      transparent 315deg,
+      rgba(255, 255, 255, 0.16) 360deg
+    ),
+    /* 高清晰对比度微纹音轨暗纹 (Crisp micro-grooves) */
     repeating-radial-gradient(
       circle at 50% 50%,
-      rgba(255, 255, 255, 0.04) 0px,
-      rgba(255, 255, 255, 0.04) 1px,
+      rgba(255, 255, 255, 0.16) 0px,
+      rgba(255, 255, 255, 0.16) 1.5px,
       transparent 2px,
-      transparent 4px
+      transparent 5.5px
     ),
-    radial-gradient(circle, #2d343b 0%, #1a1e22 65%, #0f1214 100%);
+    /* 黑胶唱片本体渐变底色 */
+    radial-gradient(
+      circle at 50% 50%,
+      #3a434c 0%,
+      #24292e 35%,
+      #16191c 70%,
+      #0b0d0f 100%
+    );
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    inset 0 0 18px rgba(0, 0, 0, 0.7);
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.24),
+    inset 0 0 22px rgba(0, 0, 0, 0.8),
+    0 10px 24px rgba(0, 0, 0, 0.25);
   animation: vinyl-spin 16s linear infinite;
   animation-play-state: paused;
 }
@@ -327,25 +350,45 @@ onUnmounted(() => {
 .vinyl-groove-ring {
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.06);
   pointer-events: none;
 }
 
-.vinyl-groove-ring.ring-1 { width: 94px; height: 94px; }
-.vinyl-groove-ring.ring-2 { width: 74px; height: 74px; }
-.vinyl-groove-ring.ring-3 { width: 58px; height: 58px; }
+.vinyl-groove-ring.ring-1 {
+  width: 126px;
+  height: 126px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+}
+.vinyl-groove-ring.ring-2 {
+  width: 108px;
+  height: 108px;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+}
+.vinyl-groove-ring.ring-3 {
+  width: 90px;
+  height: 90px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+}
+.vinyl-groove-ring.ring-4 {
+  width: 72px;
+  height: 72px;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5);
+}
 
 .vinyl-center-label {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--sage-bg);
   color: var(--accent);
   display: grid;
   place-items: center;
   position: relative;
-  border: 2px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.28);
+  border: 2.5px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.35);
   z-index: 2;
 }
 
@@ -356,11 +399,11 @@ onUnmounted(() => {
 
 .vinyl-spindle-hole {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--surface);
-  border: 1.5px solid rgba(0, 0, 0, 0.25);
+  border: 1.5px solid rgba(0, 0, 0, 0.28);
   pointer-events: none;
 }
 
@@ -658,15 +701,16 @@ onUnmounted(() => {
     gap: 16px;
   }
   .vinyl-disc {
-    width: 96px;
-    height: 96px;
+    width: 108px;
+    height: 108px;
   }
-  .vinyl-groove-ring.ring-1 { width: 76px; height: 76px; }
-  .vinyl-groove-ring.ring-2 { width: 60px; height: 60px; }
-  .vinyl-groove-ring.ring-3 { width: 46px; height: 46px; }
+  .vinyl-groove-ring.ring-1 { width: 96px; height: 96px; }
+  .vinyl-groove-ring.ring-2 { width: 82px; height: 82px; }
+  .vinyl-groove-ring.ring-3 { width: 68px; height: 68px; }
+  .vinyl-groove-ring.ring-4 { width: 54px; height: 54px; }
   .vinyl-center-label {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
   }
   .vinyl-track-title {
     font-size: 18px;

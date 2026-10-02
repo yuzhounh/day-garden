@@ -337,19 +337,9 @@ onUnmounted(() => {
           <!-- 导航栏悬浮迷你播放器 -->
           <div v-if="showAudioPopover" class="header-audio-popover glass-panel" @click.stop>
             <div class="popover-track-info">
-              <div class="popover-track-header">
-                <div class="popover-track-badge">
-                  <span class="popover-badge-dot" :class="{ 'is-active': audioState.isPlaying }"></span>
-                  <span>{{ currentTrack.category === 'nature' ? '自然声景' : '精选电台' }}</span>
-                </div>
-                <!-- 跳动的竖线波形 (与大卡片保持风格一致) -->
-                <div class="popover-sound-waves" :class="{ playing: audioState.isPlaying }" aria-hidden="true">
-                  <span class="bar bar-1"></span>
-                  <span class="bar bar-2"></span>
-                  <span class="bar bar-3"></span>
-                  <span class="bar bar-4"></span>
-                  <span class="bar bar-5"></span>
-                </div>
+              <div class="popover-track-badge">
+                <span class="popover-badge-dot" :class="{ 'is-active': audioState.isPlaying }"></span>
+                <span>{{ currentTrack.category === 'nature' ? '自然声景' : '精选电台' }}</span>
               </div>
               <h4 class="popover-track-title">{{ currentTrack.name }}</h4>
               <p class="popover-track-desc">{{ currentTrack.subtitle }}</p>
