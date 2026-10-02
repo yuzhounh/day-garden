@@ -424,7 +424,10 @@ onUnmounted(() => {
                   v-for="m in [0, 15, 30, 60]"
                   :key="m"
                   class="popover-timer-pill"
-                  :class="{ active: audioState.sleepTimerMinutes === m }"
+                  :class="{
+                    active: audioState.sleepTimerMinutes === m,
+                    'is-off': m === 0
+                  }"
                   @click="setSleepTimer(m)"
                 >
                   {{ m === 0 ? '关' : m + '分' }}

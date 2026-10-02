@@ -231,7 +231,10 @@ onUnmounted(() => {
           :key="p.val"
           type="button"
           class="timer-pill-btn"
-          :class="{ active: audioState.sleepTimerMinutes === p.val }"
+          :class="{
+            active: audioState.sleepTimerMinutes === p.val,
+            'is-off': p.val === 0
+          }"
           @click="setSleepTimer(p.val)"
         >
           {{ p.label }}
@@ -687,9 +690,17 @@ onUnmounted(() => {
 }
 
 .timer-pill-btn.active {
-  background: var(--accent);
-  color: #ffffff;
+  background: var(--sage-bg);
+  color: var(--accent);
   border-color: var(--accent);
+  font-weight: 500;
+}
+
+.timer-pill-btn.is-off.active {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 18%, transparent);
+  font-weight: 500;
 }
 
 @media (max-width: 480px) {

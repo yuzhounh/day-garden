@@ -431,9 +431,32 @@
 .popover-timer-row { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--line); font-size: 11px; }
 .popover-timer-label { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); }
 .popover-timer-pills { display: flex; align-items: center; gap: 4px; }
-.popover-timer-pill { border: 1px solid var(--line); background: var(--surface); color: var(--secondary); font-size: 10.5px; padding: 2px 6px; border-radius: 6px; cursor: pointer; transition: all .15s ease; }
-.popover-timer-pill:hover { border-color: var(--accent); color: var(--accent); }
-.popover-timer-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.popover-timer-pill {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--secondary);
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.popover-timer-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.popover-timer-pill.active {
+  background: var(--sage-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 500;
+}
+.popover-timer-pill.is-off.active {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 18%, transparent);
+  font-weight: 500;
+}
 .hero-intro { display: flex; align-items: center; justify-content: space-between; position: relative; padding: 30px 0 34px; gap: 32px; }
 .hero-copy { flex: 1 1 auto; min-width: 0; max-width: 620px; position: relative; z-index: 1; }
 .eyebrow { font-size: 12px; font-weight: 500; letter-spacing: 1.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 7px; line-height: 1.6; }
