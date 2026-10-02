@@ -3,6 +3,7 @@ import { ref, watch, computed } from 'vue'
 import { Plus, Trash2, Download, Upload, Check, Pencil, Clock, Bell } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
 import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft, isRedundantMemo } from '../services/calendar'
+import { cleanEventGiftAdvice } from '../services/storage'
 import DetailModal from './DetailModal.vue'
 
 const props = defineProps<{
@@ -222,7 +223,7 @@ function importData(e: Event) {
       const content = evt.target?.result as string
       const parsed = JSON.parse(content)
       if (Array.isArray(parsed.customEvents)) {
-        parsed.customEvents = sortEventsByDaysLeft(parsed.customEvents)
+        parsed.customEvents = sortEventsByDaysLeft(parsed.customEvents.map(cleanEventGiftAdvice))
       }
       emit('update:preferences', parsed)
       alert('配置与生活记事导入成功！')

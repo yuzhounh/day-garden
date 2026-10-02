@@ -22,8 +22,7 @@
       "date": "2010-10-05",
       "isLunar": false,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "16岁生日 (阳历10月5日)"
+      "role": "家人"
     },
     {
       "id": "bday-zhou-ming",
@@ -31,8 +30,7 @@
       "date": "1978-09-23",
       "isLunar": true,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "48岁生日 (农历九月廿三)"
+      "role": "家人"
     },
     {
       "id": "bday-zhou-zixin",
@@ -40,8 +38,7 @@
       "date": "2003-12-09",
       "isLunar": false,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "23岁生日 (阳历12月9日)"
+      "role": "家人"
     },
     {
       "id": "bday-wang-qingying",
@@ -49,8 +46,7 @@
       "date": "1992-11-04",
       "isLunar": true,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "34岁生日 (农历冬月初四)"
+      "role": "家人"
     },
     {
       "id": "bday-wang-weiwei",
@@ -58,8 +54,7 @@
       "date": "1982-11-18",
       "isLunar": true,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "44岁生日 (农历冬月十八)"
+      "role": "家人"
     },
     {
       "id": "bday-xie-xiao",
@@ -67,8 +62,7 @@
       "date": "1990-11-28",
       "isLunar": true,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "36岁生日 (农历冬月廿八)"
+      "role": "家人"
     },
     {
       "id": "bday-wang-kailun",
@@ -76,8 +70,7 @@
       "date": "1957-01-21",
       "isLunar": true,
       "type": "birthday",
-      "role": "长辈",
-      "giftAdvice": "70岁生日 (农历正月廿一)"
+      "role": "长辈"
     },
     {
       "id": "bday-wang-chenyue",
@@ -85,8 +78,7 @@
       "date": "2026-03-08",
       "isLunar": false,
       "type": "birthday",
-      "role": "晚辈",
-      "giftAdvice": "1岁生日 (阳历3月8日)"
+      "role": "晚辈"
     },
     {
       "id": "bday-wang-jing",
@@ -94,8 +86,7 @@
       "date": "1989-02-07",
       "isLunar": true,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "38岁生日 (农历二月初七)"
+      "role": "家人"
     },
     {
       "id": "bday-wang-juan",
@@ -103,8 +94,7 @@
       "date": "1981-02-19",
       "isLunar": true,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "46岁生日 (农历二月十九)"
+      "role": "家人"
     },
     {
       "id": "bday-wang-weijuan",
@@ -112,8 +102,7 @@
       "date": "1987-04-17",
       "isLunar": true,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "40岁生日 (农历四月十七)"
+      "role": "家人"
     },
     {
       "id": "bday-wang-xiaojuan",
@@ -121,8 +110,7 @@
       "date": "1985-06-05",
       "isLunar": true,
       "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "42岁生日 (农历六月初五)"
+      "role": "家人"
     },
     {
       "id": "bday-zhao-wensu",
@@ -130,8 +118,7 @@
       "date": "1958-08-17",
       "isLunar": true,
       "type": "birthday",
-      "role": "长辈",
-      "giftAdvice": "69岁生日 (农历八月十七)"
+      "role": "长辈"
     }
   ],
   "notificationEnabled": false

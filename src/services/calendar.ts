@@ -262,6 +262,7 @@ export function getUpcomingEvents(customEvents?: LifeEvent[] | null, daysThresho
 
         allEvents.push({
           ...ev,
+          giftAdvice: isRedundantMemo(ev.giftAdvice) ? undefined : ev.giftAdvice,
           daysLeft: calc.daysLeft,
           nextDateStr: calc.nextDateStr,
           urgencyLevel,

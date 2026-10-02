@@ -1,6 +1,6 @@
 import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip, InspirationalQuote, SportExercise, LifeEvent, QuickNote } from '../types'
 import { DEFAULT_CITIES } from './weather'
-import { sortEventsByDaysLeft } from './calendar'
+import { sortEventsByDaysLeft, isRedundantMemo } from './calendar'
 import rawSeasons from '../data/seasons-bloom.json'
 import rawEvidence from '../data/evidence-guide.json'
 import rawPoetry from '../data/poetry-curated.json'
@@ -72,6 +72,9 @@ export function cleanEventGiftAdvice(ev: LifeEvent): LifeEvent {
     .trim()
   if (!ev.isLunar) {
     advice = advice.replace(/\s*·\s*农历[^\s\)]+生?/g, '').trim()
+  }
+  if (isRedundantMemo(advice)) {
+    return { ...ev, giftAdvice: undefined }
   }
   return { ...ev, giftAdvice: advice }
 }
