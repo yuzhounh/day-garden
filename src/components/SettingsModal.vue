@@ -448,57 +448,61 @@ function importData(e: Event) {
               <!-- Normal Display Row -->
               <div
                 v-else
-                class="group flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition"
+                class="group flex items-stretch justify-between p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition gap-3"
               >
-                <!-- Title, Role, Date, Advice -->
-                <div class="min-w-0 flex-1 mr-3">
-                  <div class="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200 min-w-0 text-sm sm:text-[15px]">
-                    <span class="shrink-0 font-semibold">{{ ev.title }}</span>
+                <!-- Column 1: Title (Row 1), Role & Date (Row 2), Gift Advice (Row 3) -->
+                <div class="min-w-0 flex-1 flex flex-col justify-center gap-1">
+                  <!-- Row 1: Title -->
+                  <div class="font-semibold text-slate-800 dark:text-slate-200 text-sm sm:text-base tracking-tight truncate">
+                    {{ ev.title }}
+                  </div>
+                  <!-- Row 2: Role & Date -->
+                  <div class="flex items-center gap-2 text-xs sm:text-[13px] text-slate-400">
                     <span
                       v-if="ev.role"
-                      class="px-2 py-0.5 text-xs rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0 font-medium"
+                      class="px-2 py-0.5 text-xs rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium shrink-0"
                     >
                       {{ ev.role }}
                     </span>
-                    <span class="text-xs sm:text-[13px] text-slate-400 font-normal shrink-0">· {{ ev.date }} {{ ev.isLunar ? '(农历)' : '(公历)' }}</span>
+                    <span class="truncate">{{ ev.role ? '· ' : '' }}{{ ev.date }} {{ ev.isLunar ? '(农历)' : '(公历)' }}</span>
                   </div>
-                  <div class="text-xs sm:text-[13.5px] text-slate-500 dark:text-slate-400 truncate mt-1.5 leading-relaxed">
+                  <!-- Row 3: Advice -->
+                  <div class="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 truncate leading-relaxed">
                     {{ ev.giftAdvice || '无备忘' }}
                   </div>
                 </div>
 
-                <!-- Right Side: Countdown and Action Buttons -->
-                <div class="flex items-center gap-3 shrink-0">
-                  <!-- 到下一个纪念日的天数 -->
-                  <div class="text-right shrink-0">
+                <!-- Column 2: Countdown Badge (Spanning Rows 1 & 2) + Target Date (Row 3) -->
+                <div class="flex flex-col items-end justify-between shrink-0 py-0.5">
+                  <div class="flex items-center flex-1">
                     <span
-                      class="inline-block px-2.5 py-1 rounded-full text-xs font-medium"
+                      class="inline-flex items-center justify-center px-3.5 py-1 rounded-full text-sm sm:text-base font-bold shadow-xs tracking-wide"
                       :class="getCountdownClass(ev)"
                     >
                       {{ getCountdownText(ev) }}
                     </span>
-                    <div class="text-xs text-slate-400 mt-1 text-right font-mono">
-                      {{ getNextDateText(ev) }}
-                    </div>
                   </div>
+                  <div class="text-xs text-slate-400 font-mono text-right mt-1">
+                    {{ getNextDateText(ev) }}
+                  </div>
+                </div>
 
-                  <!-- 操作按钮组（编辑 + 删除）：默认隐藏，鼠标悬停时显示 -->
-                  <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      @click="startEdit(ev)"
-                      title="编辑此纪念日"
-                      class="p-2 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition"
-                    >
-                      <Pencil class="w-4 h-4" />
-                    </button>
-                    <button
-                      @click="removeEvent(ev.id)"
-                      title="删除此纪念日"
-                      class="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
-                    >
-                      <Trash2 class="w-4 h-4" />
-                    </button>
-                  </div>
+                <!-- Column 3: Actions (Edit + Delete arranged vertically, hidden by default, shown on hover) -->
+                <div class="flex flex-col items-center justify-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    @click="startEdit(ev)"
+                    title="编辑此纪念日"
+                    class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition"
+                  >
+                    <Pencil class="w-4 h-4" />
+                  </button>
+                  <button
+                    @click="removeEvent(ev.id)"
+                    title="删除此纪念日"
+                    class="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                  >
+                    <Trash2 class="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </template>
