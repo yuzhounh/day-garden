@@ -304,24 +304,25 @@ const recentNotes = computed(() => {
       <template #actions>
         <button
           type="button"
-          class="soft-button"
+          class="icon-button"
+          :class="{ active: copiedAll }"
           :disabled="!notes.length"
-          title="复制所有随想文本"
+          :title="copiedAll ? '已复制全部随想' : '复制全部随想'"
+          :aria-label="copiedAll ? '已复制全部随想' : '复制全部随想'"
           @click="copyAllNotes"
         >
-          <Check v-if="copiedAll" :size="14" class="text-emerald-500" />
-          <Copy v-else :size="14" />
-          <span>{{ copiedAll ? '已复制全部' : '复制全部' }}</span>
+          <Check v-if="copiedAll" :size="18" class="text-emerald-500" />
+          <Copy v-else :size="18" />
         </button>
         <button
           type="button"
-          class="soft-button"
+          class="icon-button"
           :disabled="!notes.length"
-          title="导出为 Markdown 笔记文件"
+          title="导出为 Markdown 文件"
+          aria-label="导出为 Markdown 文件"
           @click="exportNotes"
         >
-          <Download :size="14" />
-          <span>导出 Markdown</span>
+          <Download :size="18" />
         </button>
       </template>
 
