@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import {
   PenLine,
   Send,
@@ -12,7 +12,6 @@ import {
   Feather,
   Clock,
   Plus,
-  Shuffle,
 } from 'lucide-vue-next'
 import type { QuickNote } from '../types'
 import DetailModal from './DetailModal.vue'
@@ -60,9 +59,9 @@ function submitNote() {
 
   notes.value = [newNote, ...notes.value]
   saveQuickNotes(notes.value, account.user?.id)
-  displayedNote.value = newNote
   draft.value = ''
   showModalInput.value = false
+  nextTick(updateVisibleCount)
 }
 
 function handleKeydown(e: KeyboardEvent) {
@@ -75,9 +74,7 @@ function handleKeydown(e: KeyboardEvent) {
 function deleteNote(id: string) {
   notes.value = notes.value.filter(n => n.id !== id)
   saveQuickNotes(notes.value, account.user?.id)
-  if (displayedNote.value?.id === id) {
-    pickRandomNote()
-  }
+  nextTick(updateVisibleCount)
 }
 
 function copyNoteText(note: QuickNote) {
@@ -164,34 +161,83 @@ const filteredNotes = computed(() => {
   return notes.value.filter(n => n.content.toLowerCase().includes(q))
 })
 
-const displayedNote = ref<QuickNote | null>(null)
+const notesContainerRef = ref<HTMLElement | null>(null)
+const visibleCount = ref(1)
 
-function pickRandomNote() {
+const displayedNotes = computed(() => {
+  return notes.value.slice(0, visibleCount.value)
+})
+
+let resizeObserver: ResizeObserver | null = null
+
+function updateVisibleCount() {
+  if (!notesContainerRef.value) return
+  const availableHeight = notesContainerRef.value.clientHeight
+  if (availableHeight <= 0) return
+
   if (!notes.value.length) {
-    displayedNote.value = null
+    visibleCount.value = 0
     return
   }
-  if (notes.value.length === 1) {
-    displayedNote.value = notes.value[0]
-    return
+
+  const renderedItems = notesContainerRef.value.querySelectorAll<HTMLElement>('.recent-note-item')
+  const gap = 8
+
+  if (renderedItems.length > 0) {
+    const itemHeights: number[] = []
+    renderedItems.forEach(el => itemHeights.push(el.offsetHeight))
+    const sum = itemHeights.reduce((a, b) => a + b, 0)
+    const avgHeight = Math.max(68, sum / itemHeights.length)
+
+    let usedHeight = 0
+    let count = 0
+
+    for (let i = 0; i < notes.value.length; i++) {
+      const h = i < itemHeights.length ? itemHeights[i]! : avgHeight
+      const needed = count === 0 ? h : usedHeight + gap + h
+      // Ensure the note completely fits with a small buffer (4px)
+      if (needed <= availableHeight - 4) {
+        usedHeight = needed
+        count++
+      } else {
+        break
+      }
+    }
+
+    const newCount = Math.max(1, count)
+    if (visibleCount.value !== newCount) {
+      visibleCount.value = newCount
+    }
+  } else {
+    // Initial estimation
+    const est = Math.max(1, Math.floor((availableHeight - 4 + gap) / (76 + gap)))
+    visibleCount.value = Math.min(notes.value.length, est)
   }
-  const currentId = displayedNote.value?.id
-  const pool = notes.value.filter(n => n.id !== currentId)
-  const candidates = pool.length > 0 ? pool : notes.value
-  const randomIndex = Math.floor(Math.random() * candidates.length)
-  displayedNote.value = candidates[randomIndex] || null
 }
 
+onMounted(() => {
+  if (notesContainerRef.value && typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => {
+      window.requestAnimationFrame(() => {
+        updateVisibleCount()
+      })
+    })
+    resizeObserver.observe(notesContainerRef.value)
+  }
+  nextTick(() => {
+    updateVisibleCount()
+  })
+})
+
+onUnmounted(() => {
+  resizeObserver?.disconnect()
+})
+
 watch(
-  () => notes.value,
-  (newNotes) => {
-    if (!newNotes.length) {
-      displayedNote.value = null
-    } else if (!displayedNote.value || !newNotes.some(n => n.id === displayedNote.value?.id)) {
-      pickRandomNote()
-    }
-  },
-  { immediate: true }
+  () => notes.value.length,
+  () => {
+    nextTick(updateVisibleCount)
+  }
 )
 </script>
 
@@ -239,50 +285,41 @@ watch(
         </div>
       </div>
 
-      <!-- 随机随想展示 (仅展示 1 条) -->
-      <div class="recent-notes-container">
-        <div v-if="displayedNote" class="recent-notes-list">
+      <!-- 自适应随想展示列表 -->
+      <div ref="notesContainerRef" class="recent-notes-container">
+        <div v-if="displayedNotes.length" class="recent-notes-list">
           <div
-            :key="displayedNote.id"
+            v-for="note in displayedNotes"
+            :key="note.id"
             class="recent-note-item group"
           >
             <div class="note-item-header">
               <span class="note-time-label">
                 <Clock :size="11" />
-                {{ formatRelativeTime(displayedNote.createdAt) }}
+                {{ formatRelativeTime(note.createdAt) }}
               </span>
               <div class="note-actions">
                 <button
-                  v-if="notes.length > 1"
                   type="button"
                   class="note-action-btn"
-                  title="随机换一条笔记"
-                  aria-label="随机换一条笔记"
-                  @click="pickRandomNote"
+                  :title="copiedId === note.id ? '已复制' : '复制内容'"
+                  @click.stop="copyNoteText(note)"
                 >
-                  <Shuffle :size="12" />
-                </button>
-                <button
-                  type="button"
-                  class="note-action-btn"
-                  :title="copiedId === displayedNote.id ? '已复制' : '复制内容'"
-                  @click="copyNoteText(displayedNote)"
-                >
-                  <Check v-if="copiedId === displayedNote.id" :size="12" class="text-emerald-500" />
+                  <Check v-if="copiedId === note.id" :size="12" class="text-emerald-500" />
                   <Copy v-else :size="12" />
                 </button>
                 <button
                   type="button"
                   class="note-action-btn delete"
                   title="删除此笔"
-                  @click="deleteNote(displayedNote.id)"
+                  @click.stop="deleteNote(note.id)"
                 >
                   <Trash2 :size="12" />
                 </button>
               </div>
             </div>
             <p class="note-content-preview" @click="showModal = true">
-              {{ displayedNote.content }}
+              {{ note.content }}
             </p>
           </div>
         </div>
@@ -451,6 +488,7 @@ watch(
   flex-direction: column;
   gap: 12px;
   flex: 1;
+  min-height: 0;
 }
 
 /* 快捷输入框容器 */
@@ -461,6 +499,7 @@ watch(
   padding: 10px 12px 8px;
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  flex-shrink: 0;
 }
 
 .quick-input-box:focus-within {
@@ -533,25 +572,31 @@ watch(
 /* 最近随想列表 */
 .recent-notes-container {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
 }
 
 .recent-notes-list {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 8px;
+  width: 100%;
 }
 
 .recent-note-item {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 13px;
-  padding: 10px 12px;
+  padding: 9px 12px 8px;
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .recent-note-item:hover {
@@ -564,15 +609,17 @@ watch(
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .note-time-label {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--muted);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
 }
 
 .note-actions,
@@ -621,12 +668,12 @@ watch(
 }
 
 .note-content-preview {
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--ink);
-  line-height: 1.6;
+  line-height: 1.5;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-word;
