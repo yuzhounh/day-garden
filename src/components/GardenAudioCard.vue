@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import {
   Headphones,
   Play,
   Pause,
   SkipBack,
   SkipForward,
+  Shuffle,
   Volume2,
   VolumeX,
   Clock,
@@ -18,20 +18,16 @@ import {
   SunMedium,
 } from 'lucide-vue-next'
 import {
-  AUDIO_TRACKS,
+  currentTrack,
   audioState,
   togglePlay,
-  playTrack,
   prevTrack,
   nextTrack,
+  randomTrack,
   setVolume,
   toggleMute,
   setSleepTimer,
 } from '../services/audio'
-
-const currentTrack = computed(() => {
-  return AUDIO_TRACKS.find(t => t.id === audioState.currentTrackId) || AUDIO_TRACKS[0]!
-})
 
 const timerPills = [
   { label: '不限时', val: 0 },
@@ -64,17 +60,17 @@ function formatRemainingTime(seconds: number): string {
     </header>
 
     <div class="audio-card-body">
-      <!-- 播放器主视窗与声波动效 -->
+      <!-- 播放器主视窗与声波律动 -->
       <div class="audio-hero-panel" :class="{ 'is-active': audioState.isPlaying }">
         <div class="audio-meta-left">
           <div class="track-icon-avatar" :class="{ pulse: audioState.isPlaying }">
-            <CloudRain v-if="currentTrack.icon === 'CloudRain'" :size="20" />
-            <Waves v-else-if="currentTrack.icon === 'Waves'" :size="20" />
-            <Wind v-else-if="currentTrack.icon === 'Wind'" :size="20" />
-            <Bell v-else-if="currentTrack.icon === 'Bell'" :size="20" />
-            <Coffee v-else-if="currentTrack.icon === 'Coffee'" :size="20" />
-            <Sparkles v-else-if="currentTrack.icon === 'Sparkles'" :size="20" />
-            <SunMedium v-else :size="20" />
+            <CloudRain v-if="currentTrack.icon === 'CloudRain'" :size="22" />
+            <Waves v-else-if="currentTrack.icon === 'Waves'" :size="22" />
+            <Wind v-else-if="currentTrack.icon === 'Wind'" :size="22" />
+            <Bell v-else-if="currentTrack.icon === 'Bell'" :size="22" />
+            <Coffee v-else-if="currentTrack.icon === 'Coffee'" :size="22" />
+            <Sparkles v-else-if="currentTrack.icon === 'Sparkles'" :size="22" />
+            <SunMedium v-else :size="22" />
           </div>
           <div class="track-info-wrap">
             <div class="track-title-row">
@@ -86,27 +82,48 @@ function formatRemainingTime(seconds: number): string {
         </div>
 
         <!-- 音频律动波形 -->
-        <div class="sound-wave-bars" :class="{ playing: audioState.isPlaying }">
+        <div class="sound-wave-bars" :class="{ playing: audioState.isPlaying }" aria-hidden="true">
           <span class="bar bar-1"></span>
           <span class="bar bar-2"></span>
           <span class="bar bar-3"></span>
           <span class="bar bar-4"></span>
           <span class="bar bar-5"></span>
+          <span class="bar bar-6"></span>
         </div>
       </div>
 
-      <!-- 控制器：上一首、播放/暂停、下一首、音量调节 -->
+      <!-- 声景随想伴读气泡 -->
+      <div class="audio-mood-bubble">
+        <Sparkles :size="14" class="mood-icon" />
+        <p>{{ currentTrack.quote }}</p>
+      </div>
+
+      <!-- 控制器：随机切换、上一首、播放/暂停、下一首，以及音量调节 -->
       <div class="audio-controls-row">
         <div class="playback-btns">
+          <!-- 随机切换按钮 (位于后退键左侧) -->
           <button
             type="button"
-            class="ctrl-icon-btn small"
+            class="ctrl-icon-btn random-btn"
+            title="随机切换"
+            aria-label="随机切换"
+            @click="randomTrack"
+          >
+            <Shuffle :size="15" />
+          </button>
+
+          <!-- 后退 / 上一首 -->
+          <button
+            type="button"
+            class="ctrl-icon-btn"
             title="上一首"
             aria-label="上一首"
             @click="prevTrack"
           >
             <SkipBack :size="15" />
           </button>
+
+          <!-- 播放 / 暂停 -->
           <button
             type="button"
             class="play-main-btn"
@@ -114,12 +131,14 @@ function formatRemainingTime(seconds: number): string {
             :aria-label="audioState.isPlaying ? '暂停' : '播放'"
             @click="togglePlay"
           >
-            <Pause v-if="audioState.isPlaying" :size="18" />
-            <Play v-else :size="18" class="translate-x-0.5" />
+            <Pause v-if="audioState.isPlaying" :size="19" />
+            <Play v-else :size="19" class="translate-x-0.5" />
           </button>
+
+          <!-- 前进 / 下一首 -->
           <button
             type="button"
-            class="ctrl-icon-btn small"
+            class="ctrl-icon-btn"
             title="下一首"
             aria-label="下一首"
             @click="nextTrack"
@@ -152,21 +171,6 @@ function formatRemainingTime(seconds: number): string {
           />
           <span class="vol-num">{{ audioState.isMuted ? '0%' : audioState.volume + '%' }}</span>
         </div>
-      </div>
-
-      <!-- 场景声音与电台快捷选择胶囊 -->
-      <div class="track-pills-grid">
-        <button
-          v-for="track in AUDIO_TRACKS"
-          :key="track.id"
-          type="button"
-          class="track-pill"
-          :class="{ active: audioState.currentTrackId === track.id }"
-          @click="playTrack(track.id)"
-        >
-          <span class="pill-dot"></span>
-          <span>{{ track.name }}</span>
-        </button>
       </div>
     </div>
 
@@ -201,6 +205,7 @@ function formatRemainingTime(seconds: number): string {
 .garden-audio-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .audio-head-actions {
@@ -225,17 +230,19 @@ function formatRemainingTime(seconds: number): string {
 .audio-card-body {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 16px;
   flex: 1;
+  margin-bottom: 4px;
 }
 
-/* 顶部视窗 */
+/* 顶部声景主视窗 */
 .audio-hero-panel {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  border-radius: 16px;
+  padding: 16px 18px;
+  border-radius: 18px;
   background: var(--surface);
   border: 1px solid var(--line);
   transition: all 0.25s ease;
@@ -243,20 +250,20 @@ function formatRemainingTime(seconds: number): string {
 
 .audio-hero-panel.is-active {
   border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 12%, transparent);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
 .audio-meta-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
 .track-icon-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   background: var(--sage-bg);
   color: var(--accent);
   display: flex;
@@ -279,7 +286,7 @@ function formatRemainingTime(seconds: number): string {
 .track-info-wrap {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   min-width: 0;
 }
 
@@ -290,7 +297,7 @@ function formatRemainingTime(seconds: number): string {
 }
 
 .track-title-row h3 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--ink);
   margin: 0;
@@ -299,7 +306,7 @@ function formatRemainingTime(seconds: number): string {
 
 .track-tag {
   font-size: 10.5px;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: 6px;
   background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
@@ -321,7 +328,7 @@ function formatRemainingTime(seconds: number): string {
   display: flex;
   align-items: center;
   gap: 3px;
-  height: 24px;
+  height: 26px;
   padding-right: 4px;
   flex-shrink: 0;
 }
@@ -331,7 +338,7 @@ function formatRemainingTime(seconds: number): string {
   height: 6px;
   border-radius: 2px;
   background: var(--accent);
-  opacity: 0.35;
+  opacity: 0.32;
   transition: height 0.2s ease, opacity 0.2s ease;
 }
 
@@ -341,14 +348,41 @@ function formatRemainingTime(seconds: number): string {
 }
 
 .sound-wave-bars.playing .bar-1 { animation-delay: 0.1s; height: 14px; }
-.sound-wave-bars.playing .bar-2 { animation-delay: 0.3s; height: 20px; }
+.sound-wave-bars.playing .bar-2 { animation-delay: 0.3s; height: 22px; }
 .sound-wave-bars.playing .bar-3 { animation-delay: 0.15s; height: 12px; }
-.sound-wave-bars.playing .bar-4 { animation-delay: 0.4s; height: 18px; }
-.sound-wave-bars.playing .bar-5 { animation-delay: 0.25s; height: 10px; }
+.sound-wave-bars.playing .bar-4 { animation-delay: 0.4s; height: 19px; }
+.sound-wave-bars.playing .bar-5 { animation-delay: 0.25s; height: 11px; }
+.sound-wave-bars.playing .bar-6 { animation-delay: 0.35s; height: 16px; }
 
 @keyframes soundBounce {
-  0% { transform: scaleY(0.4); }
+  0% { transform: scaleY(0.35); }
   100% { transform: scaleY(1.3); }
+}
+
+/* 声景伴读气泡 */
+.audio-mood-bubble {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--line) 90%, transparent);
+  color: var(--secondary);
+  font-size: 13px;
+  line-height: 1.5;
+  transition: all 0.25s ease;
+}
+
+.mood-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.audio-mood-bubble p {
+  margin: 0;
+  letter-spacing: 0.2px;
 }
 
 /* 播放控制条 */
@@ -357,19 +391,19 @@ function formatRemainingTime(seconds: number): string {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 4px 2px;
+  padding: 2px;
 }
 
 .playback-btns {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ctrl-icon-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--muted);
@@ -386,9 +420,13 @@ function formatRemainingTime(seconds: number): string {
   border-color: var(--accent);
 }
 
+.ctrl-icon-btn.random-btn:hover {
+  transform: rotate(15deg);
+}
+
 .play-main-btn {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 13px;
   border: none;
   background: var(--accent);
@@ -402,8 +440,12 @@ function formatRemainingTime(seconds: number): string {
 }
 
 .play-main-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.06);
   box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.play-main-btn:active {
+  transform: scale(0.96);
 }
 
 .volume-control-wrap {
@@ -411,7 +453,11 @@ function formatRemainingTime(seconds: number): string {
   align-items: center;
   gap: 8px;
   flex: 1;
-  max-width: 170px;
+  max-width: 175px;
+  background: var(--surface);
+  padding: 5px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
 }
 
 .vol-icon-btn {
@@ -441,58 +487,10 @@ function formatRemainingTime(seconds: number): string {
 .vol-num {
   font-size: 11px;
   color: var(--muted);
-  width: 30px;
+  width: 28px;
   font-variant-numeric: tabular-nums;
   text-align: right;
   user-select: none;
-}
-
-/* 场景标签网格 */
-.track-pills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 8px;
-}
-
-.track-pill {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 8px 11px;
-  border-radius: 11px;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  color: var(--ink);
-  font-size: 12.5px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.track-pill .pill-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--muted);
-  transition: background 0.15s ease;
-}
-
-.track-pill:hover {
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
-  background: var(--sage-bg);
-}
-
-.track-pill.active {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
-  color: var(--accent);
-  font-weight: 600;
-}
-
-.track-pill.active .pill-dot {
-  background: var(--accent);
-  box-shadow: 0 0 6px var(--accent);
 }
 
 /* 底部状态 */
@@ -551,11 +549,8 @@ function formatRemainingTime(seconds: number): string {
 }
 
 @media (max-width: 480px) {
-  .track-pills-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .volume-control-wrap {
-    max-width: 130px;
+    max-width: 125px;
   }
 }
 </style>

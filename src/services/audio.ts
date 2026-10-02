@@ -4,6 +4,7 @@ export interface AudioTrack {
   id: string
   name: string
   subtitle: string
+  quote: string
   category: 'nature' | 'music'
   type: 'synth' | 'stream'
   icon: string
@@ -16,6 +17,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     id: 'rain',
     name: '细雨淅沥',
     subtitle: '自然白噪音 · 窗外柔和春雨声',
+    quote: '窗外细雨淅沥，洗净尘嚣，静享此刻专注与安宁。',
     category: 'nature',
     type: 'synth',
     icon: 'CloudRain',
@@ -25,6 +27,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     id: 'stream',
     name: '山涧清溪',
     subtitle: '自然白噪音 · 卵石水流潺潺低语',
+    quote: '空山闻流水，清泉过石隙，带走心头喧杂与疲乏。',
     category: 'nature',
     type: 'synth',
     icon: 'Waves',
@@ -34,6 +37,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     id: 'breeze',
     name: '松林微风',
     subtitle: '自然白噪音 · 树梢沙沙穿林声',
+    quote: '清风穿松林，簌簌轻拂，身心自如舒展与放空。',
     category: 'nature',
     type: 'synth',
     icon: 'Wind',
@@ -43,6 +47,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     id: 'bowl',
     name: '禅意颂钵',
     subtitle: '冥想疗愈 · 悠长沉静的共振泛音',
+    quote: '铜钵深沉悠远，泛音长鸣，安住当下与均匀呼吸。',
     category: 'nature',
     type: 'synth',
     icon: 'Bell',
@@ -52,6 +57,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     id: 'lofi',
     name: '惬意 Lo-Fi',
     subtitle: '24/7 慢拍轻音 · 学习工作治愈背景',
+    quote: '舒缓悠然的低保真慢节拍，温和陪伴伏案与专注时光。',
     category: 'music',
     type: 'stream',
     icon: 'Coffee',
@@ -61,6 +67,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     id: 'dronezone',
     name: '冥想漫步',
     subtitle: 'SomaFM 纯净电台 · 深邃舒展氛围声景',
+    quote: '空灵环境音景漫游，如在浩瀚星海与云雾间轻柔漂浮。',
     category: 'music',
     type: 'stream',
     icon: 'Sparkles',
@@ -70,6 +77,7 @@ export const AUDIO_TRACKS: AudioTrack[] = [
     id: 'groovesalad',
     name: '闲适午后',
     subtitle: 'SomaFM 纯净电台 · 慢调轻盈旋律',
+    quote: '轻盈慢调律动，宛如初春午后穿过树叶洒下的斑驳暖阳。',
     category: 'music',
     type: 'stream',
     icon: 'SunMedium',
@@ -417,6 +425,13 @@ export function prevTrack() {
   const idx = AUDIO_TRACKS.findIndex(t => t.id === audioState.currentTrackId)
   const prevIdx = (idx - 1 + AUDIO_TRACKS.length) % AUDIO_TRACKS.length
   playTrack(AUDIO_TRACKS[prevIdx]!.id)
+}
+
+export function randomTrack() {
+  const others = AUDIO_TRACKS.filter(t => t.id !== audioState.currentTrackId)
+  const pool = others.length > 0 ? others : AUDIO_TRACKS
+  const next = pool[Math.floor(Math.random() * pool.length)]!
+  playTrack(next.id)
 }
 
 export function setSleepTimer(minutes: number) {

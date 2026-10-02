@@ -19,6 +19,7 @@ import {
   Pause,
   SkipForward,
   SkipBack,
+  Shuffle,
   Volume2,
   VolumeX,
   Timer,
@@ -40,6 +41,7 @@ import {
   playTrack,
   prevTrack,
   nextTrack,
+  randomTrack,
   setVolume,
   toggleMute,
   setSleepTimer,
@@ -366,6 +368,9 @@ onUnmounted(() => {
 
             <!-- 控制按钮 -->
             <div class="popover-controls-row">
+              <button class="popover-ctrl-btn" title="随机切换" aria-label="随机切换" @click="randomTrack">
+                <Shuffle :size="14" />
+              </button>
               <button class="popover-ctrl-btn" title="上一曲" aria-label="上一曲" @click="prevTrack">
                 <SkipBack :size="15" />
               </button>
