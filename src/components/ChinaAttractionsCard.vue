@@ -17,7 +17,6 @@ const showModal = ref(false)
 const filterTab = ref<'all' | 'visited' | 'wishlist'>('all')
 const searchQuery = ref('')
 const isRefreshing = ref(false)
-const previewOffset = ref(0)
 
 const attractions = rawAttractions as ChinaAttraction[]
 
@@ -31,26 +30,29 @@ const wishlistCount = computed(() => {
   return attractions.filter(a => currentStatusMap.value[a.id] === 'wishlist').length
 })
 
-
-// 首页卡片展示的 3 个推荐景点（支持点击换一批轮换）
-const todayFeaturedIndex = computed(() => {
-  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000)
-  return dayOfYear % attractions.length
-})
-
-const previewList = computed(() => {
-  const start = (todayFeaturedIndex.value + previewOffset.value) % attractions.length
-  const list: ChinaAttraction[] = []
-  for (let i = 0; i < 2; i++) {
-    list.push(attractions[(start + i) % attractions.length]!)
+// 从全国全部景点中随机抽取若干条（不重复，且刷新时尽量与当前不同）
+function pickRandomAttractions(count = 2): ChinaAttraction[] {
+  if (attractions.length <= count) return [...attractions]
+  const currentIds = (previewList.value || []).map(a => a.id)
+  const candidates = attractions.filter(a => !currentIds.includes(a.id))
+  const pool = candidates.length >= count ? candidates : attractions
+  
+  const selected: ChinaAttraction[] = []
+  const available = [...pool]
+  for (let i = 0; i < count && available.length > 0; i++) {
+    const randomIndex = Math.floor(Math.random() * available.length)
+    selected.push(available[randomIndex]!)
+    available.splice(randomIndex, 1)
   }
-  return list
-})
+  return selected
+}
+
+const previewList = ref<ChinaAttraction[]>([])
+previewList.value = pickRandomAttractions(2)
 
 function refreshPreview() {
   isRefreshing.value = true
-  // 每次换一批顺延 2 个，触底循环
-  previewOffset.value = (previewOffset.value + 2) % attractions.length
+  previewList.value = pickRandomAttractions(2)
   setTimeout(() => {
     isRefreshing.value = false
   }, 400)

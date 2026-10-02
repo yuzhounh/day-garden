@@ -85,30 +85,38 @@ async function loadWeather() {
     if (request === weatherRequest) weatherLoading.value = false
   }
 }
+function pickRandomItem<T>(list: T[], isDifferentFrom?: (item: T) => boolean): T {
+  if (!list || list.length === 0) throw new Error('List is empty')
+  if (list.length === 1) return list[0]!
+  const pool = isDifferentFrom ? list.filter(isDifferentFrom) : list
+  const candidates = pool.length > 0 ? pool : list
+  const idx = Math.floor(Math.random() * candidates.length)
+  return candidates[idx]!
+}
+
 function handleNextPoetry() {
   const list = rawPoetry as CuratedPoetry[]
-  currentPoetry.value = list[(list.findIndex(p => p.id === currentPoetry.value.id) + 1) % list.length]
+  currentPoetry.value = pickRandomItem(list, p => p.id !== currentPoetry.value.id)
 }
 function handleNextTip() {
   const list = rawHealthTips as HealthTip[]
-  currentHealthTip.value = list[(list.findIndex(t => t.id === currentHealthTip.value.id) + 1) % list.length]
+  currentHealthTip.value = pickRandomItem(list, t => t.id !== currentHealthTip.value.id)
 }
 function handleNextGuide() {
   const list = rawEvidence as EvidenceGuide[]
-  evidenceGuide.value = list[(list.findIndex(g => g.id === evidenceGuide.value.id) + 1) % list.length]
+  evidenceGuide.value = pickRandomItem(list, g => g.id !== evidenceGuide.value.id)
 }
 function handleNextQuote() {
   const list = rawQuotes as InspirationalQuote[]
-  currentQuote.value = list[(list.findIndex(q => q.id === currentQuote.value.id) + 1) % list.length]
+  currentQuote.value = pickRandomItem(list, q => q.id !== currentQuote.value.id)
 }
 function handleNextSport() {
   const list = rawSports as SportExercise[]
-  currentSport.value = list[(list.findIndex(s => s.id === currentSport.value.id) + 1) % list.length]
+  currentSport.value = pickRandomItem(list, s => s.id !== currentSport.value.id)
 }
 function handleNextBloom() {
   const list = rawSeasons as SeasonBloom[]
-  const currentIdx = list.findIndex(b => b.name === seasonBloom.value.name)
-  seasonBloom.value = list[(currentIdx + 1) % list.length]
+  seasonBloom.value = pickRandomItem(list, b => b.name !== seasonBloom.value.name)
 }
 function handleUpdateAttractionStatus(newMap: Record<string, AttractionStatusType>) {
   prefs.value = {
