@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Feather, ArrowUpRight, RefreshCw, BookOpen, Bookmark, Check, ChevronDown, ChevronUp } from 'lucide-vue-next'
+import { Feather, ArrowUpRight, RefreshCw, BookOpen, Bookmark, Check, ChevronDown, ChevronUp, Search } from 'lucide-vue-next'
 import type { CuratedPoetry } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawPoetry from '../data/poetry-curated.json'
@@ -11,14 +11,31 @@ const emit = defineEmits<{ 'next-poetry': []; 'select-poetry': [poetry: CuratedP
 const showFull = ref(false)
 const showLibrary = ref(false)
 const filter = ref('全部')
+const searchQuery = ref('')
 const isSaved = computed(() => savedIds.value.includes(props.poetry.id))
 const poems = rawPoetry as CuratedPoetry[]
-const filteredPoems = computed(() => poems.filter(poem => {
-  if (filter.value === '收藏') return savedIds.value.includes(poem.id)
-  if (filter.value === '全部') return true
-  if (filter.value === '豁达励志') return poem.season === '通'
-  return poem.season === filter.value
-}))
+const filteredPoems = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  return poems.filter(poem => {
+    let matchCat = true
+    if (filter.value === '收藏') matchCat = savedIds.value.includes(poem.id)
+    else if (filter.value === '全部') matchCat = true
+    else if (filter.value === '豁达励志') matchCat = poem.season === '通'
+    else matchCat = poem.season === filter.value
+
+    if (!matchCat) return false
+    if (!q) return true
+    return (
+      poem.quote.toLowerCase().includes(q) ||
+      poem.title.toLowerCase().includes(q) ||
+      poem.author.toLowerCase().includes(q) ||
+      poem.dynasty.toLowerCase().includes(q) ||
+      poem.content.toLowerCase().includes(q) ||
+      (poem.reading && poem.reading.toLowerCase().includes(q)) ||
+      (poem.mood && poem.mood.toLowerCase().includes(q))
+    )
+  })
+})
 const quoteLines = computed(() => props.poetry.quote.match(/[^。！？]+[。！？]?/g) || [props.poetry.quote])
 const fullLines = computed(() => props.poetry.content.match(/[^。！？]+[。！？]?/g) || [props.poetry.content])
 function toggleSave() {
@@ -107,13 +124,30 @@ function setAsHomePoem(poem: CuratedPoetry) {
 
     <!-- 诗词小集全量沉浸浏览弹窗 -->
     <DetailModal v-if="showLibrary" title="把诗意，留在日常" subtitle="古典诗词典藏 · 随四季与心境慢慢读" class="collection-modal" @close="showLibrary = false">
+      <!-- 搜索框 -->
+      <div class="modal-search-row">
+        <div class="search-input-box">
+          <Search :size="14" class="text-slate-400" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜索诗词名句、诗人、诗名或随想..."
+            class="attraction-search-input"
+          />
+        </div>
+      </div>
+
       <div class="filter-pills">
         <button v-for="season in ['全部', '春', '夏', '秋', '冬', '豁达励志', '收藏']" :key="season" :class="{ active: filter === season }" :aria-pressed="filter === season" @click="filter = season">
           {{ season }}
         </button>
       </div>
 
-      <div class="quote-library-list">
+      <div v-if="!filteredPoems.length" class="p-8 text-center text-sm text-slate-400">
+        未找到匹配的诗词名句，试着换个词搜搜看
+      </div>
+
+      <div v-else class="quote-library-list">
         <article
           v-for="poem in filteredPoems"
           :key="poem.id"

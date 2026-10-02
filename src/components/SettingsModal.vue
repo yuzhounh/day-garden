@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { Plus, Trash2, Download, Upload, Check, Pencil, Clock, Bell } from 'lucide-vue-next'
+import { Plus, Trash2, Download, Upload, Check, Pencil, Clock, Bell, Search } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
 import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft, isRedundantMemo } from '../services/calendar'
 import { cleanEventGiftAdvice } from '../services/storage'
@@ -88,8 +88,18 @@ function saveEdit(id: string) {
   editingId.value = null
 }
 
+const searchQuery = ref('')
+
 const sortedEvents = computed(() => {
-  return sortEventsByDaysLeft(props.preferences?.customEvents || [])
+  const all = sortEventsByDaysLeft(props.preferences?.customEvents || [])
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return all
+  return all.filter(ev =>
+    ev.title.toLowerCase().includes(q) ||
+    (ev.role && ev.role.toLowerCase().includes(q)) ||
+    ev.date.includes(q) ||
+    (ev.giftAdvice && ev.giftAdvice.toLowerCase().includes(q))
+  )
 })
 
 function getEventCountdown(ev: LifeEvent) {
@@ -416,8 +426,25 @@ function importData(e: Event) {
             </div>
           </div>
 
+          <!-- 搜索与筛选栏 -->
+          <div class="modal-search-row">
+            <div class="search-input-box">
+              <Search :size="14" class="text-slate-400" />
+              <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="搜索纪念日姓名、角色或日期..."
+                class="attraction-search-input"
+              />
+            </div>
+          </div>
+
+          <div v-if="!sortedEvents.length" class="p-8 text-center text-sm text-slate-400">
+            未找到匹配的纪念日或生日
+          </div>
+
           <!-- Existing List in 2-Column Responsive Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <template v-for="ev in sortedEvents" :key="ev.id">
               <!-- Inline Edit Form (spans 2 columns if in grid) -->
               <div

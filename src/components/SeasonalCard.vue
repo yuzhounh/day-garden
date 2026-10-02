@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Flower2, MapPin, ArrowUpRight, RefreshCw, BookOpen } from 'lucide-vue-next'
+import { Flower2, MapPin, ArrowUpRight, RefreshCw, BookOpen, Search } from 'lucide-vue-next'
 import type { SeasonBloom } from '../types'
 import DetailModal from './DetailModal.vue'
 import BotanicalArt from './BotanicalArt.vue'
@@ -16,8 +16,22 @@ const emit = defineEmits<{
 const showCalendar = ref(false)
 const showDetail = ref(false)
 const month = ref(new Date().getMonth() + 1)
+const searchQuery = ref('')
 const list = rawSeasons as SeasonBloom[]
-const monthBlooms = computed(() => list.filter(item => item.months.includes(month.value)))
+const filteredBlooms = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  if (q) {
+    return list.filter(item =>
+      item.name.toLowerCase().includes(q) ||
+      item.solarTerms.some(st => st.toLowerCase().includes(q)) ||
+      item.status.toLowerCase().includes(q) ||
+      item.description.toLowerCase().includes(q) ||
+      item.bestSpot.toLowerCase().includes(q) ||
+      item.observation.toLowerCase().includes(q)
+    )
+  }
+  return list.filter(item => item.months.includes(month.value))
+})
 function monthRange(months: number[]) {
   return months[0] + '—' + (months[0]! > months[months.length - 1]! ? '次年 ' : '') + months[months.length - 1] + ' 月'
 }
@@ -108,20 +122,38 @@ function selectBloomItem(item: SeasonBloom) {
       class="collection-modal"
       @close="showCalendar = false"
     >
+      <!-- 搜索框 -->
+      <div class="modal-search-row">
+        <div class="search-input-box">
+          <Search :size="14" class="text-slate-400" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜索花名、节气、物候特征或寻芳地点..."
+            class="attraction-search-input"
+          />
+        </div>
+      </div>
+
       <div class="filter-pills month-filter">
         <button
           v-for="m in 12"
           :key="m"
-          :class="{ active: month === m }"
-          :aria-pressed="month === m"
-          @click="month = m"
+          :class="{ active: month === m && !searchQuery }"
+          :aria-pressed="month === m && !searchQuery"
+          @click="month = m; searchQuery = ''"
         >
           {{ m }} 月
         </button>
       </div>
-      <div class="bloom-list">
+
+      <div v-if="!filteredBlooms.length" class="p-8 text-center text-sm text-slate-400">
+        未找到匹配的花信物候，试着换个词搜搜看
+      </div>
+
+      <div v-else class="bloom-list">
         <article
-          v-for="item in monthBlooms"
+          v-for="item in filteredBlooms"
           :key="item.name"
           class="p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 transition flex items-stretch"
         >

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Quote as QuoteIcon, Sparkles, RefreshCw, BookOpen, ArrowUpRight, Copy, Check, Lightbulb } from 'lucide-vue-next'
+import { Quote as QuoteIcon, Sparkles, RefreshCw, BookOpen, ArrowUpRight, Copy, Check, Lightbulb, Search } from 'lucide-vue-next'
 import type { InspirationalQuote } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawQuotes from '../data/inspirational-quotes.json'
@@ -12,13 +12,24 @@ const showFull = ref(false)
 const showList = ref(false)
 const copied = ref(false)
 const filterTag = ref('全部')
+const searchQuery = ref('')
 
 const allQuotes = rawQuotes as InspirationalQuote[]
 const tags = computed(() => ['全部', ...Array.from(new Set(allQuotes.map(q => q.tag)))])
 
 const filteredQuotes = computed(() => {
-  if (filterTag.value === '全部') return allQuotes
-  return allQuotes.filter(q => q.tag === filterTag.value)
+  const q = searchQuery.value.trim().toLowerCase()
+  return allQuotes.filter(item => {
+    if (filterTag.value !== '全部' && item.tag !== filterTag.value) return false
+    if (!q) return true
+    return (
+      item.quote.toLowerCase().includes(q) ||
+      item.author.toLowerCase().includes(q) ||
+      (item.source && item.source.toLowerCase().includes(q)) ||
+      (item.insight && item.insight.toLowerCase().includes(q)) ||
+      item.tag.toLowerCase().includes(q)
+    )
+  })
 })
 
 const copiedId = ref<string | null>(null)
@@ -133,6 +144,19 @@ function setAsHomeQuote(q: InspirationalQuote) {
       class="collection-modal"
       @close="showList = false"
     >
+      <!-- 搜索框 -->
+      <div class="modal-search-row">
+        <div class="search-input-box">
+          <Search :size="14" class="text-slate-400" />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜索名言金句、作者、出处或心力启发..."
+            class="attraction-search-input"
+          />
+        </div>
+      </div>
+
       <div class="filter-pills">
         <button
           v-for="t in tags"
@@ -143,7 +167,12 @@ function setAsHomeQuote(q: InspirationalQuote) {
           {{ t }}
         </button>
       </div>
-      <div class="quote-library-list">
+
+      <div v-if="!filteredQuotes.length" class="p-8 text-center text-sm text-slate-400">
+        未找到匹配的名言金句，试着换个词搜搜看
+      </div>
+
+      <div v-else class="quote-library-list">
         <article
           v-for="item in filteredQuotes"
           :key="item.id"
