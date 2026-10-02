@@ -161,11 +161,12 @@ export function calculateNextEventDate(
       const diffMs = targetDate.getTime() - safeBaseDate.getTime()
       const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
       const turningAge = birthYear ? targetSolar.getLunar().getYear() - birthYear : undefined
-      const ageStr = turningAge !== undefined ? ` · ${turningAge}岁` : ''
       const targetLunar = targetSolar.getLunar()
       const lunarChineseStr = `农历${targetLunar.getMonthInChinese()}月${targetLunar.getDayInChinese()}`
       const nextDateSolar = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
-      const nextDateStr = `${nextDateSolar} (${lunarChineseStr}${ageStr})`
+      const nextDateStr = turningAge !== undefined
+        ? `${nextDateSolar} · ${turningAge}岁 · ${lunarChineseStr}`
+        : `${nextDateSolar} · ${lunarChineseStr}`
       return {
         daysLeft,
         nextDateStr,
@@ -186,9 +187,10 @@ export function calculateNextEventDate(
       const diffMs = targetDate.getTime() - safeBaseDate.getTime()
       const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
       const turningAge = birthYear ? targetDate.getFullYear() - birthYear : undefined
-      const ageStr = turningAge !== undefined ? ` · ${turningAge}岁` : ''
       const nextDateSolar = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
-      const nextDateStr = `${nextDateSolar}${ageStr}`
+      const nextDateStr = turningAge !== undefined
+        ? `${nextDateSolar} · ${turningAge}岁`
+        : nextDateSolar
       return {
         daysLeft,
         nextDateStr,

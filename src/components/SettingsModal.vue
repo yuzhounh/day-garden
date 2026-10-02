@@ -133,7 +133,7 @@ function getNextDateDisplay(ev: LifeEvent) {
   try {
     const info = getEventCountdown(ev)
     if (info.nextDateLunar) {
-      return `${info.nextDateSolar} (${info.nextDateLunar})`
+      return `${info.nextDateSolar} · ${info.nextDateLunar}`
     }
     return info.nextDateSolar || ev?.date || ''
   } catch {
