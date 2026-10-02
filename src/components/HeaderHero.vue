@@ -36,9 +36,7 @@ import { account } from '../services/sync'
 import {
   audioState,
   currentTrack,
-  AUDIO_TRACKS,
   togglePlay,
-  playTrack,
   prevTrack,
   nextTrack,
   randomTrack,
@@ -412,20 +410,6 @@ onUnmounted(() => {
                   </div>
                 </Transition>
               </div>
-            </div>
-
-            <!-- 曲目选择器 -->
-            <div class="popover-track-list">
-              <button
-                v-for="track in AUDIO_TRACKS"
-                :key="track.id"
-                class="popover-track-chip"
-                :class="{ active: audioState.currentTrackId === track.id }"
-                @click="playTrack(track.id)"
-              >
-                <span class="chip-name">{{ track.name }}</span>
-                <span v-if="audioState.currentTrackId === track.id && audioState.isPlaying" class="chip-pulse"></span>
-              </button>
             </div>
 
             <!-- 定时关闭 -->
