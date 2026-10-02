@@ -762,6 +762,7 @@
 .weather-details small { display: block; color: var(--muted); margin-bottom: 5px; font-size: 13px; }
 .weather-details strong { font-size: 18px; font-weight: 600; }
 .empty-state { text-align: center; padding: 30px 10px; color: var(--muted); line-height: 2; font-size: 14px; }
+.detail-modal.settings-content { width: min(720px, 100%); }
 .settings-content { padding: 0; }
 .settings-content > .modal-content { padding: 0; }
 .settings-content .modal-heading { padding-bottom: 18px; }

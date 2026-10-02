@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { Plus, Trash2, Download, Upload, Check, Pencil } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
-import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate } from '../services/calendar'
+import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft } from '../services/calendar'
 import DetailModal from './DetailModal.vue'
 
 const props = defineProps<{
@@ -82,10 +82,14 @@ function saveEdit(id: string) {
 
   emit('update:preferences', {
     ...props.preferences,
-    customEvents: updatedEvents,
+    customEvents: sortEventsByDaysLeft(updatedEvents),
   })
   editingId.value = null
 }
+
+const sortedEvents = computed(() => {
+  return sortEventsByDaysLeft(props.preferences.customEvents)
+})
 
 function getEventCountdown(ev: LifeEvent) {
   try {
@@ -149,7 +153,7 @@ function addEvent() {
 
   const updated = {
     ...props.preferences,
-    customEvents: [...props.preferences.customEvents, newEv],
+    customEvents: sortEventsByDaysLeft([...props.preferences.customEvents, newEv]),
   }
   emit('update:preferences', updated)
 
@@ -195,6 +199,9 @@ function importData(e: Event) {
     try {
       const content = evt.target?.result as string
       const parsed = JSON.parse(content)
+      if (Array.isArray(parsed.customEvents)) {
+        parsed.customEvents = sortEventsByDaysLeft(parsed.customEvents)
+      }
       emit('update:preferences', parsed)
       alert('配置与生活记事导入成功！')
     } catch {
@@ -374,7 +381,7 @@ function importData(e: Event) {
 
           <!-- Existing List -->
           <div class="space-y-3">
-            <template v-for="ev in preferences.customEvents" :key="ev.id">
+            <template v-for="ev in sortedEvents" :key="ev.id">
               <!-- Inline Edit Form -->
               <div
                 v-if="editingId === ev.id"
@@ -444,9 +451,9 @@ function importData(e: Event) {
                 class="group flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition"
               >
                 <!-- Title, Role, Date, Advice -->
-                <div class="truncate min-w-0 flex-1 mr-4">
-                  <div class="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200 truncate text-sm sm:text-[15px]">
-                    <span class="truncate">{{ ev.title }}</span>
+                <div class="min-w-0 flex-1 mr-3">
+                  <div class="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-200 min-w-0 text-sm sm:text-[15px]">
+                    <span class="shrink-0 font-semibold">{{ ev.title }}</span>
                     <span
                       v-if="ev.role"
                       class="px-2 py-0.5 text-xs rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 shrink-0 font-medium"

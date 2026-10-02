@@ -17,15 +17,6 @@
   },
   "customEvents": [
     {
-      "id": "bday-wang-chenyue",
-      "title": "王辰玥生日",
-      "date": "2026-03-08",
-      "isLunar": false,
-      "type": "birthday",
-      "role": "晚辈",
-      "giftAdvice": "阳历3月8日出生"
-    },
-    {
       "id": "bday-wang-leyao",
       "title": "王乐遥生日",
       "date": "2010-10-05",
@@ -35,15 +26,6 @@
       "giftAdvice": "16岁生日 (阳历10月5日)"
     },
     {
-      "id": "bday-zhou-zixin",
-      "title": "周子信生日",
-      "date": "2003-12-09",
-      "isLunar": false,
-      "type": "birthday",
-      "role": "家人",
-      "giftAdvice": "23岁生日 (阳历12月9日)"
-    },
-    {
       "id": "bday-zhou-ming",
       "title": "周明生日",
       "date": "1978-09-23",
@@ -51,6 +33,15 @@
       "type": "birthday",
       "role": "家人",
       "giftAdvice": "48岁生日 (农历九月廿三)"
+    },
+    {
+      "id": "bday-zhou-zixin",
+      "title": "周子信生日",
+      "date": "2003-12-09",
+      "isLunar": false,
+      "type": "birthday",
+      "role": "家人",
+      "giftAdvice": "23岁生日 (阳历12月9日)"
     },
     {
       "id": "bday-wang-qingying",
@@ -87,6 +78,15 @@
       "type": "birthday",
       "role": "长辈",
       "giftAdvice": "70岁生日 (农历正月廿一)"
+    },
+    {
+      "id": "bday-wang-chenyue",
+      "title": "王辰玥生日",
+      "date": "2026-03-08",
+      "isLunar": false,
+      "type": "birthday",
+      "role": "晚辈",
+      "giftAdvice": "阳历3月8日出生"
     },
     {
       "id": "bday-wang-jing",

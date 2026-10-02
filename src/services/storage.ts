@@ -1,5 +1,6 @@
 import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip, InspirationalQuote, SportExercise, LifeEvent } from '../types'
 import { DEFAULT_CITIES } from './weather'
+import { sortEventsByDaysLeft } from './calendar'
 import rawSeasons from '../data/seasons-bloom.json'
 import rawEvidence from '../data/evidence-guide.json'
 import rawPoetry from '../data/poetry-curated.json'
@@ -80,25 +81,29 @@ export function loadUserPreferences(userId?: string | null): UserPreferences {
     if (!raw && !userId) {
       raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY)
     }
-    if (!raw) return { ...DEFAULT_PREFERENCES, customEvents: [...DEFAULT_PREFERENCES.customEvents] }
+    if (!raw) return { ...DEFAULT_PREFERENCES, customEvents: sortEventsByDaysLeft([...DEFAULT_PREFERENCES.customEvents]) }
     const parsed = JSON.parse(raw)
     const rawEvents = Array.isArray(parsed.customEvents) ? parsed.customEvents : [...DEFAULT_PREFERENCES.customEvents]
     return {
       ...DEFAULT_PREFERENCES,
       ...parsed,
       modules: { ...DEFAULT_PREFERENCES.modules, ...parsed.modules },
-      customEvents: rawEvents.map(cleanEventGiftAdvice),
+      customEvents: sortEventsByDaysLeft(rawEvents.map(cleanEventGiftAdvice)),
     }
   } catch (e) {
     console.warn('Failed to parse preferences:', e)
-    return { ...DEFAULT_PREFERENCES, customEvents: [...DEFAULT_PREFERENCES.customEvents] }
+    return { ...DEFAULT_PREFERENCES, customEvents: sortEventsByDaysLeft([...DEFAULT_PREFERENCES.customEvents]) }
   }
 }
 
 export function saveUserPreferences(prefs: UserPreferences, userId?: string | null) {
   try {
     const key = getPreferencesKey(userId)
-    localStorage.setItem(key, JSON.stringify(prefs))
+    const toSave: UserPreferences = {
+      ...prefs,
+      customEvents: sortEventsByDaysLeft(prefs.customEvents),
+    }
+    localStorage.setItem(key, JSON.stringify(toSave))
   } catch (e) {
     console.error('Failed to save preferences:', e)
   }

@@ -127,6 +127,20 @@ export function calculateNextEventDate(
 }
 
 /**
+ * 按距离下一次发生的剩余天数升序排序自定义事件（距离越近排越前）
+ */
+export function sortEventsByDaysLeft(events: LifeEvent[], baseDate?: Date): LifeEvent[] {
+  const base = baseDate || new Date()
+  return [...events].sort((a, b) => {
+    const da = calculateNextEventDate(a.date, !!a.isLunar, base).daysLeft
+    const db = calculateNextEventDate(b.date, !!b.isLunar, base).daysLeft
+    const safeA = da < 0 ? 999999 : da
+    const safeB = db < 0 ? 999999 : db
+    return safeA - safeB
+  })
+}
+
+/**
  * 汇总即将到来的生活事件与节假日（按距离天数升序）
  */
 export function getUpcomingEvents(customEvents: LifeEvent[], daysThreshold: number = 30): LifeEvent[] {
