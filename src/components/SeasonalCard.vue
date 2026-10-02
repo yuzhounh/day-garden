@@ -122,10 +122,10 @@ function selectBloomItem(item: SeasonBloom) {
         <article
           v-for="item in monthBlooms"
           :key="item.name"
-          class="p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 transition"
+          class="p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 transition flex items-stretch"
         >
-          <span class="bloom-emoji">{{ item.icon }}</span>
-          <div class="flex-1 min-w-0">
+          <span class="bloom-emoji shrink-0">{{ item.icon }}</span>
+          <div class="bloom-body flex-1 min-w-0 flex flex-col h-full">
             <div class="flex items-center justify-between">
               <h3>
                 {{ item.name }}
@@ -141,7 +141,7 @@ function selectBloomItem(item: SeasonBloom) {
             </div>
             <p>{{ item.description }}</p>
             <p class="observation-text">{{ item.observation }}</p>
-            <div class="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
+            <div class="bloom-footer-row flex items-center justify-between mt-auto pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
               <small><MapPin :size="12" />{{ item.bestSpot }} · {{ monthRange(item.months) }}</small>
             </div>
           </div>

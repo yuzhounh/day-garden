@@ -773,7 +773,7 @@
 }
 .bloom-list > article {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 14px;
   padding: 14px 16px;
   border: 1px solid var(--line);
@@ -781,7 +781,9 @@
   background: var(--surface);
   height: 100%;
 }
-.bloom-emoji { font-size: 30px; margin-top: 4px; }
+.bloom-emoji { font-size: 30px; margin-top: 4px; align-self: flex-start; }
+.bloom-body { display: flex; flex-direction: column; flex: 1; min-width: 0; height: 100%; }
+.bloom-footer-row { margin-top: auto; }
 .bloom-list h3 { font-family: inherit; font-size: 17px; font-weight: 600; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
 .bloom-list p { font-size: 13.5px; color: var(--secondary); line-height: 1.6; }
 .bloom-list .observation-text { color: var(--accent); margin: 6px 0; }
