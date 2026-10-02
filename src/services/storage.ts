@@ -15,6 +15,19 @@ const NOTES_STORAGE_KEY = 'daygarden_quick_notes_v1'
 export const DEFAULT_CARD_ORDER: string[] = [
   'calendar',
   'upcoming',
+  'quickNotes',
+  'gardenAudio',
+  'seasonal',
+  'dailyPoetry',
+  'inspirationalQuote',
+  'evidence',
+  'chinaAttractions',
+  'sportsExercise',
+]
+
+const LEGACY_DEFAULT_ORDER: string[] = [
+  'calendar',
+  'upcoming',
   'gardenAudio',
   'dailyPoetry',
   'inspirationalQuote',
@@ -27,6 +40,15 @@ export const DEFAULT_CARD_ORDER: string[] = [
 
 export function getNormalizedCardOrder(customOrder?: string[]): string[] {
   if (!customOrder || !Array.isArray(customOrder)) return [...DEFAULT_CARD_ORDER]
+
+  // If saved order matches legacy default, automatically migrate to new default order
+  if (
+    customOrder.length === LEGACY_DEFAULT_ORDER.length &&
+    customOrder.every((k, i) => k === LEGACY_DEFAULT_ORDER[i])
+  ) {
+    return [...DEFAULT_CARD_ORDER]
+  }
+
   const validSet = new Set(DEFAULT_CARD_ORDER)
   const existing = customOrder.filter(k => validSet.has(k))
   const existingSet = new Set(existing)
