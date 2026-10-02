@@ -2,8 +2,9 @@
 import { ref, watch } from 'vue'
 import { Download, Upload, Check, Bell } from 'lucide-vue-next'
 import type { UserPreferences } from '../types'
-import { requestNotificationPermission, sendDesktopNotification, sortEventsByDaysLeft } from '../services/calendar'
-import { cleanEventGiftAdvice, DEFAULT_CARD_ORDER } from '../services/storage'
+import { requestNotificationPermission, sendDesktopNotification } from '../services/calendar'
+import { importPreferences, DEFAULT_CARD_ORDER } from '../services/storage'
+import { localDateKey } from '../services/day'
 import DetailModal from './DetailModal.vue'
 
 const props = defineProps<{
@@ -59,10 +60,10 @@ async function handleTestNotification() {
 }
 
 function exportData() {
-  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(props.preferences, null, 2))
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({ version: 2, preferences: props.preferences }, null, 2))
   const dlAnchorElem = document.createElement('a')
   dlAnchorElem.setAttribute('href', dataStr)
-  dlAnchorElem.setAttribute('download', `day-garden-backup-${new Date().toISOString().slice(0, 10)}.json`)
+  dlAnchorElem.setAttribute('download', `day-garden-backup-${localDateKey()}.json`)
   dlAnchorElem.click()
 }
 
@@ -70,20 +71,20 @@ function importData(e: Event) {
   const target = e.target as HTMLInputElement
   if (!target.files || target.files.length === 0) return
   const file = target.files[0]
+  if (file.size > 1024 * 1024) { alert('备份文件过大，请选择不超过 1 MB 的配置文件。'); target.value = ''; return }
   const reader = new FileReader()
   reader.onload = (evt) => {
     try {
       const content = evt.target?.result as string
-      const parsed = JSON.parse(content)
-      if (Array.isArray(parsed.customEvents)) {
-        parsed.customEvents = sortEventsByDaysLeft(parsed.customEvents.map(cleanEventGiftAdvice))
-      }
+      const parsed = importPreferences(JSON.parse(content), props.preferences)
       emit('update:preferences', parsed)
       alert('配置与生活记事导入成功！')
-    } catch {
-      alert('导入失败，文件格式有误。')
+    } catch (error) {
+      alert('导入失败：' + (error instanceof Error ? error.message : '文件格式有误。'))
     }
+    target.value = ''
   }
+  reader.onerror = () => { alert('备份文件读取失败。'); target.value = '' }
   reader.readAsText(file)
 }
 </script>
@@ -141,18 +142,18 @@ function importData(e: Event) {
 
           <label
             class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
-            @click.prevent="toggleModule('upcoming')"
-          >
-            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">岁月里程 · 节日与纪念日</span>
-            <input type="checkbox" :checked="preferences.modules.upcoming ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
-          </label>
-
-          <label
-            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
             @click.prevent="toggleModule('quickNotes')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">片刻随想 · 所思所想便签</span>
             <input type="checkbox" :checked="preferences.modules.quickNotes ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+          </label>
+
+          <label
+            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+            @click.prevent="toggleModule('upcoming')"
+          >
+            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">岁月里程 · 节日与纪念日</span>
+            <input type="checkbox" :checked="preferences.modules.upcoming ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
