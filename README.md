@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="src/assets/logo.svg" width="112" alt="Day Garden · 日常花园 logo">
+  <img src="src/assets/logo.svg" width="112" alt="Day Garden · 每日花园 logo">
 </p>
 
-<h1 align="center">Day Garden · 日常花园</h1>
+<h1 align="center">Day Garden · 每日花园</h1>
 
 <p align="center"><strong>天气、诗词、四季与日常提醒，组成一个轻盈安静的生活首页。</strong></p>
 
