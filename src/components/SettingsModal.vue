@@ -2,7 +2,7 @@
 import { ref, watch, computed } from 'vue'
 import { Plus, Trash2, Download, Upload, Check, Pencil, Clock, Bell, Search } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
-import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft, isRedundantMemo } from '../services/calendar'
+import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft, isRedundantMemo, getSafeLunar } from '../services/calendar'
 import { cleanEventGiftAdvice } from '../services/storage'
 import DetailModal from './DetailModal.vue'
 
@@ -129,13 +129,63 @@ function getCountdownText(ev: LifeEvent) {
   }
 }
 
-function getNextDateDisplay(ev: LifeEvent) {
+function parseDateParts(dateStr: string) {
+  if (!dateStr || typeof dateStr !== 'string') {
+    return { year: undefined, month: 0, day: 0 }
+  }
+  const cleanStr = dateStr.trim().replace(/[/. 年月]/g, '-').replace(/日$/, '')
+  const parts = cleanStr.split('-').filter(Boolean)
+  let year: number | undefined
+  let month = 0
+  let day = 0
+  if (parts.length === 2) {
+    month = parseInt(parts[0], 10)
+    day = parseInt(parts[1], 10)
+  } else if (parts.length >= 3) {
+    const y = parseInt(parts[0], 10)
+    if (!Number.isNaN(y) && y > 1900 && y < 2200) year = y
+    month = parseInt(parts[1], 10)
+    day = parseInt(parts[2], 10)
+  }
+  return { year, month, day }
+}
+
+function getBirthDateDisplay(ev: LifeEvent): string {
+  try {
+    const { year, month, day } = parseDateParts(ev?.date || '')
+    if (!month || !day) return ev?.date || ''
+
+    if (ev.isLunar) {
+      const lunar = getSafeLunar(year || 2000, month, day)
+      const lunarMonthChinese = lunar.getMonthInChinese()
+      const lunarDayChinese = lunar.getDayInChinese()
+      const yearPrefix = year ? `${year} 年` : ''
+      return `${yearPrefix}${lunarMonthChinese}月${lunarDayChinese}（农历）`
+    } else {
+      const mStr = String(month).padStart(2, '0')
+      const dStr = String(day).padStart(2, '0')
+      const yearPrefix = year ? `${year} 年 ` : ''
+      return `${yearPrefix}${mStr} 月 ${dStr} 日（公历）`
+    }
+  } catch {
+    return ev?.date || ''
+  }
+}
+
+function getNextDateDisplay(ev: LifeEvent): string {
   try {
     const info = getEventCountdown(ev)
-    if (info.nextDateLunar) {
-      return `${info.nextDateSolar} · ${info.nextDateLunar}`
+    if (ev.isLunar) {
+      return `${info.nextDateSolar}（公历）`
+    } else {
+      const { year, month, day } = parseDateParts(info.nextDateSolar)
+      if (year && month && day) {
+        const mStr = String(month).padStart(2, '0')
+        const dStr = String(day).padStart(2, '0')
+        return `${year} 年 ${mStr} 月 ${dStr} 日（公历）`
+      }
+      return `${info.nextDateSolar}（公历）`
     }
-    return info.nextDateSolar || ev?.date || ''
   } catch {
     return ev?.date || ''
   }
@@ -568,7 +618,7 @@ function importData(e: Event) {
                       {{ ev.type === 'anniversary' ? '纪念起始' : '出生日期' }}
                     </span>
                     <span class="font-medium text-slate-700 dark:text-slate-200 text-sm">
-                      {{ ev.date }} <span class="text-xs text-slate-400">({{ ev.isLunar ? '农历' : '公历' }})</span>
+                      {{ getBirthDateDisplay(ev) }}
                     </span>
                   </div>
 

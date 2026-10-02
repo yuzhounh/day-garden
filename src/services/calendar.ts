@@ -74,7 +74,7 @@ export interface NextEventInfo {
   turningAge?: number
 }
 
-function getSafeLunar(year: number, month: number, day: number) {
+export function getSafeLunar(year: number, month: number, day: number) {
   // 农历月中部分月份仅有29天或闰月不同，自指定日期递减寻找合法日子，防止抛出异常
   const safeMonth = Math.max(1, Math.min(12, month))
   const startDay = Math.max(1, Math.min(30, day))
