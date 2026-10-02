@@ -409,7 +409,7 @@ watch(
               <Clock :size="12" />
               {{ formatDateTime(item.createdAt) }}
             </span>
-            <div class="flex items-center gap-1">
+            <div class="modal-note-actions">
               <button
                 type="button"
                 class="note-action-btn"
@@ -575,16 +575,25 @@ watch(
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.note-actions {
+.note-actions,
+.modal-note-actions {
   display: flex;
   align-items: center;
   gap: 4px;
-  opacity: 0.6;
-  transition: opacity 0.15s ease;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
-.recent-note-item:hover .note-actions {
+.recent-note-item:hover .note-actions,
+.modal-note-card:hover .modal-note-actions {
   opacity: 1;
+}
+
+@media (hover: none) {
+  .note-actions,
+  .modal-note-actions {
+    opacity: 1;
+  }
 }
 
 .note-action-btn {
