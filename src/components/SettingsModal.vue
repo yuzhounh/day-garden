@@ -26,7 +26,14 @@ watch(() => props.initialTab, (newTab) => {
   }
 })
 
+watch(currentTab, (newTab) => {
+  if (newTab !== 'events') {
+    showAddForm.value = false
+  }
+})
+
 // 新增事件表单
+const showAddForm = ref(false)
 const newEventTitle = ref('')
 const newEventDate = ref('')
 const newEventType = ref<'birthday' | 'anniversary' | 'custom'>('birthday')
@@ -62,6 +69,7 @@ const editForm = ref<{
 })
 
 function startEdit(ev: LifeEvent) {
+  showAddForm.value = false
   editingId.value = ev.id
   editForm.value = {
     title: ev.title,
@@ -259,6 +267,8 @@ function addEvent() {
   newEventRole.value = ''
   newEventAdvice.value = ''
   newEventType.value = 'birthday'
+  newEventIsLunar.value = false
+  showAddForm.value = false
 }
 
 function removeEvent(id: string) {
@@ -312,6 +322,20 @@ function importData(e: Event) {
 
 <template>
   <DetailModal title="布置你的今日花园" subtitle="PERSONALIZE YOUR GARDEN" class="settings-content" @close="emit('close')">
+    <template #actions>
+      <button
+        v-if="currentTab === 'events'"
+        type="button"
+        class="toolbar-button text-xs font-medium"
+        :class="{ active: showAddForm }"
+        :title="showAddForm ? '收起新增条目' : '新增'"
+        :aria-label="showAddForm ? '收起新增条目' : '新增'"
+        @click="showAddForm = !showAddForm"
+      >
+        <Plus :size="15" class="transition-transform duration-200" :class="{ 'rotate-45': showAddForm }" />
+        <span>{{ showAddForm ? '收起' : '新增' }}</span>
+      </button>
+    </template>
 
       <!-- Tab Nav -->
       <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 shrink-0 bg-slate-50/50 dark:bg-slate-800/30">
@@ -445,71 +469,96 @@ function importData(e: Event) {
 
         <!-- 2. 生日与纪念日管理 -->
         <div v-if="currentTab === 'events'" class="space-y-4">
-          <!-- Add Event Form -->
-          <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3">
-            <div class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">添加新日子 / 备礼提醒</div>
-            <div class="grid grid-cols-2 gap-2.5">
-              <input
-                v-model="newEventTitle"
-                type="text"
-                placeholder="事件名 (如: 妈妈生日)"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-              />
-              <input
-                v-model="newEventDate"
-                type="text"
-                placeholder="日期 MM-DD (如: 10-08)"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-              />
-            </div>
-            <div class="grid grid-cols-2 gap-2.5">
-              <input
-                v-model="newEventRole"
-                type="text"
-                placeholder="角色备注 (如: 母亲 / 伴侣)"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-              />
-              <input
-                v-model="newEventAdvice"
-                type="text"
-                placeholder="备礼备忘 (如: 提前订花)"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-              />
-            </div>
-            <div class="flex items-center justify-between pt-1">
-              <div class="flex items-center gap-2.5">
-                <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs">
+          <!-- Add Event Form (默认隐藏，点击右上角“新增”按钮后展开) -->
+          <Transition name="fade-slide">
+            <div
+              v-if="showAddForm"
+              class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3"
+            >
+              <div class="flex items-center justify-between">
+                <div class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  添加新日子 / 备礼提醒
+                </div>
+                <button
+                  type="button"
+                  @click="showAddForm = false"
+                  class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+                >
+                  收起
+                </button>
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <input
+                  v-model="newEventTitle"
+                  type="text"
+                  placeholder="事件名 (如: 妈妈生日)"
+                  class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
+                />
+                <input
+                  v-model="newEventDate"
+                  type="text"
+                  placeholder="日期 MM-DD (如: 10-08)"
+                  class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <input
+                  v-model="newEventRole"
+                  type="text"
+                  placeholder="角色备注 (如: 母亲 / 伴侣)"
+                  class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
+                />
+                <input
+                  v-model="newEventAdvice"
+                  type="text"
+                  placeholder="备礼备忘 (如: 提前订花)"
+                  class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
+                />
+              </div>
+              <div class="flex items-center justify-between pt-1">
+                <div class="flex items-center gap-2.5">
+                  <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs">
+                    <button
+                      type="button"
+                      class="px-2 py-0.5 rounded-md transition"
+                      :class="newEventType === 'birthday' ? 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                      @click="newEventType = 'birthday'"
+                    >
+                      🎂 生日
+                    </button>
+                    <button
+                      type="button"
+                      class="px-2 py-0.5 rounded-md transition"
+                      :class="newEventType === 'anniversary' ? 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+                      @click="newEventType = 'anniversary'"
+                    >
+                      💖 纪念日
+                    </button>
+                  </div>
+                  <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
+                    <input type="checkbox" v-model="newEventIsLunar" class="rounded text-emerald-600" />
+                    <span>农历</span>
+                  </label>
+                </div>
+                <div class="flex items-center gap-2">
                   <button
                     type="button"
-                    class="px-2 py-0.5 rounded-md transition"
-                    :class="newEventType === 'birthday' ? 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
-                    @click="newEventType = 'birthday'"
+                    @click="showAddForm = false"
+                    class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs sm:text-sm transition"
                   >
-                    🎂 生日
+                    取消
                   </button>
                   <button
-                    type="button"
-                    class="px-2 py-0.5 rounded-md transition"
-                    :class="newEventType === 'anniversary' ? 'bg-white dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
-                    @click="newEventType = 'anniversary'"
+                    @click="addEvent"
+                    class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5 shadow-sm"
                   >
-                    💖 纪念日
+                    <Plus class="w-4 h-4" />
+                    <span>确认添加</span>
                   </button>
                 </div>
-                <label class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer">
-                  <input type="checkbox" v-model="newEventIsLunar" class="rounded text-emerald-600" />
-                  <span>农历</span>
-                </label>
               </div>
-              <button
-                @click="addEvent"
-                class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-medium transition flex items-center gap-1.5 shadow-sm"
-              >
-                <Plus class="w-4 h-4" />
-                <span>确认添加</span>
-              </button>
             </div>
-          </div>
+          </Transition>
 
           <!-- 搜索与筛选栏 -->
           <div class="modal-search-row">
@@ -749,3 +798,23 @@ function importData(e: Event) {
       </div>
   </DetailModal>
 </template>
+
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.toolbar-button.active {
+  background: var(--sage-bg);
+  color: var(--accent);
+  border-color: rgba(90, 158, 106, 0.4);
+}
+</style>
+
