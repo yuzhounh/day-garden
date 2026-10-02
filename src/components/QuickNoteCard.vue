@@ -8,7 +8,6 @@ import {
   Check,
   BookOpen,
   Search,
-  Sparkles,
   Download,
   Feather,
   Clock,
@@ -25,25 +24,10 @@ watch(() => account.user?.id, (uid) => {
 })
 
 const draft = ref('')
-const selectedTag = ref('随想')
 const showModal = ref(false)
 const searchQuery = ref('')
-const filterTag = ref('全部')
 const copiedId = ref<string | null>(null)
 const copiedAll = ref(false)
-
-const AVAILABLE_TAGS = [
-  { name: '随想', icon: '🍃', style: 'sage' },
-  { name: '灵感', icon: '💡', style: 'sky' },
-  { name: '确幸', icon: '✨', style: 'peach' },
-  { name: '感悟', icon: '💭', style: 'lavender' },
-  { name: '备忘', icon: '📌', style: 'emerald' },
-  { name: '闲思', icon: '☕', style: 'amber' },
-]
-
-function getTagInfo(tagName?: string) {
-  return AVAILABLE_TAGS.find(t => t.name === tagName) || AVAILABLE_TAGS[0]
-}
 
 function submitNote() {
   const text = draft.value.trim()
@@ -52,7 +36,6 @@ function submitNote() {
   const newNote: QuickNote = {
     id: 'note_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
     content: text,
-    tag: selectedTag.value,
     createdAt: new Date().toISOString(),
   }
 
@@ -85,7 +68,7 @@ function copyNoteText(note: QuickNote) {
 function copyAllNotes() {
   if (!notes.value.length) return
   const text = notes.value
-    .map(n => `【${n.tag || '随想'} · ${formatDateTime(n.createdAt)}】\n${n.content}`)
+    .map(n => `【${formatDateTime(n.createdAt)}】\n${n.content}`)
     .join('\n\n')
 
   navigator.clipboard.writeText(text).then(() => {
@@ -96,9 +79,9 @@ function copyAllNotes() {
 
 function exportNotes() {
   if (!notes.value.length) return
-  const text = `# Day Garden · 拾光随想便签\n导出于：${new Date().toLocaleString('zh-CN')}\n\n` +
+  const text = `# Day Garden · 拾光随笔\n导出于：${new Date().toLocaleString('zh-CN')}\n\n` +
     notes.value
-      .map(n => `### ${n.tag || '随想'} · ${formatDateTime(n.createdAt)}\n\n${n.content}`)
+      .map(n => `### ${formatDateTime(n.createdAt)}\n\n${n.content}`)
       .join('\n\n---\n\n')
 
   const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' })
@@ -152,18 +135,9 @@ function formatDateTime(isoStr: string): string {
 }
 
 const filteredNotes = computed(() => {
-  return notes.value.filter(n => {
-    if (filterTag.value !== '全部' && n.tag !== filterTag.value) {
-      return false
-    }
-    if (searchQuery.value.trim()) {
-      const q = searchQuery.value.trim().toLowerCase()
-      const matchContent = n.content.toLowerCase().includes(q)
-      const matchTag = (n.tag || '').toLowerCase().includes(q)
-      if (!matchContent && !matchTag) return false
-    }
-    return true
-  })
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return notes.value
+  return notes.value.filter(n => n.content.toLowerCase().includes(q))
 })
 
 const recentNotes = computed(() => {
@@ -202,22 +176,7 @@ const recentNotes = computed(() => {
         ></textarea>
 
         <div class="quick-input-bar">
-          <!-- 标签快速选择 -->
-          <div class="tag-selector-row">
-            <button
-              v-for="t in AVAILABLE_TAGS"
-              :key="t.name"
-              type="button"
-              class="tag-selector-btn"
-              :class="{ active: selectedTag === t.name }"
-              @click="selectedTag = t.name"
-            >
-              <span>{{ t.icon }}</span>
-              <span>{{ t.name }}</span>
-            </button>
-          </div>
-
-          <!-- 提交按钮 -->
+          <span class="note-input-hint">Ctrl + Enter 快捷记下</span>
           <button
             type="button"
             class="note-submit-btn"
@@ -239,15 +198,10 @@ const recentNotes = computed(() => {
             class="recent-note-item group"
           >
             <div class="note-item-header">
-              <div class="flex items-center gap-1.5">
-                <span class="pill mini" :class="getTagInfo(item.tag).style">
-                  {{ getTagInfo(item.tag).icon }} {{ item.tag || '随想' }}
-                </span>
-                <span class="note-time-label">
-                  <Clock :size="11" />
-                  {{ formatRelativeTime(item.createdAt) }}
-                </span>
-              </div>
+              <span class="note-time-label">
+                <Clock :size="11" />
+                {{ formatRelativeTime(item.createdAt) }}
+              </span>
               <div class="note-actions">
                 <button
                   type="button"
@@ -336,19 +290,7 @@ const recentNotes = computed(() => {
           @keydown="handleKeydown"
         ></textarea>
         <div class="modal-input-footer">
-          <div class="tag-selector-row">
-            <button
-              v-for="t in AVAILABLE_TAGS"
-              :key="'modal-' + t.name"
-              type="button"
-              class="tag-selector-btn"
-              :class="{ active: selectedTag === t.name }"
-              @click="selectedTag = t.name"
-            >
-              <span>{{ t.icon }}</span>
-              <span>{{ t.name }}</span>
-            </button>
-          </div>
+          <span class="note-input-hint">随心随记，无需刻意分类</span>
           <button
             type="button"
             class="note-submit-btn"
@@ -361,54 +303,31 @@ const recentNotes = computed(() => {
         </div>
       </div>
 
-      <!-- 搜索与分类筛选 -->
+      <!-- 搜索框 -->
       <div class="modal-search-row">
-        <div class="search-input-wrap">
-          <Search :size="15" class="search-icon" />
+        <div class="search-input-box">
+          <Search :size="14" class="text-slate-400" />
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="搜索随笔内容或标签..."
-            class="modal-search-input"
+            placeholder="搜索随笔内容..."
+            class="attraction-search-input"
           />
         </div>
       </div>
 
-      <div class="filter-pills">
-        <button
-          type="button"
-          :class="{ active: filterTag === '全部' }"
-          @click="filterTag = '全部'"
-        >
-          全部 ({{ notes.length }})
-        </button>
-        <button
-          v-for="t in AVAILABLE_TAGS"
-          :key="'filter-' + t.name"
-          type="button"
-          :class="{ active: filterTag === t.name }"
-          @click="filterTag = t.name"
-        >
-          {{ t.icon }} {{ t.name }}
-        </button>
-      </div>
-
       <!-- 随笔卡片列表 -->
-      <div class="notes-modal-grid">
+      <div v-if="filteredNotes.length" class="notes-modal-grid">
         <div
           v-for="item in filteredNotes"
           :key="'modal-item-' + item.id"
           class="modal-note-card"
         >
           <div class="modal-note-top">
-            <div class="flex items-center gap-2">
-              <span class="pill mini" :class="getTagInfo(item.tag).style">
-                {{ getTagInfo(item.tag).icon }} {{ item.tag || '随想' }}
-              </span>
-              <span class="text-xs text-slate-400 font-mono">
-                {{ formatDateTime(item.createdAt) }}
-              </span>
-            </div>
+            <span class="text-xs text-slate-400 font-mono flex items-center gap-1.5">
+              <Clock :size="12" />
+              {{ formatDateTime(item.createdAt) }}
+            </span>
             <div class="flex items-center gap-1">
               <button
                 type="button"
@@ -431,11 +350,10 @@ const recentNotes = computed(() => {
           </div>
           <p class="modal-note-text">{{ item.content }}</p>
         </div>
+      </div>
 
-        <div v-if="!filteredNotes.length" class="modal-empty-box">
-          <Sparkles :size="24" class="text-slate-400 mb-2" />
-          <p class="text-sm text-slate-500">未找到匹配的随想记录。</p>
-        </div>
+      <div v-else class="p-10 text-center text-sm text-slate-400">
+        {{ searchQuery ? '未找到包含该关键词的随笔，试着换个词搜搜看' : '暂无随笔，在上方写下此刻的心境吧' }}
       </div>
     </DetailModal>
   </article>
@@ -496,45 +414,17 @@ const recentNotes = computed(() => {
   margin-top: 4px;
 }
 
-.tag-selector-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.tag-selector-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 7px;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--muted);
+.note-input-hint {
   font-size: 11.5px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-}
-
-.tag-selector-btn:hover {
-  background: var(--sage-bg);
-  color: var(--accent);
-}
-
-.tag-selector-btn.active {
-  background: var(--sage-bg);
-  color: var(--accent);
-  border-color: rgba(68, 107, 78, 0.25);
-  font-weight: 500;
+  color: var(--muted);
+  user-select: none;
 }
 
 .note-submit-btn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px;
+  padding: 4px 11px;
   border-radius: 8px;
   border: none;
   background: var(--accent);
@@ -597,8 +487,8 @@ const recentNotes = computed(() => {
 .note-time-label {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  font-size: 11px;
+  gap: 4px;
+  font-size: 11.5px;
   color: var(--muted);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -697,7 +587,7 @@ const recentNotes = computed(() => {
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
@@ -722,14 +612,15 @@ const recentNotes = computed(() => {
   border-top: 1px dashed var(--line);
   margin-top: 8px;
   gap: 10px;
-  flex-wrap: wrap;
 }
 
 .notes-modal-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  margin-top: 16px;
+  margin-top: 14px;
+  max-height: 540px;
+  overflow-y: auto;
 }
 
 @media (max-width: 680px) {
@@ -768,15 +659,5 @@ const recentNotes = computed(() => {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.modal-empty-box {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 </style>

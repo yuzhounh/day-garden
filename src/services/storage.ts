@@ -118,7 +118,6 @@ export const DEFAULT_QUICK_NOTES: QuickNote[] = [
   {
     id: 'note-welcome-1',
     content: '心有闲田，日有花开。记下当下的所思所想，留存此刻的心境与灵光。',
-    tag: '随想',
     createdAt: new Date().toISOString(),
   },
 ]
