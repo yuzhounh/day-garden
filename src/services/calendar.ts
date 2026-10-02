@@ -88,6 +88,20 @@ function getSafeLunar(year: number, month: number, day: number) {
   return Lunar.fromYmd(year, safeMonth, 1)
 }
 
+/**
+ * 判断是否为机械式重复生成的年龄/生日/出生日期备注
+ */
+export function isRedundantMemo(memo?: unknown): boolean {
+  if (!memo || typeof memo !== 'string') return true
+  const trimmed = memo.trim()
+  if (!trimmed || trimmed === '无备忘' || trimmed === '暂无备忘' || trimmed === '无') return true
+  // 过滤机械式自动生成的年龄/生日备注，如 "16岁生日 (阳历10月5日)"、"48岁生日 (农历九月廿三)"、"1岁生日"
+  if (/^\d+岁生日(\s*\(.+?\))?$/.test(trimmed)) return true
+  // 过滤机械式重复出生日期的备注，如 "阳历3月8日出生"、"公历3月8日出生"、"农历九月廿三出生"、"阳历3月8日"
+  if (/^[公阳农]历\s*(\d+月\d+日?|[一二三四五六七八九十冬腊]+月[一二三四五六七八九十廿卅]+)?\s*出生?$/.test(trimmed)) return true
+  return false
+}
+
 export function calculateNextEventDate(
   eventDateStr: string,
   isLunar: boolean = false,
@@ -150,7 +164,7 @@ export function calculateNextEventDate(
       const ageStr = turningAge !== undefined ? ` · ${turningAge}岁` : ''
       const targetLunar = targetSolar.getLunar()
       const lunarChineseStr = `农历${targetLunar.getMonthInChinese()}月${targetLunar.getDayInChinese()}`
-      const nextDateSolar = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
+      const nextDateSolar = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
       const nextDateStr = `${nextDateSolar} (${lunarChineseStr}${ageStr})`
       return {
         daysLeft,
@@ -173,7 +187,7 @@ export function calculateNextEventDate(
       const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
       const turningAge = birthYear ? targetDate.getFullYear() - birthYear : undefined
       const ageStr = turningAge !== undefined ? ` · ${turningAge}岁` : ''
-      const nextDateSolar = `${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
+      const nextDateSolar = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
       const nextDateStr = `${nextDateSolar}${ageStr}`
       return {
         daysLeft,

@@ -2,7 +2,7 @@
 import { ref, watch, computed } from 'vue'
 import { Plus, Trash2, Download, Upload, Check, Pencil, Clock, Bell } from 'lucide-vue-next'
 import type { UserPreferences, LifeEvent } from '../types'
-import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft } from '../services/calendar'
+import { requestNotificationPermission, sendDesktopNotification, calculateNextEventDate, sortEventsByDaysLeft, isRedundantMemo } from '../services/calendar'
 import DetailModal from './DetailModal.vue'
 
 const props = defineProps<{
@@ -146,14 +146,6 @@ function getCountdownClass(ev: LifeEvent) {
   } catch {
     return 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold'
   }
-}
-
-function isRedundantMemo(memo?: unknown) {
-  if (!memo || typeof memo !== 'string') return true
-  const trimmed = memo.trim()
-  if (!trimmed || trimmed === '无备忘') return true
-  if (/^\d+岁生日\s*\(.+?\)$/.test(trimmed)) return true
-  return false
 }
 
 function toggleModule(key: keyof UserPreferences['modules']) {

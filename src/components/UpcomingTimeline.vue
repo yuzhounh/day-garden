@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Cake, Gift, Heart, Plus, BookOpen } from 'lucide-vue-next'
 import type { LifeEvent } from '../types'
+import { isRedundantMemo } from '../services/calendar'
 defineProps<{ events: LifeEvent[] }>()
 const emit = defineEmits<{
   (e: 'add-event'): void
@@ -36,7 +37,7 @@ const emit = defineEmits<{
         </span>
         <div class="event-info">
           <h3>{{ event.title }}</h3>
-          <p>{{ event.nextDateStr }}<span v-if="event.giftAdvice"> · {{ event.giftAdvice }}</span></p>
+          <p>{{ event.nextDateStr }}<span v-if="event.giftAdvice && !isRedundantMemo(event.giftAdvice)"> · {{ event.giftAdvice }}</span></p>
         </div>
         <span class="event-count" :class="{ near: (event.daysLeft ?? 31) <= 3 }">
           <strong>{{ event.daysLeft === 0 ? '今' : event.daysLeft }}</strong>
