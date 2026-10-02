@@ -97,10 +97,44 @@ const showAudioPopover = ref(false)
 const showPopoverVolume = ref(false)
 const audioMenu = ref<HTMLElement | null>(null)
 
+const isDraggingPopoverVol = ref(false)
+let popoverVolDragTimer: number | null = null
+
+const popoverVolumePercent = computed(() => {
+  return audioState.isMuted ? 0 : audioState.volume
+})
+
+const popoverVolumeTooltipLeft = computed(() => {
+  const pct = popoverVolumePercent.value / 100
+  return `calc(7px + (100% - 14px) * ${pct})`
+})
+
+function onPopoverVolInput(e: Event) {
+  const val = Number((e.target as HTMLInputElement).value)
+  setVolume(val)
+  isDraggingPopoverVol.value = true
+  if (popoverVolDragTimer) clearTimeout(popoverVolDragTimer)
+  popoverVolDragTimer = window.setTimeout(() => {
+    isDraggingPopoverVol.value = false
+  }, 1000)
+}
+
+function onPopoverVolPointerDown() {
+  isDraggingPopoverVol.value = true
+}
+
+function onPopoverVolPointerUp() {
+  if (popoverVolDragTimer) clearTimeout(popoverVolDragTimer)
+  popoverVolDragTimer = window.setTimeout(() => {
+    isDraggingPopoverVol.value = false
+  }, 600)
+}
+
 function toggleAudioPopover() {
   showAudioPopover.value = !showAudioPopover.value
   if (!showAudioPopover.value) {
     showPopoverVolume.value = false
+    isDraggingPopoverVol.value = false
   }
 }
 
@@ -108,6 +142,7 @@ function closeAudioPopover(event: MouseEvent) {
   if (!audioMenu.value?.contains(event.target as Node)) {
     showAudioPopover.value = false
     showPopoverVolume.value = false
+    isDraggingPopoverVol.value = false
   }
 }
 
@@ -396,17 +431,27 @@ onUnmounted(() => {
                       <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="13" />
                       <Volume2 v-else :size="13" />
                     </button>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      step="1"
-                      :value="audioState.isMuted ? 0 : audioState.volume"
-                      class="popover-volume-slider"
-                      aria-label="音量调节"
-                      @input="setVolume(Number(($event.target as HTMLInputElement).value))"
-                    />
-                    <span class="popover-vol-num">{{ audioState.isMuted ? '0%' : audioState.volume + '%' }}</span>
+                    <div class="popover-volume-slider-track">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        :value="audioState.isMuted ? 0 : audioState.volume"
+                        class="popover-volume-slider"
+                        aria-label="音量调节"
+                        @input="onPopoverVolInput"
+                        @pointerdown="onPopoverVolPointerDown"
+                        @pointerup="onPopoverVolPointerUp"
+                      />
+                      <div
+                        class="volume-thumb-tooltip"
+                        :class="{ 'is-visible': isDraggingPopoverVol }"
+                        :style="{ left: popoverVolumeTooltipLeft }"
+                      >
+                        {{ audioState.isMuted ? '0%' : audioState.volume + '%' }}
+                      </div>
+                    </div>
                   </div>
                 </Transition>
               </div>

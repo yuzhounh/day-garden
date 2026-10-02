@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import {
   Headphones,
   Play,
@@ -33,6 +33,39 @@ import {
 const showVolumeBar = ref(false)
 const volumeWrapRef = ref<HTMLElement | null>(null)
 
+const isDraggingCardVol = ref(false)
+let cardVolDragTimer: number | null = null
+
+const cardVolumePercent = computed(() => {
+  return audioState.isMuted ? 0 : audioState.volume
+})
+
+const cardVolumeTooltipLeft = computed(() => {
+  const pct = cardVolumePercent.value / 100
+  return `calc(7px + (100% - 14px) * ${pct})`
+})
+
+function onCardVolInput(e: Event) {
+  const val = Number((e.target as HTMLInputElement).value)
+  setVolume(val)
+  isDraggingCardVol.value = true
+  if (cardVolDragTimer) clearTimeout(cardVolDragTimer)
+  cardVolDragTimer = window.setTimeout(() => {
+    isDraggingCardVol.value = false
+  }, 1000)
+}
+
+function onCardVolPointerDown() {
+  isDraggingCardVol.value = true
+}
+
+function onCardVolPointerUp() {
+  if (cardVolDragTimer) clearTimeout(cardVolDragTimer)
+  cardVolDragTimer = window.setTimeout(() => {
+    isDraggingCardVol.value = false
+  }, 600)
+}
+
 const timerPills = [
   { label: '不限时', val: 0 },
   { label: '15分', val: 15 },
@@ -49,6 +82,7 @@ function formatRemainingTime(seconds: number): string {
 function closeVolumeBar(event: MouseEvent) {
   if (!volumeWrapRef.value?.contains(event.target as Node)) {
     showVolumeBar.value = false
+    isDraggingCardVol.value = false
   }
 }
 
@@ -197,17 +231,27 @@ onUnmounted(() => {
                 <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="14" />
                 <Volume2 v-else :size="14" />
               </button>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                :value="audioState.isMuted ? 0 : audioState.volume"
-                class="volume-slider"
-                aria-label="调节音量"
-                @input="setVolume(Number(($event.target as HTMLInputElement).value))"
-              />
-              <span class="vol-num">{{ audioState.isMuted ? '0%' : audioState.volume + '%' }}</span>
+              <div class="volume-slider-track-wrap">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  :value="audioState.isMuted ? 0 : audioState.volume"
+                  class="volume-slider"
+                  aria-label="调节音量"
+                  @input="onCardVolInput"
+                  @pointerdown="onCardVolPointerDown"
+                  @pointerup="onCardVolPointerUp"
+                />
+                <div
+                  class="volume-thumb-tooltip"
+                  :class="{ 'is-visible': isDraggingCardVol }"
+                  :style="{ left: cardVolumeTooltipLeft }"
+                >
+                  {{ audioState.isMuted ? '0%' : audioState.volume + '%' }}
+                </div>
+              </div>
             </div>
           </Transition>
         </div>
@@ -577,7 +621,7 @@ onUnmounted(() => {
   position: absolute;
   bottom: calc(100% + 9px);
   right: 0;
-  width: 175px;
+  width: 140px;
   padding: 8px 12px;
   border-radius: 14px;
   background: var(--surface);
@@ -589,6 +633,7 @@ onUnmounted(() => {
   z-index: 50;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  overflow: visible;
 }
 
 .vol-mute-btn {
@@ -606,22 +651,80 @@ onUnmounted(() => {
   color: var(--accent);
 }
 
+.volume-slider-track-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
 .volume-slider {
   flex: 1;
   height: 4px;
-  border-radius: 2px;
-  accent-color: var(--accent);
-  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
   background: var(--line);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  margin: 0;
+  display: block;
+  width: 100%;
 }
 
-.vol-num {
-  font-size: 11px;
-  color: var(--muted);
-  width: 28px;
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.volume-slider:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.volume-thumb-tooltip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1.5px 5.5px;
+  border-radius: 5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 3px) scale(0.92);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.22);
+  z-index: 60;
   font-variant-numeric: tabular-nums;
-  text-align: right;
-  user-select: none;
+}
+
+.volume-thumb-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 3.5px 3.5px 0 3.5px;
+  border-style: solid;
+  border-color: var(--accent) transparent transparent transparent;
+}
+
+.volume-slider-track-wrap:hover .volume-thumb-tooltip,
+.volume-thumb-tooltip.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0) scale(1);
 }
 
 .fade-slide-enter-active,
