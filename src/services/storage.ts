@@ -1,4 +1,4 @@
-import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip, InspirationalQuote, SportExercise, LifeEvent } from '../types'
+import type { UserPreferences, SeasonBloom, EvidenceGuide, CuratedPoetry, HealthTip, InspirationalQuote, SportExercise, LifeEvent, QuickNote } from '../types'
 import { DEFAULT_CITIES } from './weather'
 import { sortEventsByDaysLeft } from './calendar'
 import rawSeasons from '../data/seasons-bloom.json'
@@ -10,6 +10,7 @@ import rawSports from '../data/sports-exercise.json'
 
 const STORAGE_KEY = 'daygarden_user_preferences_v1'
 const LEGACY_STORAGE_KEY = 'daybloom_user_preferences_v1'
+const NOTES_STORAGE_KEY = 'daygarden_quick_notes_v1'
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'auto',
@@ -24,6 +25,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     inspirationalQuote: true,
     chinaAttractions: true,
     sportsExercise: true,
+    quickNotes: true,
     healthTip: true,
   },
   attractionStatus: {},
@@ -106,6 +108,42 @@ export function saveUserPreferences(prefs: UserPreferences, userId?: string | nu
     localStorage.setItem(key, JSON.stringify(toSave))
   } catch (e) {
     console.error('Failed to save preferences:', e)
+  }
+}
+
+export const DEFAULT_QUICK_NOTES: QuickNote[] = [
+  {
+    id: 'note-welcome-1',
+    content: '心有闲田，日有花开。记下当下的所思所想，留存此刻的心境与灵光。',
+    tag: '随想',
+    createdAt: new Date().toISOString(),
+  },
+]
+
+export function getQuickNotesKey(userId?: string | null): string {
+  if (userId) return `daygarden_quick_notes_${userId}`
+  return NOTES_STORAGE_KEY
+}
+
+export function loadQuickNotes(userId?: string | null): QuickNote[] {
+  try {
+    const key = getQuickNotesKey(userId)
+    const raw = localStorage.getItem(key)
+    if (!raw) return DEFAULT_QUICK_NOTES
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_QUICK_NOTES
+  } catch (e) {
+    console.warn('Failed to load quick notes:', e)
+    return DEFAULT_QUICK_NOTES
+  }
+}
+
+export function saveQuickNotes(notes: QuickNote[], userId?: string | null) {
+  try {
+    const key = getQuickNotesKey(userId)
+    localStorage.setItem(key, JSON.stringify(notes))
+  } catch (e) {
+    console.error('Failed to save quick notes:', e)
   }
 }
 

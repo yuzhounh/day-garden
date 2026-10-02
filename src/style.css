@@ -621,10 +621,14 @@
 .icon-tile { width: 34px; height: 34px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sage { color: var(--accent); background: var(--sage-bg); }
 .peach { color: #a9824e; background: var(--peach-bg); }
+.amber { color: #a37233; background: var(--peach-bg); }
+.emerald { color: #2d7a52; background: var(--sage-bg); }
 .lavender { color: #8a7b9c; background: var(--lavender-bg); }
 .rose { color: #b28080; background: var(--rose-bg); }
 .sky { color: #587d97; background: var(--sky-bg); }
 .dark .peach { color: #d5b27a; }
+.dark .amber { color: #e6b36d; }
+.dark .emerald { color: #6ee7b7; }
 .dark .lavender { color: #c0aecf; }
 .dark .rose { color: #d7a2a2; }
 .dark .sky { color: #adc9dc; }

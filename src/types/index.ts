@@ -113,6 +113,13 @@ export interface SportExercise {
   tips: string
 }
 
+export interface QuickNote {
+  id: string
+  content: string
+  tag?: string
+  createdAt: string
+}
+
 export interface UserPreferences {
   theme: 'light' | 'dark' | 'auto'
   selectedCity: CityOption
@@ -126,6 +133,7 @@ export interface UserPreferences {
     inspirationalQuote?: boolean
     chinaAttractions?: boolean
     sportsExercise?: boolean
+    quickNotes?: boolean
     healthTip: boolean
   }
   customEvents: LifeEvent[]

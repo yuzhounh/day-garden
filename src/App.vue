@@ -11,6 +11,7 @@ import DailyPageCard from './components/DailyPageCard.vue'
 import InspirationalQuoteCard from './components/InspirationalQuoteCard.vue'
 import ChinaAttractionsCard from './components/ChinaAttractionsCard.vue'
 import SportsExerciseCard from './components/SportsExerciseCard.vue'
+import QuickNoteCard from './components/QuickNoteCard.vue'
 import HealthTipBar from './components/HealthTipBar.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import AccountModal from './components/AccountModal.vue'
@@ -204,6 +205,9 @@ onUnmounted(() => {
             :quote="currentQuote"
             @next-quote="handleNextQuote"
             @select-quote="currentQuote = $event"
+          />
+          <QuickNoteCard
+            v-if="prefs.modules.quickNotes ?? true"
           />
           <SeasonalCard
             v-if="prefs.modules.seasonal"
