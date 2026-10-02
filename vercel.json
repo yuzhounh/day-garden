@@ -1,5 +1,6 @@
 {
-  "buildCommand": null,
+  "framework": null,
+  "buildCommand": "",
   "outputDirectory": "dist_pages",
   "cleanUrls": true,
   "redirects": [
