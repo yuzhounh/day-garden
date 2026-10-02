@@ -184,7 +184,7 @@ function importData(e: Event) {
             class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
             @click.prevent="toggleModule('inspirationalQuote')"
           >
-            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">积极励志 · 名人名言</span>
+            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">积极励志 · 名言语录</span>
             <input type="checkbox" :checked="preferences.modules.inspirationalQuote ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 

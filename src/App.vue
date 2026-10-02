@@ -88,7 +88,7 @@ function handleUpdateCustomEvents(events: LifeEvent[]) {
 }
 
 const isSortMode = ref(false)
-const cardTitles: Record<string, string> = { calendar: '月历', upcoming: '岁月里程', quickNotes: '拾光随笔', gardenAudio: '花园声景', seasonal: '四时花期', dailyPoetry: '经典晨读', inspirationalQuote: '名人名言', evidence: '生活锦囊', chinaAttractions: '山河行记', sportsExercise: '每日运动' }
+const cardTitles: Record<string, string> = { calendar: '月历', upcoming: '岁月里程', quickNotes: '拾光随笔', gardenAudio: '花园声景', seasonal: '四时花期', dailyPoetry: '经典晨读', inspirationalQuote: '名言语录', evidence: '生活锦囊', chinaAttractions: '山河行记', sportsExercise: '每日运动' }
 const sortAnnouncement = ref('')
 const draggingCard = ref<string | null>(null)
 const dropTargetCard = ref<string | null>(null)

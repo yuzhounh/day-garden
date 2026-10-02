@@ -64,7 +64,7 @@ function setAsHomeQuote(q: InspirationalQuote) {
     <header class="card-heading">
       <div class="section-label">
         <span class="icon-tile sky"><Sparkles :size="16" /></span>
-        <h2>名人名言</h2>
+        <h2>名言语录</h2>
         <span class="eyebrow">INSPIRATION</span>
       </div>
       <button class="icon-button small" aria-label="换一则名言" title="换一则名言" @click="emit('next-quote')">
@@ -139,7 +139,7 @@ function setAsHomeQuote(q: InspirationalQuote) {
     <!-- 语录库全量浏览弹窗 -->
     <DetailModal
       v-if="showList"
-      title="心力之源 · 励志名人名言小集"
+      title="心力之源 · 励志名言语录小集"
       subtitle="经典思想金句 · 向上生长，滋养心力"
       class="collection-modal"
       @close="showList = false"

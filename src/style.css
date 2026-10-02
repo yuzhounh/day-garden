@@ -1445,7 +1445,7 @@
 .account-backup { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; justify-content: space-between; border-top: 1px solid var(--line); margin-top: 24px; padding-top: 17px; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: rgba(110, 133, 104, .25); border-radius: 6px; }
-/* 名人名言卡片 */
+/* 名言语录卡片 */
 .quote-card {
   min-height: 290px;
 }
