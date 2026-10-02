@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Flower2, MapPin, ArrowUpRight, Eye, RefreshCw, BookOpen } from 'lucide-vue-next'
+import { Flower2, MapPin, ArrowUpRight, RefreshCw, BookOpen } from 'lucide-vue-next'
 import type { SeasonBloom } from '../types'
 import DetailModal from './DetailModal.vue'
 import BotanicalArt from './BotanicalArt.vue'
+import ScentIcon from './ScentIcon.vue'
 import rawSeasons from '../data/seasons-bloom.json'
 
 const props = defineProps<{ bloom: SeasonBloom }>()
@@ -58,22 +59,22 @@ function selectBloomItem(item: SeasonBloom) {
     </div>
 
     <div class="bloom-observation">
-      <Eye :size="15" />
+      <ScentIcon :size="16" />
       <p>{{ bloom.observation }}</p>
+    </div>
+
+    <div class="bloom-spot-row">
+      <span class="spot-label"><MapPin :size="13" />寻芳赏鉴：{{ bloom.bestSpot }}</span>
+      <span class="spot-term">{{ bloom.solarTerms.join(' · ') }}</span>
     </div>
 
     <footer class="card-footer">
       <button class="text-button" @click="showCalendar = true">
         <BookOpen :size="14" />全年花期谱
       </button>
-      <div class="inline-actions">
-        <span class="bloom-location">
-          <MapPin :size="13" />{{ bloom.bestSpot }}
-        </span>
-        <button class="text-button" @click="showDetail = true">
-          物候细品<ArrowUpRight :size="14" />
-        </button>
-      </div>
+      <button class="text-button" @click="showDetail = true">
+        物候细品<ArrowUpRight :size="14" />
+      </button>
     </footer>
 
     <!-- 单花物候细品弹窗 -->
@@ -90,7 +91,7 @@ function selectBloomItem(item: SeasonBloom) {
         </div>
       </div>
       <div class="reading-note">
-        <span class="eyebrow">物候微观观察</span>
+        <span class="eyebrow flex items-center gap-1.5"><ScentIcon :size="14" />物候微观观察与嗅觉感知</span>
         <p>{{ bloom.observation }}</p>
       </div>
       <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">

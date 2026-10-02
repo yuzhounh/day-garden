@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Quote as QuoteIcon, Sparkles, RefreshCw, BookOpen, ArrowUpRight, Copy, Check, Eye } from 'lucide-vue-next'
+import { Quote as QuoteIcon, Sparkles, RefreshCw, BookOpen, ArrowUpRight, Copy, Check, Lightbulb } from 'lucide-vue-next'
 import type { InspirationalQuote } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawQuotes from '../data/inspirational-quotes.json'
@@ -73,7 +73,7 @@ function setAsHomeQuote(q: InspirationalQuote) {
     </div>
 
     <div class="quote-insight">
-      <Eye :size="16" class="quote-insight-icon" />
+      <Lightbulb :size="16" class="quote-insight-icon" />
       <p>{{ quote.insight }}</p>
     </div>
 
@@ -160,7 +160,7 @@ function setAsHomeQuote(q: InspirationalQuote) {
 
           <!-- 生活心力解读：直接在集合卡片里展示，沉浸式阅读 -->
           <div class="quote-item-insight">
-            <Eye :size="14" class="quote-insight-icon" />
+            <Lightbulb :size="14" class="quote-insight-icon" />
             <p>{{ item.insight }}</p>
           </div>
 
