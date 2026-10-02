@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
 import {
   Headphones,
   Play,
@@ -29,6 +30,9 @@ import {
   setSleepTimer,
 } from '../services/audio'
 
+const showVolumeBar = ref(false)
+const volumeWrapRef = ref<HTMLElement | null>(null)
+
 const timerPills = [
   { label: '不限时', val: 0 },
   { label: '15分', val: 15 },
@@ -41,6 +45,20 @@ function formatRemainingTime(seconds: number): string {
   const s = seconds % 60
   return `${m}:${String(s).padStart(2, '0')}`
 }
+
+function closeVolumeBar(event: MouseEvent) {
+  if (!volumeWrapRef.value?.contains(event.target as Node)) {
+    showVolumeBar.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', closeVolumeBar)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeVolumeBar)
+})
 </script>
 
 <template>
@@ -98,10 +116,10 @@ function formatRemainingTime(seconds: number): string {
         <p>{{ currentTrack.quote }}</p>
       </div>
 
-      <!-- 控制器：随机切换、上一首、播放/暂停、下一首，以及音量调节 -->
+      <!-- 控制器：随机在左、三键居中、音量在右（点击后弹出音量条） -->
       <div class="audio-controls-row">
-        <div class="playback-btns">
-          <!-- 随机切换按钮 (位于后退键左侧) -->
+        <!-- 左侧：随机切换按钮 -->
+        <div class="controls-left">
           <button
             type="button"
             class="ctrl-icon-btn random-btn"
@@ -111,7 +129,10 @@ function formatRemainingTime(seconds: number): string {
           >
             <Shuffle :size="15" />
           </button>
+        </div>
 
+        <!-- 中间：后退、播放/暂停、前进三个按键居中显示 -->
+        <div class="controls-center">
           <!-- 后退 / 上一首 -->
           <button
             type="button"
@@ -147,29 +168,46 @@ function formatRemainingTime(seconds: number): string {
           </button>
         </div>
 
-        <!-- 音量滑块与静音切换 -->
-        <div class="volume-control-wrap">
+        <!-- 右侧：音量按键与弹出式调节条 -->
+        <div ref="volumeWrapRef" class="controls-right volume-pop-wrapper">
           <button
             type="button"
-            class="vol-icon-btn"
-            :title="audioState.isMuted ? '取消静音' : '静音'"
-            :aria-label="audioState.isMuted ? '取消静音' : '静音'"
-            @click="toggleMute"
+            class="ctrl-icon-btn vol-toggle-btn"
+            :class="{ 'is-active': showVolumeBar }"
+            :title="showVolumeBar ? '收起音量调节' : '展开音量调节'"
+            :aria-label="showVolumeBar ? '收起音量调节' : '展开音量调节'"
+            @click.stop="showVolumeBar = !showVolumeBar"
           >
             <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="15" />
             <Volume2 v-else :size="15" />
           </button>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            :value="audioState.isMuted ? 0 : audioState.volume"
-            class="volume-slider"
-            aria-label="调节音量"
-            @input="setVolume(Number(($event.target as HTMLInputElement).value))"
-          />
-          <span class="vol-num">{{ audioState.isMuted ? '0%' : audioState.volume + '%' }}</span>
+
+          <!-- 点击后弹出的毛玻璃音量条浮层 -->
+          <Transition name="fade-slide">
+            <div v-if="showVolumeBar" class="volume-slider-popover glass-panel" @click.stop>
+              <button
+                type="button"
+                class="vol-mute-btn"
+                :title="audioState.isMuted ? '取消静音' : '静音'"
+                :aria-label="audioState.isMuted ? '取消静音' : '静音'"
+                @click="toggleMute"
+              >
+                <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="14" />
+                <Volume2 v-else :size="14" />
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                :value="audioState.isMuted ? 0 : audioState.volume"
+                class="volume-slider"
+                aria-label="调节音量"
+                @input="setVolume(Number(($event.target as HTMLInputElement).value))"
+              />
+              <span class="vol-num">{{ audioState.isMuted ? '0%' : audioState.volume + '%' }}</span>
+            </div>
+          </Transition>
         </div>
       </div>
     </div>
@@ -385,25 +423,37 @@ function formatRemainingTime(seconds: number): string {
   letter-spacing: 0.2px;
 }
 
-/* 播放控制条 */
+/* 播放控制条：三栏 Grid 布局保证中间三个按键绝对居中 */
 .audio-controls-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 2px;
+  width: 100%;
+  padding: 2px 0;
 }
 
-.playback-btns {
+.controls-left {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.controls-center {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 12px;
+}
+
+.controls-right {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
 }
 
 .ctrl-icon-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--muted);
@@ -424,10 +474,16 @@ function formatRemainingTime(seconds: number): string {
   transform: rotate(15deg);
 }
 
+.vol-toggle-btn.is-active {
+  background: var(--sage-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 .play-main-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 13px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
   border: none;
   background: var(--accent);
   color: #ffffff;
@@ -435,43 +491,54 @@ function formatRemainingTime(seconds: number): string {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: all 0.2s ease;
 }
 
 .play-main-btn:hover {
   transform: scale(1.06);
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .play-main-btn:active {
   transform: scale(0.96);
 }
 
-.volume-control-wrap {
+/* 弹出式音量条浮层 */
+.volume-pop-wrapper {
+  position: relative;
+}
+
+.volume-slider-popover {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  right: 0;
+  width: 175px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
-  max-width: 175px;
-  background: var(--surface);
-  padding: 5px 10px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
+  z-index: 50;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
-.vol-icon-btn {
+.vol-mute-btn {
   background: transparent;
   border: none;
   color: var(--muted);
   cursor: pointer;
-  padding: 4px;
+  padding: 2px;
   display: flex;
   align-items: center;
   transition: color 0.15s ease;
 }
 
-.vol-icon-btn:hover {
+.vol-mute-btn:hover {
   color: var(--accent);
 }
 
@@ -491,6 +558,17 @@ function formatRemainingTime(seconds: number): string {
   font-variant-numeric: tabular-nums;
   text-align: right;
   user-select: none;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
 }
 
 /* 底部状态 */
@@ -546,11 +624,5 @@ function formatRemainingTime(seconds: number): string {
   background: var(--accent);
   color: #ffffff;
   border-color: var(--accent);
-}
-
-@media (max-width: 480px) {
-  .volume-control-wrap {
-    max-width: 125px;
-  }
 }
 </style>

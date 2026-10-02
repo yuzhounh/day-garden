@@ -96,15 +96,20 @@ let searchTimer: number | undefined
 let timer: number | undefined
 
 const showAudioPopover = ref(false)
+const showPopoverVolume = ref(false)
 const audioMenu = ref<HTMLElement | null>(null)
 
 function toggleAudioPopover() {
   showAudioPopover.value = !showAudioPopover.value
+  if (!showAudioPopover.value) {
+    showPopoverVolume.value = false
+  }
 }
 
 function closeAudioPopover(event: MouseEvent) {
   if (!audioMenu.value?.contains(event.target as Node)) {
     showAudioPopover.value = false
+    showPopoverVolume.value = false
   }
 }
 
@@ -131,6 +136,7 @@ function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     showCities.value = false
     showAudioPopover.value = false
+    showPopoverVolume.value = false
     clearSearch()
   }
 }
@@ -341,40 +347,71 @@ onUnmounted(() => {
               <p class="popover-track-desc">{{ currentTrack.subtitle }}</p>
             </div>
 
-            <!-- 控制按钮 -->
+            <!-- 控制按钮：随机在左、三键居中、音量在右（点击弹出音量条） -->
             <div class="popover-controls-row">
-              <button class="popover-ctrl-btn" title="随机切换" aria-label="随机切换" @click="randomTrack">
-                <Shuffle :size="14" />
-              </button>
-              <button class="popover-ctrl-btn" title="上一曲" aria-label="上一曲" @click="prevTrack">
-                <SkipBack :size="15" />
-              </button>
-              <button
-                class="popover-play-btn"
-                :title="audioState.isPlaying ? '暂停' : '播放'"
-                :aria-label="audioState.isPlaying ? '暂停' : '播放'"
-                @click="togglePlay"
-              >
-                <Pause v-if="audioState.isPlaying" :size="16" />
-                <Play v-else :size="16" />
-              </button>
-              <button class="popover-ctrl-btn" title="下一曲" aria-label="下一曲" @click="nextTrack">
-                <SkipForward :size="15" />
-              </button>
-              <button class="popover-mute-btn" :title="audioState.isMuted ? '取消静音' : '静音'" @click="toggleMute">
-                <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="15" />
-                <Volume2 v-else :size="15" />
-              </button>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                step="1"
-                :value="audioState.volume"
-                class="popover-volume-slider"
-                aria-label="音量调节"
-                @input="setVolume(Number(($event.target as HTMLInputElement).value))"
-              />
+              <!-- 左：随机切换 -->
+              <div class="popover-ctrls-left">
+                <button class="popover-ctrl-btn" title="随机切换" aria-label="随机切换" @click="randomTrack">
+                  <Shuffle :size="14" />
+                </button>
+              </div>
+
+              <!-- 中：后退、播放、前进居中 -->
+              <div class="popover-ctrls-center">
+                <button class="popover-ctrl-btn" title="上一曲" aria-label="上一曲" @click="prevTrack">
+                  <SkipBack :size="15" />
+                </button>
+                <button
+                  class="popover-play-btn"
+                  :title="audioState.isPlaying ? '暂停' : '播放'"
+                  :aria-label="audioState.isPlaying ? '暂停' : '播放'"
+                  @click="togglePlay"
+                >
+                  <Pause v-if="audioState.isPlaying" :size="16" />
+                  <Play v-else :size="16" />
+                </button>
+                <button class="popover-ctrl-btn" title="下一曲" aria-label="下一曲" @click="nextTrack">
+                  <SkipForward :size="15" />
+                </button>
+              </div>
+
+              <!-- 右：音量键与弹出滑块 -->
+              <div class="popover-ctrls-right popover-volume-wrapper">
+                <button
+                  class="popover-ctrl-btn vol-toggle-btn"
+                  :class="{ 'is-active': showPopoverVolume }"
+                  :title="showPopoverVolume ? '收起音量' : '调节音量'"
+                  @click.stop="showPopoverVolume = !showPopoverVolume"
+                >
+                  <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="15" />
+                  <Volume2 v-else :size="15" />
+                </button>
+
+                <!-- 点击音量键后弹出的滑块浮层 -->
+                <Transition name="fade-slide">
+                  <div v-if="showPopoverVolume" class="popover-volume-pop glass-panel" @click.stop>
+                    <button
+                      class="popover-mute-mini-btn"
+                      :title="audioState.isMuted ? '取消静音' : '静音'"
+                      @click="toggleMute"
+                    >
+                      <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="13" />
+                      <Volume2 v-else :size="13" />
+                    </button>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      :value="audioState.isMuted ? 0 : audioState.volume"
+                      class="popover-volume-slider"
+                      aria-label="音量调节"
+                      @input="setVolume(Number(($event.target as HTMLInputElement).value))"
+                    />
+                    <span class="popover-vol-num">{{ audioState.isMuted ? '0%' : audioState.volume + '%' }}</span>
+                  </div>
+                </Transition>
+              </div>
             </div>
 
             <!-- 曲目选择器 -->
