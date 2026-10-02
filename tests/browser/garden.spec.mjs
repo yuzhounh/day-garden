@@ -123,21 +123,54 @@ test('Disabled modules do not load their content libraries; loaded poetry remain
   }
 })
 
+test('Login methods separate Google from email registration and password login', async ({ page }, testInfo) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
+  await expect(page.getByText('无需单独注册，首次登录会自动创建账户。')).toBeVisible()
+  await expect(page.locator('#garden-username')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: /GitHub/ })).toHaveCount(0)
+  await page.locator('.account-modal').screenshot({ path: `tmp/account-google-${testInfo.project.name}.png` })
+  await page.getByRole('button', { name: '邮箱与密码', exact: true }).click()
+  await expect(page.getByRole('button', { name: '使用 Google 账户登录', exact: true })).toHaveCount(0)
+  await expect(page.locator('#garden-password-confirmation')).toHaveCount(0)
+  await page.locator('.account-modal').screenshot({ path: `tmp/account-email-${testInfo.project.name}.png` })
+  await page.getByRole('button', { name: '创建账户', exact: true }).click()
+  const email = `flow${testInfo.project.name}@example.com`
+  const password = 'GardenBrowserTest2026'
+  await page.locator('#garden-username').fill(email)
+  await page.locator('#garden-password').fill(password)
+  await page.locator('#garden-password-confirmation').fill('DifferentPassword2026')
+  await page.getByRole('button', { name: '创建账户并登录', exact: true }).click()
+  await expect(page.getByRole('alert')).toHaveText('两次输入的密码不一致，请重新确认。')
+  await page.locator('#garden-password-confirmation').fill(password)
+  await page.getByRole('button', { name: '创建账户并登录', exact: true }).click()
+  await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
+  await page.getByRole('button', { name: '退出账户', exact: true }).click()
+  await page.locator('#garden-username').fill(email)
+  await page.locator('#garden-password').fill(password)
+  await page.getByRole('button', { name: '登录并同步', exact: true }).click()
+  await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
+})
+
 test('Two accounts and guest apply their own city, weather and theme; an upgrade backup requires explicit recovery', async ({ page }, testInfo) => {
   await page.goto('/')
   const origin = new URL(page.url()).origin
   const legacyId = 'upgrade-' + testInfo.project.name
   const accounts = []
-  for (const provider of ['google', 'github']) {
-    await page.request.post('/api/auth/mock', { data: { provider }, headers: { Origin: origin } })
-    accounts.push((await (await page.request.get('/api/session')).json()).user)
-  }
+  await page.request.post('/api/auth/mock', { data: { provider: 'google' }, headers: { Origin: origin } })
+  accounts.push((await (await page.request.get('/api/session')).json()).user)
+  const passwordUsername = 'prefs' + testInfo.project.name
+  const password = 'GardenBrowserTest2026'
+  const registration = await page.request.post('/api/register', { data: { username: passwordUsername, password }, headers: { Origin: origin } })
+  expect(registration.ok()).toBe(true)
+  accounts.push((await registration.json()).user)
   await page.request.post('/api/logout', { headers: { Origin: origin } })
   await page.evaluate(({ accounts, city, legacyId }) => {
     localStorage.setItem('daygarden_user_prefs_' + accounts[0].id, JSON.stringify({ theme: 'dark', selectedCity: city, customEvents: [{ id: legacyId, title: '旧本机日程', date: '10-09', type: 'birthday' }] }))
     localStorage.setItem('daygarden_user_prefs_' + accounts[1].id, JSON.stringify({ theme: 'light', selectedCity: { name: '北京', province: '北京', lat: 39.9, lon: 116.4 }, customEvents: [] }))
   }, { accounts, city, legacyId })
   await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
+  await expect(page.getByRole('button', { name: /GitHub/ })).toHaveCount(0)
   await page.getByRole('button', { name: '模拟 Google 登录', exact: true }).click()
   await expect(page.getByRole('button', { name: '合并旧本机日程', exact: true })).toBeVisible()
   expect((await (await page.request.get('/api/state')).json()).customEvents.some(event => event.id === legacyId)).toBe(false)
@@ -149,7 +182,10 @@ test('Two accounts and guest apply their own city, weather and theme; an upgrade
   await expect(page.locator('.weather-panel')).toContainText('25')
   await page.getByRole('button', { name: '云端已同步' }).click()
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
-  await page.getByRole('button', { name: '模拟 GitHub 登录', exact: true }).click()
+  await page.getByRole('button', { name: '邮箱与密码', exact: true }).click()
+  await page.locator('#garden-username').fill(passwordUsername)
+  await page.locator('#garden-password').fill(password)
+  await page.getByRole('button', { name: '登录并同步', exact: true }).click()
   await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(page.locator('html')).not.toHaveClass(/dark/)

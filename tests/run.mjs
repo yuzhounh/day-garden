@@ -60,6 +60,8 @@ try {
   if (!ready) throw new Error('Test server did not become ready: ' + log)
   const testEnv = { ...environment, TEST_BASE_URL: base }
   await run(['tests/api.mjs'], root, testEnv)
+  // Start browser authentication flows without the API rate-limit test's exhausted counter.
+  await run([wrangler, 'd1', 'execute', 'day-garden-test', '--local', '--persist-to', persistence, '--config', config, '--command', 'DELETE FROM auth_attempts'], sandbox)
   await run([resolve(root, 'node_modules/@playwright/test/cli.js'), 'test', ...process.argv.slice(2)], root, testEnv)
   console.log('All regression checks passed; only the isolated test database was used.')
 } catch (error) {

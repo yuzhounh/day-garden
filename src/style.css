@@ -1407,6 +1407,21 @@
 .settings-content input, .settings-content select { border-radius: 10px; font-size: 14px; }
 .account-intro { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 23px; }
 .account-intro p { font-size: 14px; line-height: 1.8; color: var(--secondary); }
+.detail-modal.account-modal { width: min(520px, 100%); background: #f8faf8; }
+.dark .detail-modal.account-modal { background: #1c1e24; }
+.account-modal .account-intro { margin-bottom: 20px; }
+.login-methods { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; gap: 4px; margin-bottom: 24px; border-radius: 13px; background: var(--surface); border: 1px solid var(--line); }
+.login-methods button { padding: 10px 8px; border-radius: 9px; color: var(--muted); font-size: 14px; font-weight: 500; cursor: pointer; }
+.login-methods button[aria-pressed="true"] { background: var(--sage-bg); color: var(--accent); box-shadow: 0 1px 4px rgba(20, 35, 25, .06); }
+.login-methods button:focus-visible, .auth-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.auth-panel-copy { margin-bottom: 8px; }
+.auth-panel-copy h3 { font-size: 17px; font-weight: 600; line-height: 1.5; color: var(--ink); }
+.auth-panel-copy p, .auth-hint { font-size: 13px; color: var(--muted); line-height: 1.7; margin-top: 5px; }
+.account-modal .merge-choice { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; line-height: 1.7; color: var(--secondary); margin: 6px 0; }
+.account-modal .merge-choice input { flex-shrink: 0; margin-top: 4px; }
+.auth-switch { text-align: center; font-size: 13px; color: var(--muted); margin-top: 4px; }
+.auth-switch button { color: var(--accent); font-weight: 600; padding: 4px; cursor: pointer; }
+.auth-local-note { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12px; line-height: 1.7; color: var(--muted); text-align: center; }
 .account-form { display: flex; flex-direction: column; gap: 12px; }
 .account-form > label { font-size: 14px; color: var(--ink); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .account-form label small { font-size: 12px; color: var(--muted); }

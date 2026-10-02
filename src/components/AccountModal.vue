@@ -15,9 +15,12 @@ import {
 } from '../services/sync'
 
 const emit = defineEmits<{ close: [] }>()
+const loginMethod = ref<'google' | 'email'>('google')
 const register = ref(false)
 const username = ref('')
 const password = ref('')
+const passwordConfirmation = ref('')
+const formError = ref('')
 const mergeGuest = ref(true)
 const submitted = ref(false)
 
@@ -28,34 +31,48 @@ const message = computed(() => {
 })
 
 const hasGoogle = computed(() => account.user?.providers?.includes('google'))
-const hasGithub = computed(() => account.user?.providers?.includes('github'))
 const avatarFailed = ref(false)
 watch(() => account.user?.avatarUrl, () => { avatarFailed.value = false })
+watch([loginMethod, register], () => {
+  submitted.value = false
+  formError.value = ''
+  account.error = ''
+  password.value = ''
+  passwordConfirmation.value = ''
+})
 
 async function submit() {
   submitted.value = true
+  formError.value = ''
+  if (register.value && password.value !== passwordConfirmation.value) {
+    formError.value = '两次输入的密码不一致，请重新确认。'
+    return
+  }
   try {
     await signIn(username.value, password.value, register.value, mergeGuest.value)
+    register.value = false
     password.value = ''
+    passwordConfirmation.value = ''
   } catch {
     /* The account error is displayed below */
   }
 }
 
-function handleOAuth(provider: 'google' | 'github' = 'google') {
-  loginWithOAuth(provider, mergeGuest.value)
+function handleOAuth() {
+  submitted.value = true
+  loginWithOAuth('google', mergeGuest.value)
 }
 
-function handleMock(provider: 'google' | 'github' = 'google') {
-  void loginWithMock(provider, mergeGuest.value)
+function handleMock() {
+  void loginWithMock('google', mergeGuest.value)
 }
 </script>
 
 <template>
-  <DetailModal title="让花园，与你同行" subtitle="YOUR GARDEN, EVERYWHERE" @close="emit('close')">
+  <DetailModal class="account-modal" :title="account.user ? '我的花园账户' : '登录我的花园'" subtitle="DAY GARDEN" @close="emit('close')">
     <div class="account-intro">
       <span class="icon-tile sage"><Cloud :size="19" /></span>
-      <p>登录同一个账户，同步诗词收藏、每日打卡和重要日子。城市、主题与随笔仍在本机保存。</p>
+      <p>登录后，诗词收藏、每日打卡和重要日子会在你的设备间同步。</p>
     </div>
 
     <!-- 登录后账户概览 -->
@@ -82,7 +99,6 @@ function handleMock(provider: 'google' | 'github' = 'google') {
                   <Check :size="12" />{{ account.status === 'synced' ? '已同步' : account.status === 'syncing' ? '同步中' : '本机已保存' }}
                 </span>
                 <span v-if="hasGoogle" class="pill lavender">Google 绑定</span>
-                <span v-if="hasGithub" class="pill lavender">GitHub 绑定</span>
               </div>
             </div>
           </div>
@@ -106,9 +122,21 @@ function handleMock(provider: 'google' | 'github' = 'google') {
       </div>
     </template>
 
-    <!-- 未登录：快捷社交登录与密码登录 -->
+    <!-- 未登录：一次只显示一种登录方式 -->
     <template v-else>
-      <div class="oauth-options">
+      <div class="login-methods" role="group" aria-label="登录方式">
+        <button type="button" :aria-pressed="loginMethod === 'google'" :disabled="account.busy" @click="loginMethod = 'google'">Google 登录</button>
+        <button type="button" :aria-pressed="loginMethod === 'email'" :disabled="account.busy" @click="loginMethod = 'email'">邮箱与密码</button>
+      </div>
+
+      <div v-if="loginMethod === 'google'" class="oauth-options">
+        <div class="auth-panel-copy">
+          <h3>用 Google 账户直接登录</h3>
+          <p>无需单独注册，首次登录会自动创建账户。</p>
+        </div>
+        <label class="merge-choice">
+          <input v-model="mergeGuest" type="checkbox" />合并此浏览器里的收藏、打卡和重要日子
+        </label>
         <div class="oauth-grid">
           <!-- Google 登录按钮 -->
           <button
@@ -116,7 +144,7 @@ function handleMock(provider: 'google' | 'github' = 'google') {
             type="button"
             :disabled="account.busy || !authProviders.google"
             aria-label="使用 Google 账户登录"
-            @click="handleOAuth('google')"
+            @click="handleOAuth()"
           >
             <svg class="oauth-icon" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -126,42 +154,37 @@ function handleMock(provider: 'google' | 'github' = 'google') {
             </svg>
             <span>使用 Google 账户登录</span>
           </button>
-          <button class="oauth-btn" type="button" :disabled="account.busy || !authProviders.github" aria-label="使用 GitHub 账户登录" @click="handleOAuth('github')">使用 GitHub 账户登录</button>
         </div>
 
-        <label class="merge-choice">
-          <input v-model="mergeGuest" type="checkbox" />合并本机未登录时的收藏、打卡与重要日子
-        </label>
+        <p v-if="!authProviders.google" class="auth-hint">Google 登录暂不可用，请选择邮箱与密码。</p>
+        <p v-if="submitted && account.error" class="account-error" role="alert">{{ account.error }}</p>
 
         <!-- 本地调试免配置模拟体验 -->
         <div v-if="authProviders.dev" class="oauth-mock-banner">
           <span>🛠️ 本地开发模拟体验：</span>
-          <button class="oauth-mock-btn" type="button" @click="handleMock('google')">模拟 Google 登录</button>
-          <button class="oauth-mock-btn" type="button" @click="handleMock('github')">模拟 GitHub 登录</button>
+          <button class="oauth-mock-btn" type="button" @click="handleMock()">模拟 Google 登录</button>
         </div>
       </div>
 
-      <div class="oauth-divider"><span>或使用邮箱 / 密码登录</span></div>
-
-      <div class="filter-pills">
-        <button :class="{ active: !register }" :aria-pressed="!register" @click="register = false">登录</button>
-        <button :class="{ active: register }" :aria-pressed="register" @click="register = true">创建账户</button>
-      </div>
-
-      <form class="account-form" @submit.prevent="submit">
-        <label for="garden-username">邮箱或用户名<small>支持邮箱地址或 3—32 位字母数字</small></label>
+      <form v-else class="account-form" @submit.prevent="submit">
+        <div class="auth-panel-copy">
+          <h3>{{ register ? '创建邮箱账户' : '登录邮箱账户' }}</h3>
+          <p>{{ register ? '使用邮箱和密码注册，创建后即可登录并同步。' : '使用已注册的邮箱和密码登录。' }}</p>
+        </div>
+        <label for="garden-username">{{ register ? '邮箱' : '邮箱或用户名' }}</label>
         <input
           id="garden-username"
           v-model="username"
           name="username"
+          :type="register ? 'email' : 'text'"
           autocomplete="username"
           minlength="3"
           maxlength="64"
           required
-          placeholder="例如 yourname@example.com 或 gardener"
+          placeholder="yourname@example.com"
         />
 
-        <label for="garden-password">密码<small>至少 10 位，请妥善保存</small></label>
+        <label for="garden-password">密码<small v-if="register">至少 10 位</small></label>
         <input
           id="garden-password"
           v-model="password"
@@ -171,16 +194,28 @@ function handleMock(provider: 'google' | 'github' = 'google') {
           minlength="10"
           maxlength="128"
           required
-          placeholder="你的花园钥匙"
+          :placeholder="register ? '设置登录密码' : '输入登录密码'"
         />
 
-        <p v-if="submitted && account.error" class="account-error" role="alert">{{ account.error }}</p>
+        <template v-if="register">
+          <label for="garden-password-confirmation">确认密码</label>
+          <input id="garden-password-confirmation" v-model="passwordConfirmation" name="password-confirmation" type="password" autocomplete="new-password" minlength="10" maxlength="128" required placeholder="再次输入密码" />
+          <p class="auth-hint">暂不提供密码找回，请妥善保存密码。</p>
+        </template>
+        <label class="merge-choice">
+          <input v-model="mergeGuest" type="checkbox" />合并此浏览器里的收藏、打卡和重要日子
+        </label>
+        <p v-if="formError || (submitted && account.error)" class="account-error" role="alert">{{ formError || account.error }}</p>
         <button class="soft-button account-submit" :disabled="account.busy">
-          {{ account.busy ? '正在连接…' : register ? '创建我的花园账户' : '登录并同步' }}
+          {{ account.busy ? '正在连接…' : register ? '创建账户并登录' : '登录并同步' }}
         </button>
+        <p class="auth-switch">
+          {{ register ? '已有账户？' : '还没有账户？' }}
+          <button type="button" :disabled="account.busy" @click="register = !register">{{ register ? '返回登录' : '创建账户' }}</button>
+        </p>
       </form>
 
-      <p class="content-footnote">支持已配置的 Google、GitHub 或邮箱/用户名密码登录。随笔与其他偏好保存在当前浏览器；关闭页面后不会在后台发送通知。</p>
+      <p class="auth-local-note">城市、主题与随笔仅保存在当前浏览器。</p>
     </template>
 
   </DetailModal>
