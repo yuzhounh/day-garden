@@ -350,14 +350,14 @@ onUnmounted(() => {
               <!-- 左：随机切换 -->
               <div class="popover-ctrls-left">
                 <button class="popover-ctrl-btn" title="随机切换" aria-label="随机切换" @click="randomTrack">
-                  <Shuffle :size="14" />
+                  <Shuffle :size="16" />
                 </button>
               </div>
 
               <!-- 中：后退、播放、前进居中 -->
               <div class="popover-ctrls-center">
                 <button class="popover-ctrl-btn" title="上一曲" aria-label="上一曲" @click="prevTrack">
-                  <SkipBack :size="15" />
+                  <SkipBack :size="16" />
                 </button>
                 <button
                   class="popover-play-btn"
@@ -365,11 +365,11 @@ onUnmounted(() => {
                   :aria-label="audioState.isPlaying ? '暂停' : '播放'"
                   @click="togglePlay"
                 >
-                  <Pause v-if="audioState.isPlaying" :size="16" />
-                  <Play v-else :size="16" />
+                  <Pause v-if="audioState.isPlaying" :size="18" />
+                  <Play v-else :size="18" />
                 </button>
                 <button class="popover-ctrl-btn" title="下一曲" aria-label="下一曲" @click="nextTrack">
-                  <SkipForward :size="15" />
+                  <SkipForward :size="16" />
                 </button>
               </div>
 
@@ -381,8 +381,8 @@ onUnmounted(() => {
                   :title="showPopoverVolume ? '收起音量' : '调节音量'"
                   @click.stop="showPopoverVolume = !showPopoverVolume"
                 >
-                  <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="15" />
-                  <Volume2 v-else :size="15" />
+                  <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="16" />
+                  <Volume2 v-else :size="16" />
                 </button>
 
                 <!-- 点击音量键后弹出的滑块浮层 -->

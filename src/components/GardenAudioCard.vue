@@ -132,7 +132,7 @@ onUnmounted(() => {
             aria-label="随机切换"
             @click="randomTrack"
           >
-            <Shuffle :size="15" />
+            <Shuffle :size="17" />
           </button>
         </div>
 
@@ -145,7 +145,7 @@ onUnmounted(() => {
             aria-label="上一首"
             @click="prevTrack"
           >
-            <SkipBack :size="15" />
+            <SkipBack :size="17" />
           </button>
 
           <button
@@ -155,8 +155,8 @@ onUnmounted(() => {
             :aria-label="audioState.isPlaying ? '暂停' : '播放'"
             @click="togglePlay"
           >
-            <Pause v-if="audioState.isPlaying" :size="19" />
-            <Play v-else :size="19" class="translate-x-0.5" />
+            <Pause v-if="audioState.isPlaying" :size="20" />
+            <Play v-else :size="20" class="translate-x-0.5" />
           </button>
 
           <button
@@ -166,7 +166,7 @@ onUnmounted(() => {
             aria-label="下一首"
             @click="nextTrack"
           >
-            <SkipForward :size="15" />
+            <SkipForward :size="17" />
           </button>
         </div>
 
@@ -180,8 +180,8 @@ onUnmounted(() => {
             :aria-label="showVolumeBar ? '收起音量调节' : '展开音量调节'"
             @click.stop="showVolumeBar = !showVolumeBar"
           >
-            <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="15" />
-            <Volume2 v-else :size="15" />
+            <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="17" />
+            <Volume2 v-else :size="17" />
           </button>
 
           <!-- 点击后弹出的毛玻璃音量条浮层 -->
@@ -523,9 +523,9 @@ onUnmounted(() => {
 }
 
 .ctrl-icon-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   border: none;
   background: transparent;
   color: var(--secondary);
