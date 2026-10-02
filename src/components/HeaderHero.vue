@@ -14,6 +14,14 @@ import {
   X,
   Loader2,
   GripVertical,
+  Headphones,
+  Play,
+  Pause,
+  SkipForward,
+  SkipBack,
+  Volume2,
+  VolumeX,
+  Timer,
 } from 'lucide-vue-next'
 import { getTodayCalendarInfo } from '../services/calendar'
 import {
@@ -24,6 +32,24 @@ import {
 } from '../services/weather'
 import type { CityOption } from '../types'
 import { account } from '../services/sync'
+import {
+  audioState,
+  currentTrack,
+  AUDIO_TRACKS,
+  togglePlay,
+  playTrack,
+  prevTrack,
+  nextTrack,
+  setVolume,
+  toggleMute,
+  setSleepTimer,
+} from '../services/audio'
+
+function formatSleepRemaining(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
 
 const props = defineProps<{
   selectedCity: CityOption
@@ -67,6 +93,19 @@ const recentCities = ref<CityOption[]>(getRecentCities())
 let searchTimer: number | undefined
 let timer: number | undefined
 
+const showAudioPopover = ref(false)
+const audioMenu = ref<HTMLElement | null>(null)
+
+function toggleAudioPopover() {
+  showAudioPopover.value = !showAudioPopover.value
+}
+
+function closeAudioPopover(event: MouseEvent) {
+  if (!audioMenu.value?.contains(event.target as Node)) {
+    showAudioPopover.value = false
+  }
+}
+
 function toggleCities() {
   showCities.value = !showCities.value
   if (showCities.value) {
@@ -89,6 +128,7 @@ function closeCities(event: MouseEvent) {
 function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     showCities.value = false
+    showAudioPopover.value = false
     clearSearch()
   }
 }
@@ -141,6 +181,7 @@ onMounted(() => {
   query.addEventListener('change', updateSystem)
   timer = window.setInterval(() => { now.value = new Date() }, 30000)
   document.addEventListener('click', closeCities)
+  document.addEventListener('click', closeAudioPopover)
   document.addEventListener('keydown', onKey)
 })
 
@@ -149,6 +190,7 @@ onUnmounted(() => {
   clearTimeout(searchTimer)
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', updateSystem)
   document.removeEventListener('click', closeCities)
+  document.removeEventListener('click', closeAudioPopover)
   document.removeEventListener('keydown', onKey)
 })
 </script>
@@ -293,6 +335,103 @@ onUnmounted(() => {
           <Cloud v-else-if="account.user" :size="17" />
           <UserRound v-else :size="17" />
         </button>
+
+        <!-- 听见花园 · 放松轻音与白噪音入口 (Scheme A) -->
+        <div ref="audioMenu" class="header-audio-control">
+          <button
+            class="icon-button header-audio-btn"
+            :class="{ 'is-playing': audioState.isPlaying, 'is-active': showAudioPopover }"
+            :aria-label="audioState.isPlaying ? '正在播放：' + currentTrack.name : '听见花园 · 放松轻音'"
+            :title="audioState.isPlaying ? '正在播放：' + currentTrack.name : '听见花园 · 放松轻音'"
+            @click="toggleAudioPopover"
+          >
+            <div v-if="audioState.isPlaying" class="header-audio-waves" aria-hidden="true">
+              <span class="bar bar-1"></span>
+              <span class="bar bar-2"></span>
+              <span class="bar bar-3"></span>
+            </div>
+            <Headphones v-else :size="17" />
+          </button>
+
+          <!-- 导航栏悬浮迷你播放器 -->
+          <div v-if="showAudioPopover" class="header-audio-popover glass-panel" @click.stop>
+            <div class="popover-track-info">
+              <div class="popover-track-badge">
+                <span class="popover-badge-dot" :class="{ 'is-active': audioState.isPlaying }"></span>
+                <span>{{ currentTrack.category === 'nature' ? '自然声景' : '精选电台' }}</span>
+              </div>
+              <h4 class="popover-track-title">{{ currentTrack.name }}</h4>
+              <p class="popover-track-desc">{{ currentTrack.subtitle }}</p>
+            </div>
+
+            <!-- 控制按钮 -->
+            <div class="popover-controls-row">
+              <button class="popover-ctrl-btn" title="上一曲" aria-label="上一曲" @click="prevTrack">
+                <SkipBack :size="15" />
+              </button>
+              <button
+                class="popover-play-btn"
+                :title="audioState.isPlaying ? '暂停' : '播放'"
+                :aria-label="audioState.isPlaying ? '暂停' : '播放'"
+                @click="togglePlay"
+              >
+                <Pause v-if="audioState.isPlaying" :size="16" />
+                <Play v-else :size="16" />
+              </button>
+              <button class="popover-ctrl-btn" title="下一曲" aria-label="下一曲" @click="nextTrack">
+                <SkipForward :size="15" />
+              </button>
+              <button class="popover-mute-btn" :title="audioState.isMuted ? '取消静音' : '静音'" @click="toggleMute">
+                <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="15" />
+                <Volume2 v-else :size="15" />
+              </button>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                :value="audioState.volume"
+                class="popover-volume-slider"
+                aria-label="音量调节"
+                @input="setVolume(Number(($event.target as HTMLInputElement).value))"
+              />
+            </div>
+
+            <!-- 曲目选择器 -->
+            <div class="popover-track-list">
+              <button
+                v-for="track in AUDIO_TRACKS"
+                :key="track.id"
+                class="popover-track-chip"
+                :class="{ active: audioState.currentTrackId === track.id }"
+                @click="playTrack(track.id)"
+              >
+                <span class="chip-name">{{ track.name }}</span>
+                <span v-if="audioState.currentTrackId === track.id && audioState.isPlaying" class="chip-pulse"></span>
+              </button>
+            </div>
+
+            <!-- 定时关闭 -->
+            <div class="popover-timer-row">
+              <span class="popover-timer-label">
+                <Timer :size="12" />
+                <span v-if="audioState.sleepTimerRemaining > 0">{{ formatSleepRemaining(audioState.sleepTimerRemaining) }} 后静止</span>
+                <span v-else>定时关闭</span>
+              </span>
+              <div class="popover-timer-pills">
+                <button
+                  v-for="m in [0, 15, 30, 60]"
+                  :key="m"
+                  class="popover-timer-pill"
+                  :class="{ active: audioState.sleepTimerMinutes === m }"
+                  @click="setSleepTimer(m)"
+                >
+                  {{ m === 0 ? '关' : m + '分' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- 主题切换 -->
         <button

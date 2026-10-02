@@ -299,6 +299,64 @@
 .city-result-item strong { font-weight: 500; color: var(--ink); }
 .city-result-item small { margin-left: 8px; color: var(--muted); font-size: 12px; }
 .city-loading-hint, .city-empty-hint { padding: 18px 8px; font-size: 12.5px; color: var(--muted); text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+/* 听见花园 · Scheme A 顶栏音乐播放入口与悬浮窗 */
+.header-audio-control { position: relative; z-index: 20; }
+.header-audio-btn.is-playing { background: var(--sage-bg); color: var(--accent); border-color: var(--accent); }
+.header-audio-waves { display: flex; align-items: flex-end; justify-content: center; gap: 2.5px; width: 16px; height: 16px; }
+.header-audio-waves .bar { width: 2.5px; background: var(--accent); border-radius: 2px; animation: header-wave-bounce 0.8s ease-in-out infinite alternate; }
+.header-audio-waves .bar-1 { height: 6px; animation-delay: 0.1s; }
+.header-audio-waves .bar-2 { height: 14px; animation-delay: 0.35s; }
+.header-audio-waves .bar-3 { height: 8px; animation-delay: 0.2s; }
+
+@keyframes header-wave-bounce {
+  0% { height: 3px; }
+  100% { height: 14px; }
+}
+
+.header-audio-popover {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 9px);
+  width: 320px;
+  border-radius: 20px;
+  padding: 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-edge);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 100;
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+}
+.popover-track-info { display: flex; flex-direction: column; gap: 4px; }
+.popover-track-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; }
+.popover-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.popover-badge-dot.is-active { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6); }
+.popover-track-title { font-size: 16px; font-weight: 600; color: var(--ink); margin: 0; line-height: 1.2; }
+.popover-track-desc { font-size: 12px; color: var(--secondary); margin: 0; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.popover-controls-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.popover-ctrl-btn { background: transparent; border: none; color: var(--secondary); display: grid; place-items: center; padding: 4px; border-radius: 6px; cursor: pointer; transition: all .15s ease; }
+.popover-ctrl-btn:hover { color: var(--ink); background: rgba(0,0,0,0.05); }
+.popover-play-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; border: none; display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(68, 107, 78, 0.3); transition: transform .15s ease, background .15s ease; }
+.popover-play-btn:hover { transform: scale(1.05); }
+.popover-play-btn:active { transform: scale(0.95); }
+.popover-mute-btn { background: transparent; border: none; color: var(--secondary); display: grid; place-items: center; padding: 4px; border-radius: 6px; cursor: pointer; margin-left: 2px; }
+.popover-volume-slider { flex: 1; height: 4px; -webkit-appearance: none; appearance: none; background: var(--line); border-radius: 2px; outline: none; cursor: pointer; }
+.popover-volume-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+.popover-track-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 130px; overflow-y: auto; }
+.popover-track-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; font-size: 11.5px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--secondary); cursor: pointer; transition: all .15s ease; }
+.popover-track-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--sage-bg); }
+.popover-track-chip.active { border-color: var(--accent); background: var(--sage-bg); color: var(--accent); font-weight: 600; }
+.popover-track-chip .chip-pulse { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: pulse-dot 1.5s infinite; }
+.popover-timer-row { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--line); font-size: 11px; }
+.popover-timer-label { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); }
+.popover-timer-pills { display: flex; align-items: center; gap: 4px; }
+.popover-timer-pill { border: 1px solid var(--line); background: var(--surface); color: var(--secondary); font-size: 10.5px; padding: 2px 6px; border-radius: 6px; cursor: pointer; transition: all .15s ease; }
+.popover-timer-pill:hover { border-color: var(--accent); color: var(--accent); }
+.popover-timer-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 .hero-intro { display: flex; align-items: center; justify-content: space-between; position: relative; padding: 30px 0 34px; gap: 32px; }
 .hero-copy { flex: 1 1 auto; min-width: 0; max-width: 620px; position: relative; z-index: 1; }
 .eyebrow { font-size: 12px; font-weight: 500; letter-spacing: 1.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 7px; line-height: 1.6; }
@@ -1715,6 +1773,7 @@
   .brand-symbol { width: 36px; height: 36px; border-radius: 11px; }
   .header-actions { gap: 4px; }
   .header-actions .icon-button { width: 34px; height: 34px; }
+  .header-audio-popover { width: calc(100vw - 32px); max-width: 320px; right: -50px; }
   .toolbar-button { padding: 8px; }
   .toolbar-button > svg:last-child { display: none; }
   .hero-copy > .eyebrow { max-width: 100%; font-size: 10px; }

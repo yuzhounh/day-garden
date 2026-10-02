@@ -149,6 +149,14 @@ function importData(e: Event) {
 
           <label
             class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+            @click.prevent="toggleModule('gardenAudio')"
+          >
+            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">听见花园 · 放松轻音与白噪音</span>
+            <input type="checkbox" :checked="preferences.modules.gardenAudio ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+          </label>
+
+          <label
+            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
             @click.prevent="toggleModule('seasonal')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">四时物候与花期</span>

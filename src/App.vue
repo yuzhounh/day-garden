@@ -12,6 +12,7 @@ import InspirationalQuoteCard from './components/InspirationalQuoteCard.vue'
 import ChinaAttractionsCard from './components/ChinaAttractionsCard.vue'
 import SportsExerciseCard from './components/SportsExerciseCard.vue'
 import QuickNoteCard from './components/QuickNoteCard.vue'
+import GardenAudioCard from './components/GardenAudioCard.vue'
 import HealthTipBar from './components/HealthTipBar.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import AccountModal from './components/AccountModal.vue'
@@ -324,6 +325,9 @@ onUnmounted(() => {
               :events="upcomingEvents"
               :custom-events="prefs.customEvents"
               @update:custom-events="handleUpdateCustomEvents"
+            />
+            <GardenAudioCard
+              v-else-if="cardId === 'gardenAudio'"
             />
             <DailyPageCard
               v-else-if="cardId === 'dailyPoetry'"

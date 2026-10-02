@@ -15,6 +15,7 @@ const NOTES_STORAGE_KEY = 'daygarden_quick_notes_v1'
 export const DEFAULT_CARD_ORDER: string[] = [
   'calendar',
   'upcoming',
+  'gardenAudio',
   'dailyPoetry',
   'inspirationalQuote',
   'quickNotes',
@@ -40,6 +41,7 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
     weather: true,
     calendar: true,
     upcoming: true,
+    gardenAudio: true,
     seasonal: true,
     evidence: true,
     dailyPoetry: true,

@@ -134,6 +134,7 @@ export interface UserPreferences {
     chinaAttractions?: boolean
     sportsExercise?: boolean
     quickNotes?: boolean
+    gardenAudio?: boolean
     healthTip: boolean
   }
   cardOrder?: string[]
