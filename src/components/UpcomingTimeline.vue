@@ -1,12 +1,26 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Cake, Gift, Heart, Plus, BookOpen } from 'lucide-vue-next'
 import type { LifeEvent } from '../types'
 import { isRedundantMemo, isAnniversaryEvent } from '../services/calendar'
-defineProps<{ events: LifeEvent[] }>()
-const emit = defineEmits<{
-  (e: 'add-event'): void
-  (e: 'manage-events'): void
+import EventsModal from './EventsModal.vue'
+
+defineProps<{
+  events: LifeEvent[]
+  customEvents: LifeEvent[]
 }>()
+
+const emit = defineEmits<{
+  (e: 'update:customEvents', events: LifeEvent[]): void
+}>()
+
+const showModal = ref(false)
+const initialAdd = ref(false)
+
+function openModal(withAdd: boolean) {
+  initialAdd.value = withAdd
+  showModal.value = true
+}
 </script>
 
 <template>
@@ -17,17 +31,19 @@ const emit = defineEmits<{
         <h2>岁月里程</h2>
         <span class="eyebrow">MILESTONES</span>
       </div>
-      <button class="icon-button small" aria-label="添加纪念日" @click="emit('add-event')">
+      <button class="icon-button small" aria-label="添加纪念日" @click="openModal(true)">
         <Plus :size="16" />
       </button>
     </header>
+
     <div v-if="!events.length" class="event-empty">
       <Heart :size="28" :stroke-width="1" />
       <p>暂无临近的纪念日，记下那些温暖的时刻。</p>
-      <button class="text-button" @click="emit('add-event')">
+      <button class="text-button" @click="openModal(true)">
         记下一个纪念日<Plus :size="14" />
       </button>
     </div>
+
     <div v-else class="event-list">
       <div v-for="event in events.slice(0, 4)" :key="event.id" class="event-row">
         <span class="event-icon" :class="isAnniversaryEvent(event) ? 'anniversary' : event.type">
@@ -45,11 +61,21 @@ const emit = defineEmits<{
         </span>
       </div>
     </div>
+
     <footer class="card-footer">
-      <button class="text-button" type="button" @click="emit('manage-events'); emit('add-event')">
+      <button class="text-button" type="button" @click="openModal(false)">
         <BookOpen :size="14" />管理纪念日
       </button>
       <span class="muted">未来 30 天 · {{ events.length }} 个日子</span>
     </footer>
+
+    <!-- 独立的生日与纪念日管理弹窗 -->
+    <EventsModal
+      v-if="showModal"
+      :custom-events="customEvents"
+      :initial-add="initialAdd"
+      @close="showModal = false"
+      @update:custom-events="emit('update:customEvents', $event)"
+    />
   </article>
 </template>

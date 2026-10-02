@@ -38,7 +38,7 @@ const weatherDays = ref<WeatherDay[]>([])
 const weatherLoading = ref(false)
 const showSettings = ref(false)
 const showAccount = ref(false)
-const settingsTab = ref<'modules' | 'events' | 'notification'>('modules')
+const settingsTab = ref<'modules' | 'notification'>('modules')
 const dateKey = ref(localDateKey())
 const seasonBloom = ref(getTodaySeasonBloom())
 const evidenceGuide = ref(getTodayEvidenceGuide())
@@ -118,8 +118,16 @@ function handleUpdateAttractionStatus(newMap: Record<string, AttractionStatusTyp
   saveUserPreferences(prefs.value, account.user?.id)
 }
 
-function openSettings(tab?: 'modules' | 'events' | 'notification' | unknown) {
-  if (typeof tab === 'string' && (tab === 'modules' || tab === 'events' || tab === 'notification')) {
+function handleUpdateCustomEvents(events: LifeEvent[]) {
+  prefs.value = {
+    ...prefs.value,
+    customEvents: events,
+  }
+  saveUserPreferences(prefs.value, account.user?.id)
+}
+
+function openSettings(tab?: 'modules' | 'notification' | unknown) {
+  if (tab === 'notification' || tab === 'modules') {
     settingsTab.value = tab
   } else {
     settingsTab.value = 'modules'
@@ -191,8 +199,8 @@ onUnmounted(() => {
           <UpcomingTimeline
             v-if="prefs.modules.upcoming"
             :events="upcomingEvents"
-            @add-event="openSettings('events')"
-            @manage-events="openSettings('events')"
+            :custom-events="prefs.customEvents"
+            @update:custom-events="handleUpdateCustomEvents"
           />
           <DailyPageCard
             v-if="prefs.modules.dailyPoetry"
