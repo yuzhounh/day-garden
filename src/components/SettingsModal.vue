@@ -166,42 +166,26 @@ function importData(e: Event) {
 
           <label
             class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+            @click.prevent="toggleModule('chinaAttractions')"
+          >
+            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">华夏胜景 · 中国旅游景点</span>
+            <input type="checkbox" :checked="preferences.modules.chinaAttractions ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+          </label>
+
+          <label
+            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
             @click.prevent="toggleModule('seasonal')"
           >
-            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">四时物候与花期</span>
+            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">四时花信 · 物候与花期</span>
             <input type="checkbox" :checked="preferences.modules.seasonal ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
-          </label>
-
-          <label
-            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
-            @click.prevent="toggleModule('dailyPoetry')"
-          >
-            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">今日一页 · 诗词名句</span>
-            <input type="checkbox" :checked="preferences.modules.dailyPoetry ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
-          </label>
-
-          <label
-            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
-            @click.prevent="toggleModule('inspirationalQuote')"
-          >
-            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">积极励志 · 名言语录</span>
-            <input type="checkbox" :checked="preferences.modules.inspirationalQuote ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
             class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
             @click.prevent="toggleModule('evidence')"
           >
-            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">循证生活高性价比锦囊</span>
+            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">生活有方 · 循证生活锦囊</span>
             <input type="checkbox" :checked="preferences.modules.evidence ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
-          </label>
-
-          <label
-            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
-            @click.prevent="toggleModule('chinaAttractions')"
-          >
-            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">中国最值得去的旅游景点</span>
-            <input type="checkbox" :checked="preferences.modules.chinaAttractions ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -210,6 +194,22 @@ function importData(e: Event) {
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">动健身心 · 运动项目指南</span>
             <input type="checkbox" :checked="preferences.modules.sportsExercise ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+          </label>
+
+          <label
+            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+            @click.prevent="toggleModule('dailyPoetry')"
+          >
+            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">今日诗笺 · 今日一页诗词</span>
+            <input type="checkbox" :checked="preferences.modules.dailyPoetry ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+          </label>
+
+          <label
+            class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
+            @click.prevent="toggleModule('inspirationalQuote')"
+          >
+            <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">名言语录 · 积极励志语录</span>
+            <input type="checkbox" :checked="preferences.modules.inspirationalQuote ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label

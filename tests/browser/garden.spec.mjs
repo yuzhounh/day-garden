@@ -80,6 +80,7 @@ test('Mock sign-in changes account theme and city together; event creation queue
   await page.route('**/api/events/**', route => route.abort())
   await page.getByRole('button', { name: '确认添加', exact: true }).click()
   await expect.poll(() => page.evaluate(id => JSON.parse(localStorage.getItem('daygarden_account_' + id)).pending.length, user.id)).toBeGreaterThan(0)
+  await page.waitForTimeout(500)
   await page.unroute('**/api/events/**')
   await page.evaluate(() => window.dispatchEvent(new Event('online')))
   await expect.poll(async () => (await (await page.request.get('/api/state')).json()).customEvents.some(event => event.title === '浏览器回归生日'), { timeout: 15000 }).toBe(true)

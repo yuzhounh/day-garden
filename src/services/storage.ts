@@ -13,38 +13,51 @@ export const DEFAULT_CARD_ORDER: string[] = [
   'quickNotes',
   'upcoming',
   'gardenAudio',
+  'chinaAttractions',
   'seasonal',
+  'evidence',
+  'sportsExercise',
   'dailyPoetry',
   'inspirationalQuote',
-  'evidence',
-  'chinaAttractions',
-  'sportsExercise',
 ]
 
-const LEGACY_DEFAULT_ORDER: string[] = [
-  'calendar',
-  'upcoming',
-  'gardenAudio',
-  'dailyPoetry',
-  'inspirationalQuote',
-  'quickNotes',
-  'seasonal',
-  'evidence',
-  'chinaAttractions',
-  'sportsExercise',
-]
-
-const PREVIOUS_DEFAULT_ORDER: string[] = [
-  'calendar',
-  'upcoming',
-  'quickNotes',
-  'gardenAudio',
-  'seasonal',
-  'dailyPoetry',
-  'inspirationalQuote',
-  'evidence',
-  'chinaAttractions',
-  'sportsExercise',
+const LEGACY_DEFAULT_ORDERS: string[][] = [
+  [
+    'calendar',
+    'upcoming',
+    'gardenAudio',
+    'dailyPoetry',
+    'inspirationalQuote',
+    'quickNotes',
+    'seasonal',
+    'evidence',
+    'chinaAttractions',
+    'sportsExercise',
+  ],
+  [
+    'calendar',
+    'upcoming',
+    'quickNotes',
+    'gardenAudio',
+    'seasonal',
+    'dailyPoetry',
+    'inspirationalQuote',
+    'evidence',
+    'chinaAttractions',
+    'sportsExercise',
+  ],
+  [
+    'calendar',
+    'quickNotes',
+    'upcoming',
+    'gardenAudio',
+    'seasonal',
+    'dailyPoetry',
+    'inspirationalQuote',
+    'evidence',
+    'chinaAttractions',
+    'sportsExercise',
+  ],
 ]
 
 export function getNormalizedCardOrder(customOrder?: string[]): string[] {
@@ -55,7 +68,7 @@ export function getNormalizedCardOrder(customOrder?: string[]): string[] {
     customOrder.length === target.length &&
     customOrder.every((k, i) => k === target[i])
 
-  if (isMatching(LEGACY_DEFAULT_ORDER) || isMatching(PREVIOUS_DEFAULT_ORDER)) {
+  if (LEGACY_DEFAULT_ORDERS.some(isMatching)) {
     return [...DEFAULT_CARD_ORDER]
   }
 
