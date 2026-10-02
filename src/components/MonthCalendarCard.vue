@@ -231,11 +231,17 @@ function selectCell(cell: CalendarCell) {
         <button class="icon-button small" aria-label="上一月" type="button" @click="prevMonth">
           <ChevronLeft :size="16" />
         </button>
-        <button v-if="!isCurrentViewToday" class="cal-today-pill" type="button" @click="goToday">
-          今天
-        </button>
         <button class="icon-button small" aria-label="下一月" type="button" @click="nextMonth">
           <ChevronRight :size="16" />
+        </button>
+        <button
+          class="cal-today-pill"
+          :class="{ active: isCurrentViewToday }"
+          type="button"
+          title="返回今天"
+          @click="goToday"
+        >
+          今天
         </button>
       </div>
     </header>

@@ -430,11 +430,17 @@
   color: var(--secondary);
   transition: all .2s;
   cursor: pointer;
+  white-space: nowrap;
 }
 .cal-today-pill:hover {
   background: var(--sage-bg);
   color: var(--accent);
   border-color: var(--accent);
+}
+.cal-today-pill.active {
+  background: var(--sage-bg);
+  color: var(--accent);
+  border-color: rgba(90, 158, 106, 0.4);
 }
 .cal-week-row {
   display: grid;
