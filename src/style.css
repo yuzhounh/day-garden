@@ -183,10 +183,10 @@
 .dashboard-caption { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 7px; letter-spacing: .5px; }
 .weather-panel { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; border-radius: 22px; padding: 24px 26px; margin-bottom: 20px; }
 .weather-summary { display: flex; flex-direction: column; border-right: 1px solid var(--line); padding-right: 22px; }
-.summary-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 16px; }
+.summary-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .summary-header > .eyebrow { font-size: 12px; letter-spacing: 1.2px; color: var(--muted); }
 .summary-city { font-size: 13px; font-weight: 600; color: var(--ink); background: var(--surface); border: 1px solid var(--line); padding: 2px 8px; border-radius: 12px; }
-.today-content { display: flex; flex-direction: column; }
+.today-content { display: flex; flex-direction: column; margin: auto 0; }
 .today-main { display: flex; align-items: center; gap: 18px; margin-bottom: 6px; }
 .today-temp { font-size: 54px; font-weight: 300; line-height: 1.05; letter-spacing: -2.5px; color: var(--ink); }
 .today-temp > span { font-size: 30px; vertical-align: top; margin-left: 2px; }
@@ -195,12 +195,12 @@
 .today-condition-text { font-weight: 500; color: var(--ink); font-size: 15.5px; }
 .today-condition-dot { color: var(--muted); font-size: 13px; }
 .today-range { color: var(--secondary); font-size: 13.5px; }
-.today-sub-tags { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.today-sub-tags { display: flex; flex-direction: column; gap: 8px; }
 .today-tag { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; color: var(--secondary); background: rgba(110, 133, 104, 0.08); padding: 6.5px 12px; border-radius: 9px; border: 1px solid rgba(110, 133, 104, 0.1); }
 .dark .today-tag { background: rgba(110, 133, 104, 0.15); border-color: rgba(110, 133, 104, 0.22); }
 .today-tag-label { display: inline-flex; align-items: center; gap: 6px; }
 .today-tag-val { font-weight: 600; color: var(--ink); }
-.today-hint { font-size: 12.5px; line-height: 1.6; color: var(--muted); background: var(--surface); border-radius: 12px; padding: 11px 14px; border: 1px solid var(--line); margin-top: auto; margin-bottom: 0; }
+.today-hint { font-size: 12.5px; line-height: 1.6; color: var(--muted); background: var(--surface); border-radius: 12px; padding: 11px 14px; border: 1px solid var(--line); margin-top: 0; margin-bottom: 0; }
 .dark .today-hint { background: rgba(255, 255, 255, 0.03); border-color: var(--line); }
 .weather-placeholder { padding: 20px 0; color: var(--secondary); font-size: 14px; }
 .forecast-heading { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--secondary); margin-bottom: 11px; gap: 8px; }
@@ -1288,6 +1288,7 @@
   .dashboard-caption { display: none; }
   .weather-panel { grid-template-columns: 1fr; gap: 16px; }
   .weather-summary { border-right: 0; padding: 0; }
+  .today-content { margin: 12px 0; }
   .today-hint { margin-top: 8px; }
   .forecast-area { border-top: 1px solid var(--line); padding-top: 15px; }
   .forecast-heading small { display: inline; }
