@@ -232,28 +232,34 @@ function importData(e: Event) {
   <DetailModal title="布置你的今日花园" subtitle="PERSONALIZE YOUR GARDEN" class="settings-content" @close="emit('close')">
 
       <!-- Tab Nav -->
-      <div class="flex border-b border-slate-100 dark:border-slate-800 px-6 shrink-0 bg-slate-50/50 dark:bg-slate-800/30">
-        <button
-          @click="currentTab = 'modules'"
-          class="py-3 px-3 text-xs font-medium border-b-2 transition"
-          :class="currentTab === 'modules' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-        >
-          模块开关
-        </button>
-        <button
-          @click="currentTab = 'events'"
-          class="py-3 px-3 text-xs font-medium border-b-2 transition"
-          :class="currentTab === 'events' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-        >
-          生日与纪念日管理
-        </button>
-        <button
-          @click="currentTab = 'notification'"
-          class="py-3 px-3 text-xs font-medium border-b-2 transition"
-          :class="currentTab === 'notification' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-        >
-          提醒与数据备份
-        </button>
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 shrink-0 bg-slate-50/50 dark:bg-slate-800/30">
+        <div class="flex">
+          <button
+            @click="currentTab = 'modules'"
+            class="py-3 px-3 text-xs font-medium border-b-2 transition"
+            :class="currentTab === 'modules' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
+          >
+            模块开关
+          </button>
+          <button
+            @click="currentTab = 'events'"
+            class="py-3 px-3 text-xs font-medium border-b-2 transition"
+            :class="currentTab === 'events' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
+          >
+            生日与纪念日管理
+          </button>
+          <button
+            @click="currentTab = 'notification'"
+            class="py-3 px-3 text-xs font-medium border-b-2 transition"
+            :class="currentTab === 'notification' ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
+          >
+            提醒与数据备份
+          </button>
+        </div>
+        <div class="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400 select-none">
+          <Check :size="12" class="text-emerald-500" />
+          <span>修改实时自动保存</span>
+        </div>
       </div>
 
       <!-- Tab Content Area -->
@@ -264,7 +270,7 @@ function importData(e: Event) {
             极简原则：建议首页启用不超过 6 个模块，确保每天 30 秒内扫视完毕，绝不变成让人刷屏的信息流。
           </p>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2">
             <label
               class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
               @click.prevent="toggleModule('weather')"
@@ -396,12 +402,12 @@ function importData(e: Event) {
           </div>
 
           <!-- Existing List in 2-Column Responsive Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <template v-for="ev in sortedEvents" :key="ev.id">
               <!-- Inline Edit Form (spans 2 columns if in grid) -->
               <div
                 v-if="editingId === ev.id"
-                class="md:col-span-2 p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition"
+                class="sm:col-span-2 p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition"
               >
                 <div class="flex items-center justify-between text-xs font-semibold text-emerald-800 dark:text-emerald-300">
                   <span class="flex items-center gap-1.5">
@@ -548,16 +554,16 @@ function importData(e: Event) {
         </div>
 
         <!-- 3. 提醒与数据备份 -->
-        <div v-if="currentTab === 'notification'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-xs font-medium text-slate-800 dark:text-slate-200">桌面与 PWA 系统级提醒</div>
-                <div class="text-[11px] text-slate-400 mt-0.5">当命中 14天前/3天前/当天 阈值时触发系统弹窗</div>
-              </div>
+        <div v-if="currentTab === 'notification'" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3 flex flex-col justify-between">
+            <div class="space-y-1">
+              <div class="text-xs font-medium text-slate-800 dark:text-slate-200">桌面与 PWA 系统级提醒</div>
+              <div class="text-[11px] text-slate-400 leading-relaxed">当命中 14天前/3天前/当天 阈值时触发系统弹窗</div>
+            </div>
+            <div class="pt-1">
               <button
                 @click="handleTestNotification"
-                class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition"
+                class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium transition"
               >
                 授权并测试推送
               </button>
@@ -570,9 +576,11 @@ function importData(e: Event) {
             </div>
           </div>
 
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3">
-            <div class="text-xs font-medium text-slate-800 dark:text-slate-200">数据备份与迁移</div>
-            <div class="text-[11px] text-slate-400">将所有自定义生日、偏好导出为 JSON 文件，随时导入到手机或其他电脑。</div>
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3 flex flex-col justify-between">
+            <div class="space-y-1">
+              <div class="text-xs font-medium text-slate-800 dark:text-slate-200">数据备份与迁移</div>
+              <div class="text-[11px] text-slate-400 leading-relaxed">将所有自定义生日、偏好导出为 JSON 文件，随时导入到手机或其他电脑。</div>
+            </div>
             <div class="flex items-center gap-3 pt-1">
               <button
                 @click="exportData"
@@ -590,16 +598,6 @@ function importData(e: Event) {
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="px-6 py-3 border-t border-slate-100 dark:border-slate-800 flex justify-end shrink-0">
-        <button
-          @click="emit('close')"
-          class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 text-xs font-medium transition"
-        >
-          完成
-        </button>
       </div>
   </DetailModal>
 </template>
