@@ -541,10 +541,6 @@ onUnmounted(() => {
   color: var(--accent);
 }
 
-.ctrl-icon-btn.random-btn:hover {
-  transform: rotate(15deg);
-}
-
 .ctrl-icon-btn.vol-toggle-btn.is-active {
   background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
