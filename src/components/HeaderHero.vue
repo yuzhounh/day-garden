@@ -313,32 +313,7 @@ onUnmounted(() => {
 
         <span class="toolbar-divider"></span>
 
-        <!-- 开启/退出卡片排序模式 -->
-        <button
-          class="icon-button sort-mode-toggle"
-          :class="{ 'is-active': sortMode }"
-          :aria-label="sortMode ? '退出排序模式' : '开启排序模式'"
-          :title="sortMode ? '退出排序模式' : '开启排序模式'"
-          :aria-pressed="Boolean(sortMode)"
-          @click="emit('toggle-sort-mode')"
-        >
-          <Check v-if="sortMode" :size="17" class="sort-active-check" />
-          <GripVertical v-else :size="17" />
-        </button>
-
-        <!-- 账户同步按钮 -->
-        <button
-          class="icon-button account-button"
-          :aria-label="account.user ? (account.status === 'synced' ? '云端已同步' : account.status === 'syncing' ? '同步中' : '本机已保存') : '我的花园 · 账户与云端同步'"
-          :title="account.user ? (account.status === 'synced' ? '云端已同步' : account.status === 'syncing' ? '同步中' : '本机已保存') : '我的花园 · 账户与云端同步'"
-          @click="emit('open-account')"
-        >
-          <Loader2 v-if="account.status === 'syncing'" :size="17" class="animate-spin text-emerald-600 dark:text-emerald-400" />
-          <Cloud v-else-if="account.user" :size="17" />
-          <UserRound v-else :size="17" />
-        </button>
-
-        <!-- 听见花园 · 放松轻音与白噪音入口 (Scheme A) -->
+        <!-- 1. 音乐：听见花园 · 放松轻音与白噪音入口 (Scheme A) -->
         <div ref="audioMenu" class="header-audio-control">
           <button
             class="icon-button header-audio-btn"
@@ -438,7 +413,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- 主题切换 -->
+        <!-- 2. 深色模式：主题切换 -->
         <button
           class="icon-button"
           :aria-label="isDark ? '切换浅色模式' : '切换深色模式'"
@@ -448,7 +423,32 @@ onUnmounted(() => {
           <Moon v-else :size="17" />
         </button>
 
-        <!-- 设置入口 -->
+        <!-- 3. 同步：账户同步按钮 -->
+        <button
+          class="icon-button account-button"
+          :aria-label="account.user ? (account.status === 'synced' ? '云端已同步' : account.status === 'syncing' ? '同步中' : '本机已保存') : '我的花园 · 账户与云端同步'"
+          :title="account.user ? (account.status === 'synced' ? '云端已同步' : account.status === 'syncing' ? '同步中' : '本机已保存') : '我的花园 · 账户与云端同步'"
+          @click="emit('open-account')"
+        >
+          <Loader2 v-if="account.status === 'syncing'" :size="17" class="animate-spin text-emerald-600 dark:text-emerald-400" />
+          <Cloud v-else-if="account.user" :size="17" />
+          <UserRound v-else :size="17" />
+        </button>
+
+        <!-- 4. 排序：开启/退出卡片排序模式 -->
+        <button
+          class="icon-button sort-mode-toggle"
+          :class="{ 'is-active': sortMode }"
+          :aria-label="sortMode ? '退出排序模式' : '开启排序模式'"
+          :title="sortMode ? '退出排序模式' : '开启排序模式'"
+          :aria-pressed="Boolean(sortMode)"
+          @click="emit('toggle-sort-mode')"
+        >
+          <Check v-if="sortMode" :size="17" class="sort-active-check" />
+          <GripVertical v-else :size="17" />
+        </button>
+
+        <!-- 5. 设置：设置入口 -->
         <button
           class="icon-button"
           aria-label="布置我的花园 · 设置与个性化"
