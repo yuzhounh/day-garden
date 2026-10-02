@@ -24,6 +24,7 @@ import {
   VolumeX,
   Timer,
 } from 'lucide-vue-next'
+import BrandLogo from './BrandLogo.vue'
 import { getTodayCalendarInfo } from '../services/calendar'
 import { useCurrentTime } from '../services/day'
 import {
@@ -240,7 +241,7 @@ onUnmounted(() => {
   <header class="garden-header">
     <div class="topbar">
       <a class="brand" href="#today" aria-label="Day Garden 首页">
-        <span class="brand-symbol"><Sprout :size="23" :stroke-width="1.5" /></span>
+        <span class="brand-symbol"><BrandLogo :size="36" /></span>
         <span>Day Garden<small>今 日 花 园</small></span>
       </a>
 

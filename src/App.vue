@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, watch, defineAsyncComponent } from 'vue'
-import { Sprout, GripVertical } from 'lucide-vue-next'
+import { GripVertical } from 'lucide-vue-next'
+import BrandLogo from './components/BrandLogo.vue'
 import HeaderHero from './components/HeaderHero.vue'
 import WeatherTimeline from './components/WeatherTimeline.vue'
 import LazyCard from './components/LazyCard.vue'
@@ -333,9 +334,9 @@ onUnmounted(() => {
 
         <!-- 最下面：好好照顾自己卡片（全宽） -->
         <LazyCard v-if="prefs.modules.healthTip" title="好好照顾自己"><DailyContentCard kind="healthTip" /></LazyCard>
-        <div v-if="!Object.values(prefs.modules).some(Boolean)" class="glass-panel empty-dashboard"><Sprout :size="32" /><h2>花园留白，随你安排。</h2><button class="soft-button" @click="openSettings()">选择想看的内容</button></div>
+        <div v-if="!Object.values(prefs.modules).some(Boolean)" class="glass-panel empty-dashboard"><BrandLogo :size="32" /><h2>花园留白，随你安排。</h2><button class="soft-button" @click="openSettings()">选择想看的内容</button></div>
       </main>
-      <footer class="garden-footer"><span><Sprout :size="13" />Day Garden · 今日花园</span><p>心有闲田，日有花开。</p><button class="text-button" @click="openSettings('modules')">布置我的花园</button></footer>
+      <footer class="garden-footer"><span><BrandLogo :size="16" />Day Garden · 今日花园</span><p>心有闲田，日有花开。</p><button class="text-button" @click="openSettings('modules')">布置我的花园</button></footer>
     </div>
     <SettingsModal v-if="showSettings" :preferences="prefs" :initial-tab="settingsTab" @close="showSettings = false" @update:preferences="handleUpdatePreferences" />
     <AccountModal v-if="showAccount" @close="showAccount = false" />
