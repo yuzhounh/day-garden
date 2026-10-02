@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Cloud, Check, Download, RefreshCw, LogOut, User as UserIcon } from 'lucide-vue-next'
+import { ref, computed, watch } from 'vue'
+import { Cloud, Check, RefreshCw, LogOut, User as UserIcon } from 'lucide-vue-next'
 import DetailModal from './DetailModal.vue'
 import {
   account,
   signIn,
   signOut,
   refreshCloud,
-  exportGardenData,
   loginWithOAuth,
   loginWithMock,
   authProviders,
+  legacyCustomEvents,
+  recoverLegacyEvents,
 } from '../services/sync'
 
 const emit = defineEmits<{ close: [] }>()
@@ -21,12 +22,15 @@ const mergeGuest = ref(true)
 const submitted = ref(false)
 
 const message = computed(() => {
-  if (account.status === 'synced') return '收藏和打卡已同步到云端。'
+  if (account.status === 'synced') return '收藏、打卡和重要日子已同步到云端。'
   if (account.status === 'syncing') return '正在同步你的花园…'
   return '内容已保存在本机，等待云端同步。'
 })
 
 const hasGoogle = computed(() => account.user?.providers?.includes('google'))
+const hasGithub = computed(() => account.user?.providers?.includes('github'))
+const avatarFailed = ref(false)
+watch(() => account.user?.avatarUrl, () => { avatarFailed.value = false })
 
 async function submit() {
   submitted.value = true
@@ -38,11 +42,11 @@ async function submit() {
   }
 }
 
-function handleOAuth(provider: 'google' = 'google') {
+function handleOAuth(provider: 'google' | 'github' = 'google') {
   loginWithOAuth(provider, mergeGuest.value)
 }
 
-function handleMock(provider: 'google' = 'google') {
+function handleMock(provider: 'google' | 'github' = 'google') {
   void loginWithMock(provider, mergeGuest.value)
 }
 </script>
@@ -51,7 +55,7 @@ function handleMock(provider: 'google' = 'google') {
   <DetailModal title="让花园，与你同行" subtitle="YOUR GARDEN, EVERYWHERE" @close="emit('close')">
     <div class="account-intro">
       <span class="icon-tile sage"><Cloud :size="19" /></span>
-      <p>本地保存一直可用。登录同一个账户，让诗词收藏与每日打卡在不同设备间安心同步。</p>
+      <p>登录同一个账户，同步诗词收藏、每日打卡和重要日子。城市、主题与随笔仍在本机保存。</p>
     </div>
 
     <!-- 登录后账户概览 -->
@@ -60,11 +64,12 @@ function handleMock(provider: 'google' = 'google') {
         <div class="account-summary-main">
           <div class="account-user-card">
             <img
-              v-if="account.user.avatarUrl"
+              v-if="account.user.avatarUrl && !avatarFailed"
               :src="account.user.avatarUrl"
               class="user-avatar-img"
               alt="用户头像"
               referrerpolicy="no-referrer"
+              @error="avatarFailed = true"
             />
             <div v-else class="user-avatar-fallback">
               <UserIcon :size="22" />
@@ -77,6 +82,7 @@ function handleMock(provider: 'google' = 'google') {
                   <Check :size="12" />{{ account.status === 'synced' ? '已同步' : account.status === 'syncing' ? '同步中' : '本机已保存' }}
                 </span>
                 <span v-if="hasGoogle" class="pill lavender">Google 绑定</span>
+                <span v-if="hasGithub" class="pill lavender">GitHub 绑定</span>
               </div>
             </div>
           </div>
@@ -94,6 +100,10 @@ function handleMock(provider: 'google' = 'google') {
       </div>
 
       <p v-if="account.error" class="account-error" role="status">{{ account.error }}</p>
+      <div v-if="legacyCustomEvents.length" class="account-backup">
+        <p>本机保留了 {{ legacyCustomEvents.length }} 条旧日程备份。合并仅补回云端缺少的日程；已有日程保留云端内容。</p>
+        <button class="soft-button" :disabled="account.busy" @click="recoverLegacyEvents">合并旧本机日程</button>
+      </div>
     </template>
 
     <!-- 未登录：快捷社交登录与密码登录 -->
@@ -104,7 +114,7 @@ function handleMock(provider: 'google' = 'google') {
           <button
             class="oauth-btn google-oauth-btn"
             type="button"
-            :disabled="account.busy"
+            :disabled="account.busy || !authProviders.google"
             aria-label="使用 Google 账户登录"
             @click="handleOAuth('google')"
           >
@@ -116,16 +126,18 @@ function handleMock(provider: 'google' = 'google') {
             </svg>
             <span>使用 Google 账户登录</span>
           </button>
+          <button class="oauth-btn" type="button" :disabled="account.busy || !authProviders.github" aria-label="使用 GitHub 账户登录" @click="handleOAuth('github')">使用 GitHub 账户登录</button>
         </div>
 
         <label class="merge-choice">
-          <input v-model="mergeGuest" type="checkbox" />合并本机未登录时的收藏与打卡
+          <input v-model="mergeGuest" type="checkbox" />合并本机未登录时的收藏、打卡与重要日子
         </label>
 
         <!-- 本地调试免配置模拟体验 -->
         <div v-if="authProviders.dev" class="oauth-mock-banner">
           <span>🛠️ 本地开发模拟体验：</span>
           <button class="oauth-mock-btn" type="button" @click="handleMock('google')">模拟 Google 登录</button>
+          <button class="oauth-mock-btn" type="button" @click="handleMock('github')">模拟 GitHub 登录</button>
         </div>
       </div>
 
@@ -168,14 +180,8 @@ function handleMock(provider: 'google' = 'google') {
         </button>
       </form>
 
-      <p class="content-footnote">账户用于同步收藏与打卡。支持通过 Google 快捷登录，或使用邮箱/用户名密码登录。城市与自定义日程仍保存在本机。</p>
+      <p class="content-footnote">支持已配置的 Google、GitHub 或邮箱/用户名密码登录。随笔与其他偏好保存在当前浏览器；关闭页面后不会在后台发送通知。</p>
     </template>
 
-    <div class="account-backup">
-      <button class="text-button" @click="exportGardenData()">
-        <Download :size="14" />导出收藏与打卡备份
-      </button>
-      <span class="muted">为喜欢的日常，留一份副本。</span>
-    </div>
   </DetailModal>
 </template>
