@@ -193,8 +193,10 @@ const chartData = computed(() => {
         <span role="status">{{ source }}</span>
       </div>
 
-      <div v-if="loading && !days.length" class="forecast-grid" aria-label="正在加载">
-        <div v-for="n in 10" :key="n" class="weather-skeleton"></div>
+      <div v-if="loading && !days.length" class="trend-scroll-container" aria-label="正在加载">
+        <div class="forecast-grid">
+          <div v-for="n in 10" :key="n" class="weather-skeleton"></div>
+        </div>
       </div>
 
       <div v-else-if="chartData" class="trend-scroll-container">

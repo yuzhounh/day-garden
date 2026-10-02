@@ -205,10 +205,8 @@
 .weather-placeholder { padding: 20px 0; color: var(--secondary); font-size: 14px; }
 .forecast-heading { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--secondary); margin-bottom: 11px; gap: 8px; }
 .forecast-heading small { color: var(--muted); font-size: 12px; font-weight: normal; margin-left: 10px; }
-.forecast-heading > span:last-child { font-size: 12px; font-weight: normal; color: var(--muted); display: flex; align-items: center; gap: 4px; text-align: right; }
-.forecast-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
-.weather-placeholder { padding: 20px 0; color: var(--secondary); font-size: 14px; }
-.weather-skeleton { height: 160px; border-radius: 14px; background: var(--sage-bg); animation: breathe 1.5s ease-in-out infinite alternate; }
+.forecast-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; min-width: 620px; padding: 4px 2px; }
+.weather-skeleton { height: 236px; border-radius: 14px; background: var(--sage-bg); animation: breathe 1.5s ease-in-out infinite alternate; }
 
 .trend-scroll-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .trend-grid-wrapper {
