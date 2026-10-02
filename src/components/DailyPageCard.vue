@@ -90,9 +90,19 @@ function setAsHomePoem(poem: CuratedPoetry) {
 
     <!-- 单诗全篇弹窗 -->
     <DetailModal v-if="showFull" :title="poetry.title" :subtitle="'〔' + poetry.dynasty + '〕' + poetry.author" @close="showFull = false">
+      <template #actions>
+        <button
+          class="icon-button"
+          :class="{ active: isSaved }"
+          :title="isSaved ? '已收藏 · 点击取消' : '收藏这首诗'"
+          :aria-label="isSaved ? '已收藏 · 点击取消' : '收藏这首诗'"
+          @click="toggleSave()"
+        >
+          <Bookmark :size="18" :class="isSaved ? 'fill-emerald-500 text-emerald-500' : ''" />
+        </button>
+      </template>
       <div class="full-poem"><p v-for="(line, i) in fullLines" :key="i">{{ line }}</p></div>
-      <div class="reading-note"><span class="eyebrow">读诗随想</span><p>{{ poetry.reading || poetry.mood }}</p></div>
-      <button class="soft-button" :aria-pressed="isSaved" @click="toggleSave()"><Bookmark :size="15" />{{ isSaved ? '已收藏 · 点击取消' : '收藏这首诗' }}</button>
+      <div class="reading-note" style="margin-bottom: 0;"><span class="eyebrow">读诗随想</span><p>{{ poetry.reading || poetry.mood }}</p></div>
     </DetailModal>
 
     <!-- 诗词小集全量沉浸浏览弹窗 -->

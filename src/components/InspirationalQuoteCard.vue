@@ -99,6 +99,18 @@ function setAsHomeQuote(q: InspirationalQuote) {
       :subtitle="quote.source || quote.tag"
       @close="showFull = false"
     >
+      <template #actions>
+        <button
+          class="icon-button"
+          :class="{ active: copied }"
+          :title="copied ? '已复制到剪贴板' : '复制此句至剪贴板'"
+          :aria-label="copied ? '已复制到剪贴板' : '复制此句至剪贴板'"
+          @click="copyQuote"
+        >
+          <Check v-if="copied" :size="18" class="text-emerald-500" />
+          <Copy v-else :size="18" />
+        </button>
+      </template>
       <div class="full-quote-modal">
         <blockquote class="modal-quote-text">“{{ quote.quote }}”</blockquote>
         <div class="modal-credit-row">
@@ -107,15 +119,10 @@ function setAsHomeQuote(q: InspirationalQuote) {
           <span class="pill sky">{{ quote.tag }}</span>
         </div>
       </div>
-      <div class="reading-note">
+      <div class="reading-note" style="margin-bottom: 0;">
         <span class="eyebrow">生活心力解读</span>
         <p>{{ quote.insight }}</p>
       </div>
-      <button class="soft-button" @click="copyQuote">
-        <Check v-if="copied" :size="15" />
-        <Copy v-else :size="15" />
-        {{ copied ? '已复制到剪贴板' : '复制此句至剪贴板' }}
-      </button>
     </DetailModal>
 
     <!-- 语录库全量浏览弹窗 -->

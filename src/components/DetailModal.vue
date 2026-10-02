@@ -39,8 +39,14 @@ onUnmounted(() => {
     <div class="modal-backdrop" @click.self="emit('close')">
       <section ref="panel" class="detail-modal glass-panel focus:outline-none" :class="$attrs.class" role="dialog" aria-modal="true" :aria-labelledby="titleId" tabindex="-1">
         <header class="modal-heading">
-          <div><p v-if="subtitle" class="eyebrow">{{ subtitle }}</p><h2 :id="titleId">{{ title }}</h2></div>
-          <button class="icon-button" aria-label="关闭" @click="emit('close')"><X :size="18" /></button>
+          <div class="min-w-0 flex-1">
+            <p v-if="subtitle" class="eyebrow truncate">{{ subtitle }}</p>
+            <h2 :id="titleId" class="truncate">{{ title }}</h2>
+          </div>
+          <div class="modal-header-actions">
+            <slot name="actions" />
+            <button class="icon-button" aria-label="关闭" title="关闭" @click="emit('close')"><X :size="18" /></button>
+          </div>
         </header>
         <div class="modal-content"><slot /></div>
       </section>
