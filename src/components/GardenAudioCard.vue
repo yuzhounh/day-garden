@@ -17,10 +17,14 @@ import {
   Coffee,
   Sparkles,
   SunMedium,
+  ListMusic,
+  Search,
 } from 'lucide-vue-next'
 import {
+  AUDIO_TRACKS,
   currentTrack,
   audioState,
+  playTrack,
   togglePlay,
   prevTrack,
   nextTrack,
@@ -29,6 +33,42 @@ import {
   toggleMute,
   setSleepTimer,
 } from '../services/audio'
+import DetailModal from './DetailModal.vue'
+
+const showLibrary = ref(false)
+const searchQuery = ref('')
+const filterCategory = ref<'all' | 'nature' | 'music'>('all')
+
+const categories = [
+  { label: '全部曲目', val: 'all' as const },
+  { label: '自然白噪音', val: 'nature' as const },
+  { label: '舒缓轻电台', val: 'music' as const },
+]
+
+const filteredTracks = computed(() => {
+  let list = AUDIO_TRACKS
+  if (filterCategory.value !== 'all') {
+    list = list.filter((t) => t.category === filterCategory.value)
+  }
+  const q = searchQuery.value.trim().toLowerCase()
+  if (q) {
+    list = list.filter(
+      (t) =>
+        t.name.toLowerCase().includes(q) ||
+        t.subtitle.toLowerCase().includes(q) ||
+        t.quote.toLowerCase().includes(q)
+    )
+  }
+  return list
+})
+
+function selectAndPlay(trackId: string) {
+  if (audioState.currentTrackId === trackId) {
+    togglePlay()
+  } else {
+    playTrack(trackId)
+  }
+}
 
 const showVolumeBar = ref(false)
 const volumeWrapRef = ref<HTMLElement | null>(null)
@@ -260,14 +300,17 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- 卡片底部：状态显示与定时关闭 -->
+    <!-- 卡片底部：曲目库入口与定时关闭 -->
     <footer class="card-footer">
-      <div class="audio-footer-status">
-        <span class="status-indicator-dot" :class="{ active: audioState.isPlaying }"></span>
-        <span class="status-text">
-          {{ audioState.isPlaying ? '正在播放 · ' + currentTrack.name : '已暂停 · 点击随时聆听' }}
-        </span>
-      </div>
+      <button
+        type="button"
+        class="text-button"
+        title="打开声景与轻音曲目库"
+        aria-label="打开声景与轻音曲目库"
+        @click="showLibrary = true"
+      >
+        <ListMusic :size="14" />曲目库
+      </button>
 
       <!-- 定时关闭切换 -->
       <div class="sleep-timer-group">
@@ -288,6 +331,102 @@ onUnmounted(() => {
       </div>
     </footer>
   </article>
+
+  <!-- 声景与轻音曲目库弹窗 -->
+  <DetailModal
+    v-if="showLibrary"
+    title="听见花园 · 声景与轻音曲目库"
+    subtitle="SOUNDS OF GARDEN · 随时切换自然白噪音与舒缓轻电台"
+    class="collection-modal audio-library-modal"
+    @close="showLibrary = false"
+  >
+    <!-- 搜索框 -->
+    <div class="modal-search-row">
+      <div class="search-input-box">
+        <Search :size="14" class="text-slate-400" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="搜索曲目名、声景或氛围描述..."
+          class="attraction-search-input"
+        />
+      </div>
+    </div>
+
+    <!-- 分类筛选药丸 -->
+    <div class="filter-pills">
+      <button
+        v-for="cat in categories"
+        :key="cat.val"
+        :class="{ active: filterCategory === cat.val }"
+        :aria-pressed="filterCategory === cat.val"
+        @click="filterCategory = cat.val"
+      >
+        {{ cat.label }}
+      </button>
+    </div>
+
+    <div v-if="!filteredTracks.length" class="p-8 text-center text-sm text-slate-400">
+      未找到匹配的声景曲目，试着换个词搜搜看
+    </div>
+
+    <div v-else class="audio-library-grid">
+      <article
+        v-for="track in filteredTracks"
+        :key="track.id"
+        class="audio-track-item-card"
+        :class="{
+          'is-current': currentTrack.id === track.id,
+          'is-playing': currentTrack.id === track.id && audioState.isPlaying,
+        }"
+        @click="selectAndPlay(track.id)"
+      >
+        <div class="track-card-left">
+          <div class="track-icon-badge" :class="track.category">
+            <CloudRain v-if="track.icon === 'CloudRain'" :size="22" />
+            <Waves v-else-if="track.icon === 'Waves'" :size="22" />
+            <Wind v-else-if="track.icon === 'Wind'" :size="22" />
+            <Bell v-else-if="track.icon === 'Bell'" :size="22" />
+            <Coffee v-else-if="track.icon === 'Coffee'" :size="22" />
+            <Sparkles v-else-if="track.icon === 'Sparkles'" :size="22" />
+            <SunMedium v-else :size="22" />
+          </div>
+
+          <div class="track-meta">
+            <div class="track-title-row">
+              <h4 class="track-name">{{ track.name }}</h4>
+              <span class="track-pill" :class="track.category">
+                {{ track.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}
+              </span>
+              <span
+                v-if="currentTrack.id === track.id"
+                class="now-playing-pill"
+                :class="{ playing: audioState.isPlaying }"
+              >
+                {{ audioState.isPlaying ? '正在播放' : '当前已选' }}
+              </span>
+            </div>
+            <p class="track-sub">{{ track.subtitle }}</p>
+            <p class="track-quote">“{{ track.quote }}”</p>
+          </div>
+        </div>
+
+        <div class="track-card-action">
+          <button
+            type="button"
+            class="track-play-btn"
+            :class="{ 'is-playing': currentTrack.id === track.id && audioState.isPlaying }"
+            :title="currentTrack.id === track.id && audioState.isPlaying ? '暂停' : '播放此曲'"
+            :aria-label="currentTrack.id === track.id && audioState.isPlaying ? '暂停' : '播放此曲'"
+            @click.stop="selectAndPlay(track.id)"
+          >
+            <Pause v-if="currentTrack.id === track.id && audioState.isPlaying" :size="16" />
+            <Play v-else :size="16" class="translate-x-0.5" />
+          </button>
+        </div>
+      </article>
+    </div>
+  </DetailModal>
 </template>
 
 <style scoped>
@@ -745,26 +884,188 @@ onUnmounted(() => {
   transform: translateY(6px);
 }
 
-/* 底部状态 */
-.audio-footer-status {
+/* 曲目库弹窗与列表卡片 */
+.audio-library-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 680px) {
+  .audio-library-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.audio-track-item-card {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 14px;
+}
+
+.audio-track-item-card:hover {
+  border-color: rgba(68, 107, 78, 0.4);
+  background: var(--sage-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.audio-track-item-card.is-current {
+  border-color: rgba(68, 107, 78, 0.5);
+  background: var(--sage-bg);
+}
+
+.audio-track-item-card.is-playing {
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.track-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.track-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(68, 107, 78, 0.1);
+  color: var(--accent);
+  transition: transform 0.2s ease;
+}
+
+.audio-track-item-card:hover .track-icon-badge {
+  transform: scale(1.05);
+}
+
+.track-icon-badge.music {
+  background: rgba(14, 116, 144, 0.1);
+  color: #0e7490;
+}
+
+:global(.dark) .track-icon-badge.music {
+  background: rgba(34, 211, 238, 0.12);
+  color: #38bdf8;
+}
+
+.track-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+}
+
+.track-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.track-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.track-pill {
+  font-size: 11px;
+  padding: 1.5px 7px;
+  border-radius: 9999px;
+  font-weight: 500;
+  background: rgba(68, 107, 78, 0.12);
+  color: var(--accent);
+}
+
+.track-pill.music {
+  background: rgba(14, 116, 144, 0.12);
+  color: #0e7490;
+}
+
+:global(.dark) .track-pill.music {
+  color: #38bdf8;
+  background: rgba(34, 211, 238, 0.15);
+}
+
+.now-playing-pill {
+  font-size: 11px;
+  padding: 1.5px 7px;
+  border-radius: 9999px;
+  font-weight: 500;
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.now-playing-pill.playing {
+  animation: pulseBadge 1.8s infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.track-sub {
   font-size: 12px;
+  color: var(--secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.track-quote {
+  font-size: 11.5px;
   color: var(--muted);
+  margin: 0;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.status-indicator-dot {
-  width: 7px;
-  height: 7px;
+.track-card-action {
+  flex-shrink: 0;
+}
+
+.track-play-btn {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: var(--muted);
-  transition: background 0.2s ease;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.status-indicator-dot.active {
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
+.track-play-btn:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  transform: scale(1.08);
+}
+
+.track-play-btn.is-playing {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
 }
 
 .sleep-timer-group {
