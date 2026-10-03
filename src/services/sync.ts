@@ -457,11 +457,15 @@ export async function signOut() {
   try {
     await flushing
     await api('/api/logout', 'POST')
+  } catch {
+    // 即使网络中断或处于无后端的本地纯前端模式，也确保本机能成功退出
+  } finally {
     activate(null)
+    persist()
     account.status = 'local'
     account.error = ''
-  } catch { account.error = '退出暂时未成功，请联网后重试。' }
-  finally { account.busy = false }
+    account.busy = false
+  }
 }
 
 export function exportGardenData() {
