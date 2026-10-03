@@ -15,13 +15,25 @@ export const DEFAULT_CARD_ORDER: string[] = [
   'gardenAudio',
   'chinaAttractions',
   'seasonal',
-  'evidence',
-  'sportsExercise',
   'dailyPoetry',
   'inspirationalQuote',
+  'evidence',
+  'sportsExercise',
 ]
 
 const LEGACY_DEFAULT_ORDERS: string[][] = [
+  [
+    'calendar',
+    'quickNotes',
+    'upcoming',
+    'gardenAudio',
+    'chinaAttractions',
+    'seasonal',
+    'evidence',
+    'sportsExercise',
+    'dailyPoetry',
+    'inspirationalQuote',
+  ],
   [
     'calendar',
     'upcoming',
