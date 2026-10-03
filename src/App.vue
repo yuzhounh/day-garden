@@ -11,8 +11,8 @@ const ChinaAttractionsCard = defineAsyncComponent(() => import('./components/Chi
 const QuickNoteCard = defineAsyncComponent(() => import('./components/QuickNoteCard.vue'))
 const GardenAudioCard = defineAsyncComponent(() => import('./components/GardenAudioCard.vue'))
 const DailyContentCard = defineAsyncComponent(() => import('./components/DailyContentCard.vue'))
-const SettingsModal = defineAsyncComponent(() => import('./components/SettingsModal.vue'))
-const AccountModal = defineAsyncComponent(() => import('./components/AccountModal.vue'))
+import SettingsModal from './components/SettingsModal.vue'
+import AccountModal from './components/AccountModal.vue'
 import { initializeSync, refreshCloud, account, syncCustomEvents, syncSelectedCity } from './services/sync'
 import type { UserPreferences, WeatherDay, CityOption, LifeEvent, AttractionStatusType } from './types'
 import { fetch7DayWeather } from './services/weather'
