@@ -131,13 +131,19 @@ export function isRedundantMemo(memo?: unknown): boolean {
   return false
 }
 
+export type EventCategory = 'birthday' | 'anniversary' | 'schedule'
+
 /**
- * 智能判定一个纪念日/事件是否属于周年纪念日（非生日）
+ * 智能判定一个事件是否属于周年纪念日（非生日、非日程）
  */
 export function isAnniversaryEvent(ev?: { type?: string; title?: string } | null): boolean {
   if (!ev) return false
-  if (ev.type === 'anniversary') return true
+  if (ev.type === 'schedule' || ev.type === 'birthday') return false
   const title = (ev.title || '').trim().toLowerCase()
+  if (title.includes('到期') || title.includes('年检') || title.includes('保险') || title.includes('行程') || title.includes('计划') || title.includes('待办') || title.includes('还款')) {
+    return false
+  }
+  if (ev.type === 'anniversary') return true
   if (
     title.includes('纪念') ||
     title.includes('周年') ||
@@ -157,17 +163,46 @@ export function isAnniversaryEvent(ev?: { type?: string; title?: string } | null
   ) {
     return true
   }
-  if (ev.type === 'birthday' || title.includes('生日') || title.includes('生辰') || title.includes('出生') || title.includes('诞辰')) {
+  return false
+}
+
+/**
+ * 智能判定一个事件是否属于日程计划/截止事项
+ */
+export function isScheduleEvent(ev?: { type?: string; title?: string } | null): boolean {
+  if (!ev) return false
+  if (ev.type === 'schedule') return true
+  if (ev.type === 'birthday' || ev.type === 'anniversary') return false
+  if (isAnniversaryEvent(ev)) return false
+  const title = (ev.title || '').trim().toLowerCase()
+  if (title.includes('生日') || title.includes('生辰') || title.includes('出生') || title.includes('诞辰')) {
     return false
   }
-  return ev.type === 'custom'
+  return true
+}
+
+/**
+ * 获取事件的明确分类（生日 / 纪念日 / 日程）
+ */
+export function getEventCategory(ev?: { type?: string; title?: string } | null): EventCategory {
+  if (!ev) return 'schedule'
+  if (ev.type === 'birthday') return 'birthday'
+  if (ev.type === 'anniversary') return 'anniversary'
+  if (ev.type === 'schedule') return 'schedule'
+  if (isAnniversaryEvent(ev)) return 'anniversary'
+  const title = (ev.title || '').trim().toLowerCase()
+  if (title.includes('生日') || title.includes('生辰') || title.includes('出生') || title.includes('诞辰')) {
+    return 'birthday'
+  }
+  return 'schedule'
 }
 
 export function calculateNextEventDate(
   eventDateStr: string,
   isLunar: boolean = false,
   baseDate: Date = new Date(),
-  isAnniversary: boolean = false
+  isAnniversary: boolean = false,
+  isSchedule: boolean = false
 ): NextEventInfo {
   const fallbackInfo: NextEventInfo = {
     daysLeft: 9999,
@@ -190,7 +225,7 @@ export function calculateNextEventDate(
     const { year: birthYear } = parsed
 
     if (isLunar) {
-      // 农历生日计算今年或明年的公历对应日
+      // 农历计算今年或明年的公历对应日
       const candidates = [baseYear - 1, baseYear, baseYear + 1, baseYear + 2]
         .map(year => eventDateInYear(eventDateStr, true, year))
         .filter((date): date is Date => !!date && date.getTime() >= safeBaseDate.getTime())
@@ -201,7 +236,7 @@ export function calculateNextEventDate(
 
       const diffMs = targetDate.getTime() - safeBaseDate.getTime()
       const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
-      const turningAge = birthYear ? targetSolar.getLunar().getYear() - birthYear : undefined
+      const turningAge = (!isSchedule && birthYear) ? targetSolar.getLunar().getYear() - birthYear : undefined
       const targetLunar = targetSolar.getLunar()
       const lunarChineseStr = `农历${targetLunar.getMonthInChinese()}月${targetLunar.getDayInChinese()}`
       const nextDateSolar = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
@@ -227,7 +262,7 @@ export function calculateNextEventDate(
 
       const diffMs = targetDate.getTime() - safeBaseDate.getTime()
       const daysLeft = Math.round(diffMs / (1000 * 60 * 60 * 24))
-      const turningAge = birthYear ? targetDate.getFullYear() - birthYear : undefined
+      const turningAge = (!isSchedule && birthYear) ? targetDate.getFullYear() - birthYear : undefined
       const nextDateSolar = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`
       const unit = isAnniversary ? '周年' : '岁'
       const nextDateStr = turningAge !== undefined
@@ -294,11 +329,12 @@ export function getUpcomingEvents(customEvents?: LifeEvent[] | null, daysThresho
     }
   }
 
-  // 2. 自定义事件（家人朋友生日、重要纪念日）
+  // 2. 自定义事件（家人朋友生日、重要纪念日、重要日程）
   for (const ev of safeEvents) {
     try {
       const isAnniv = isAnniversaryEvent(ev)
-      const calc = calculateNextEventDate(ev.date, !!ev.isLunar, new Date(now), isAnniv)
+      const isSchedule = isScheduleEvent(ev)
+      const calc = calculateNextEventDate(ev.date, !!ev.isLunar, new Date(now), isAnniv, isSchedule)
       if (calc.daysLeft <= daysThreshold) {
         let urgencyLevel: LifeEvent['urgencyLevel'] = 'normal'
         if (calc.daysLeft === 0) urgencyLevel = 'today'
@@ -307,7 +343,7 @@ export function getUpcomingEvents(customEvents?: LifeEvent[] | null, daysThresho
 
         allEvents.push({
           ...ev,
-          type: isAnniv ? 'anniversary' : ev.type,
+          type: getEventCategory(ev),
           giftAdvice: isRedundantMemo(ev.giftAdvice) ? undefined : ev.giftAdvice,
           daysLeft: calc.daysLeft,
           nextDateStr: calc.nextDateStr,

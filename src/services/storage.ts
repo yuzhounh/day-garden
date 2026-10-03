@@ -1,6 +1,6 @@
 import type { UserPreferences, LifeEvent, QuickNote } from '../types'
 import { DEFAULT_CITIES } from './weather'
-import { sortEventsByDaysLeft, isRedundantMemo, isAnniversaryEvent } from './calendar'
+import { sortEventsByDaysLeft, isRedundantMemo, getEventCategory } from './calendar'
 import { isRecord, validateEventList, validateLifeEvent, validateCityOption } from './validation'
 import { saveLocal } from './persistence'
 
@@ -133,8 +133,9 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
       id: 'car-insurance',
       title: '车辆保险与年检到期',
       date: '11-15',
+      startDate: '10-01',
       isLunar: false,
-      type: 'custom',
+      type: 'schedule',
       giftAdvice: '提前比价续保与检查车况',
     }
   ],
@@ -228,7 +229,7 @@ function normalizePreferences(value: unknown, strict = false, base = freshPrefer
       }
     }
   }
-  prefs.customEvents = sortEventsByDaysLeft(prefs.customEvents.map(cleanEventGiftAdvice).map(event => ({ ...event, type: isAnniversaryEvent(event) ? 'anniversary' : event.type })))
+  prefs.customEvents = sortEventsByDaysLeft(prefs.customEvents.map(cleanEventGiftAdvice).map(event => ({ ...event, type: getEventCategory(event) })))
   return prefs
 }
 

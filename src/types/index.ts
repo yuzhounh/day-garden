@@ -25,9 +25,10 @@ export interface CityOption {
 export interface LifeEvent {
   id: string
   title: string
-  date: string // YYYY-MM-DD or MM-DD
+  date: string // YYYY-MM-DD or MM-DD (目标/截止日期)
+  startDate?: string // 可选创建/起始日期 YYYY-MM-DD or MM-DD
   isLunar?: boolean
-  type: 'birthday' | 'anniversary' | 'holiday' | 'custom'
+  type: 'birthday' | 'anniversary' | 'holiday' | 'custom' | 'schedule'
   role?: string // e.g. "妈妈", "伴侣"
   giftAdvice?: string
   daysLeft?: number

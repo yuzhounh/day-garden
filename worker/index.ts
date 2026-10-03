@@ -541,7 +541,7 @@ async function api(request: Request, env: Env): Promise<Response> {
     const [saved, actions, events, preferences] = await Promise.all([
       env.DB.prepare('SELECT poem_id FROM saved_poetry WHERE user_id = ?').bind(user.id).all<{ poem_id: string }>(),
       env.DB.prepare('SELECT date, action_id FROM daily_actions WHERE user_id = ? ORDER BY date DESC LIMIT 1098').bind(user.id).all<{ date: string; action_id: string }>(),
-      env.DB.prepare('SELECT id, title, date, is_lunar, type, role, gift_advice FROM custom_events WHERE user_id = ? ORDER BY created_at ASC').bind(user.id).all<{ id: string; title: string; date: string; is_lunar: number; type: string; role?: string; gift_advice?: string }>(),
+      env.DB.prepare('SELECT id, title, date, start_date, is_lunar, type, role, gift_advice FROM custom_events WHERE user_id = ? ORDER BY created_at ASC').bind(user.id).all<{ id: string; title: string; date: string; start_date?: string; is_lunar: number; type: string; role?: string; gift_advice?: string }>(),
       env.DB.prepare('SELECT selected_city FROM users WHERE id = ?').bind(user.id).first<{ selected_city: string | null }>(),
     ])
     const dailyActions: Record<string, string[]> = {}
@@ -550,6 +550,7 @@ async function api(request: Request, env: Env): Promise<Response> {
       id: e.id,
       title: e.title,
       date: e.date,
+      startDate: e.start_date || undefined,
       isLunar: Boolean(e.is_lunar),
       type: e.type,
       role: e.role || undefined,
@@ -584,15 +585,16 @@ async function api(request: Request, env: Env): Promise<Response> {
       throw new ApiError(400, (error as Error).message)
     }
     if (singleEventMatch && singleEventMatch[1] !== ev.id) throw new ApiError(400, '日程编号与路径不一致。')
-    const { id, title, date, isLunar, type } = ev
+    const { id, title, date, startDate, isLunar, type } = ev
     const role = ev.role || null
     const giftAdvice = ev.giftAdvice || null
     await env.DB.prepare(`
-      INSERT INTO custom_events(id, user_id, title, date, is_lunar, type, role, gift_advice, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO custom_events(id, user_id, title, date, start_date, is_lunar, type, role, gift_advice, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(user_id, id) DO UPDATE SET
         title = excluded.title,
         date = excluded.date,
+        start_date = excluded.start_date,
         is_lunar = excluded.is_lunar,
         type = excluded.type,
         role = excluded.role,
@@ -602,6 +604,7 @@ async function api(request: Request, env: Env): Promise<Response> {
       user.id,
       title.slice(0, 64),
       date.slice(0, 32),
+      startDate ? startDate.slice(0, 32) : null,
       isLunar ? 1 : 0,
       type,
       role,

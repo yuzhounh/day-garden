@@ -37,12 +37,18 @@ export function validateLifeEvent(value: unknown): LifeEvent {
   if (value.isLunar !== undefined && typeof value.isLunar !== 'boolean') throw new Error('农历选项必须是布尔值。')
   const parsed = parseEventDate(value.date, value.isLunar === true)
   if (!parsed) throw new Error('日期无效，请填写有效的 YYYY-MM-DD 或 MM-DD 日期。农历日期最多为三十日。')
+  let startDate: string | undefined
+  if (value.startDate !== undefined && value.startDate !== null && value.startDate !== '') {
+    const parsedStart = parseEventDate(value.startDate, value.isLunar === true)
+    if (!parsedStart) throw new Error('创建/起始日期无效，请填写有效的 YYYY-MM-DD 或 MM-DD 日期。')
+    startDate = parsedStart.date
+  }
   const type = value.type ?? 'birthday'
-  if (!['birthday', 'anniversary', 'custom'].includes(type as string)) throw new Error('日程类型无效。')
+  if (!['birthday', 'anniversary', 'custom', 'schedule'].includes(type as string)) throw new Error('日程类型无效。')
   for (const [key, limit] of [['role', 32], ['giftAdvice', 128]] as const) {
     if (value[key] !== undefined && (typeof value[key] !== 'string' || value[key].length > limit)) throw new Error(`${key === 'role' ? '关系' : '备注'}格式或长度无效。`)
   }
-  return { id: value.id, title: value.title.trim(), date: parsed.date, isLunar: value.isLunar === true, type: type as LifeEvent['type'], role: (value.role as string | undefined)?.trim() || undefined, giftAdvice: (value.giftAdvice as string | undefined)?.trim() || undefined }
+  return { id: value.id, title: value.title.trim(), date: parsed.date, startDate, isLunar: value.isLunar === true, type: type as LifeEvent['type'], role: (value.role as string | undefined)?.trim() || undefined, giftAdvice: (value.giftAdvice as string | undefined)?.trim() || undefined }
 }
 
 export function validateEventList(value: unknown): LifeEvent[] {

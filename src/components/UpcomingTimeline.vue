@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Cake, Gift, Heart, Plus, BookOpen } from 'lucide-vue-next'
+import { Cake, Gift, Heart, Plus, BookOpen, CalendarCheck } from 'lucide-vue-next'
 import type { LifeEvent } from '../types'
-import { isRedundantMemo, isAnniversaryEvent } from '../services/calendar'
+import { isRedundantMemo, getEventCategory } from '../services/calendar'
 import EventsModal from './EventsModal.vue'
 
 defineProps<{
@@ -29,24 +29,25 @@ function openModal() {
         <h2>岁月里程</h2>
         <span class="eyebrow">MILESTONES</span>
       </div>
-      <button class="icon-button small" aria-label="添加纪念日" @click="openModal">
+      <button class="icon-button small" aria-label="添加重要日子与日程" @click="openModal">
         <Plus :size="16" />
       </button>
     </header>
 
     <div v-if="!events.length" class="event-empty">
       <Heart :size="28" :stroke-width="1" />
-      <p>暂无临近的纪念日，记下那些温暖的时刻。</p>
+      <p>暂无临近的日子或日程，记下那些温暖时刻与重要安排。</p>
       <button class="text-button" @click="openModal">
-        记下一个纪念日<Plus :size="14" />
+        记下一个日子或日程<Plus :size="14" />
       </button>
     </div>
 
     <div v-else class="event-list">
       <div v-for="event in events.slice(0, 4)" :key="event.id" class="event-row">
-        <span class="event-icon" :class="isAnniversaryEvent(event) ? 'anniversary' : event.type">
-          <Heart v-if="isAnniversaryEvent(event) || event.type === 'anniversary'" :size="17" />
-          <Cake v-else-if="event.type === 'birthday'" :size="17" />
+        <span class="event-icon" :class="getEventCategory(event)">
+          <CalendarCheck v-if="getEventCategory(event) === 'schedule'" :size="17" />
+          <Heart v-else-if="getEventCategory(event) === 'anniversary'" :size="17" />
+          <Cake v-else-if="getEventCategory(event) === 'birthday'" :size="17" />
           <Gift v-else :size="17" />
         </span>
         <div class="event-info">
@@ -62,12 +63,12 @@ function openModal() {
 
     <footer class="card-footer">
       <button class="text-button" type="button" @click="openModal">
-        <BookOpen :size="14" />管理纪念日
+        <BookOpen :size="14" />管理重要日子与日程
       </button>
-      <span class="muted">未来 30 天 · {{ events.length }} 个日子</span>
+      <span class="muted">未来 30 天 · {{ events.length }} 项</span>
     </footer>
 
-    <!-- 独立的生日与纪念日管理弹窗 -->
+    <!-- 独立的日子与日程管理弹窗 -->
     <EventsModal
       v-if="showModal"
       :custom-events="customEvents"
