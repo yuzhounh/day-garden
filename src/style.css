@@ -1190,7 +1190,7 @@
 .inline-actions { display: flex; align-items: center; gap: 14px; }
 .poetry-card { background: var(--glass); position: relative; }
 .poetry-body { padding: 4px 6px 14px; position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.poetry-quotes { display: block; text-align: left; font-family: var(--poetry-font); font-size: 68px; line-height: 0.7; height: 34px; color: #9bb2a1; opacity: 0.45; margin-bottom: 6px; user-select: none; }
+.poetry-quotes { display: block; text-align: left; font-family: var(--poetry-font); font-size: 68px; line-height: 0.7; height: 34px; color: #9bb2a1; opacity: 0.45; margin-left: -14px; margin-bottom: 6px; user-select: none; }
 .poetry-body blockquote { position: relative; font-family: var(--poetry-font); font-size: 24px; font-weight: normal; line-height: 1.7; letter-spacing: 1.5px; text-align: center; }
 .poetry-body blockquote span { display: block; }
 .poetry-body blockquote .poetry-phrase { display: inline-block; }
