@@ -74,7 +74,7 @@ function handleMock() {
 
 <template>
   <DetailModal class="account-modal" :title="account.user ? '我的花园账户' : '登录我的花园'" subtitle="DAY GARDEN" @close="emit('close')">
-    <div class="account-intro">
+    <div v-if="account.user" class="account-intro">
       <span class="icon-tile sage"><Cloud :size="19" /></span>
       <p>{{ intro }}</p>
     </div>
@@ -134,13 +134,7 @@ function handleMock() {
       </div>
 
       <div v-if="loginMethod === 'google'" class="oauth-options">
-        <div class="auth-panel-copy">
-          <h3>用 Google 账户直接登录</h3>
-          <p>无需单独注册，首次登录会自动创建账户。</p>
-        </div>
-        <label class="merge-choice">
-          <input v-model="mergeGuest" type="checkbox" />合并此浏览器里的打卡、重要日子与旧版收藏
-        </label>
+        <p class="auth-hint">无需单独注册，首次登录会自动创建账户。</p>
         <div class="oauth-grid">
           <!-- Google 登录按钮 -->
           <button
@@ -171,10 +165,6 @@ function handleMock() {
       </div>
 
       <form v-else class="account-form" @submit.prevent="submit">
-        <div class="auth-panel-copy">
-          <h3>{{ register ? '创建邮箱账户' : '登录邮箱账户' }}</h3>
-          <p>{{ register ? '使用邮箱和密码注册，创建后即可登录并同步。' : '使用已注册的邮箱和密码登录。' }}</p>
-        </div>
         <label for="garden-username">{{ register ? '邮箱' : '邮箱或用户名' }}</label>
         <input
           id="garden-username"
@@ -206,9 +196,6 @@ function handleMock() {
           <input id="garden-password-confirmation" v-model="passwordConfirmation" name="password-confirmation" type="password" autocomplete="new-password" minlength="10" maxlength="128" required placeholder="再次输入密码" />
           <p class="auth-hint">暂不提供密码找回，请妥善保存密码。</p>
         </template>
-        <label class="merge-choice">
-          <input v-model="mergeGuest" type="checkbox" />合并此浏览器里的打卡、重要日子与旧版收藏
-        </label>
         <p v-if="formError || (submitted && account.error)" class="account-error" role="alert">{{ formError || account.error }}</p>
         <button class="soft-button account-submit" :disabled="account.busy">
           {{ account.busy ? '正在连接…' : register ? '创建账户并登录' : '登录并同步' }}
@@ -218,8 +205,6 @@ function handleMock() {
           <button type="button" :disabled="account.busy" @click="register = !register">{{ register ? '返回登录' : '创建账户' }}</button>
         </p>
       </form>
-
-      <p class="auth-local-note">登录后会记住你的城市；主题与随笔仅保存在当前浏览器。</p>
     </template>
 
   </DetailModal>
