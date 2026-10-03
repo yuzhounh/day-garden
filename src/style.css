@@ -1181,7 +1181,7 @@
 .inline-actions { display: flex; align-items: center; gap: 14px; }
 .poetry-card { background: var(--glass); position: relative; }
 .poetry-body { padding: 4px 6px 14px; position: relative; flex: 1; display: flex; flex-direction: column; justify-content: center; }
-.poetry-quotes { display: flex; justify-content: center; color: var(--accent); opacity: 0.3; margin-bottom: 8px; }
+.poetry-quotes { display: flex; justify-content: flex-start; color: var(--accent); opacity: 0.3; margin-bottom: 8px; }
 .poetry-body blockquote { position: relative; font-family: var(--poetry-font); font-size: 24px; font-weight: normal; line-height: 1.7; letter-spacing: 1.5px; text-align: center; }
 .poetry-body blockquote span { display: block; }
 .poetry-body blockquote .poetry-phrase { display: inline-block; }
@@ -1474,6 +1474,8 @@
   margin: 8px 0 14px;
 }
 .quote-symbol {
+  display: flex;
+  justify-content: flex-end;
   color: var(--accent);
   opacity: 0.3;
   margin-bottom: 6px;
