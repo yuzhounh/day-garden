@@ -317,7 +317,7 @@ function getIntensityColor(intensity: string) {
   padding: 4px 11px;
   border-radius: 999px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: normal;
   background: rgba(249, 115, 22, 0.08);
   color: #ea580c;
   border: 1px solid rgba(249, 115, 22, 0.2);
