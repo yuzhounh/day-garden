@@ -625,9 +625,20 @@
 .garden-tabs { display: inline-flex; padding: 4px; border-radius: 14px; gap: 3px; }
 .garden-tabs a { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; font-size: 14px; font-weight: 500; color: var(--secondary); border-radius: 10px; transition: background .2s; }
 .garden-tabs a.active { color: var(--accent); background: var(--surface); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
-.garden-tabs a:hover { background: var(--sage-bg); }
-.weather-panel { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; border-radius: 22px; padding: 24px 26px; margin-bottom: 20px; transition: box-shadow .25s ease; }
-.weather-panel:hover { box-shadow: var(--card-shadow-hover); }
+.weather-panel {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  border-radius: 22px;
+  padding: 24px 26px;
+  margin-bottom: 20px;
+  min-height: 280px;
+  contain: layout style;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+  transition: box-shadow .25s ease;
+}
 .weather-panel > * { min-width: 0; }
 .weather-summary { display: flex; flex-direction: column; border-right: 1px solid var(--line); padding-right: 22px; }
 .summary-header { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
@@ -1970,7 +1981,7 @@
   .hero-copy > .eyebrow { font-size: 11px; }
   .date-card { width: 100%; max-width: 380px; flex: 1 1 300px; }
   .dashboard-caption { display: none; }
-  .weather-panel { grid-template-columns: 1fr; gap: 16px; }
+  .weather-panel { grid-template-columns: 1fr; gap: 16px; min-height: 420px; }
   .weather-summary { border-right: 0; padding: 0; }
   .today-content { margin: 12px 0; }
   .today-hint { margin-top: 8px; }
@@ -2017,7 +2028,7 @@
   .cal-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
   .garden-tabs { width: 100%; justify-content: space-between; }
   .garden-tabs a { padding: 9px 12px; font-size: 12px; }
-  .weather-panel { padding: 18px 15px; }
+  .weather-panel { padding: 18px 15px; min-height: 400px; }
   .forecast-heading > span:last-child { max-width: 140px; font-size: 11px; }
   .trend-grid-wrapper { min-width: 440px; }
   .dashboard-card { padding: 20px 18px 0; }
