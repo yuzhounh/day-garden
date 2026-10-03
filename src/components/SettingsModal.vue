@@ -269,7 +269,7 @@ function importData(e: Event) {
               class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition"
             >
               <Download class="w-3.5 h-3.5 text-slate-400" />
-              <span>导出备份 JSON</span>
+              <span>导出备份</span>
             </button>
 
             <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-50 cursor-pointer transition">
