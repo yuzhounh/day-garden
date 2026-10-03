@@ -373,9 +373,8 @@ onUnmounted(() => {
           <!-- 导航栏悬浮迷你播放器 -->
           <div v-if="showAudioPopover" class="header-audio-popover glass-panel" @click.stop>
             <div class="popover-track-info">
-              <div class="popover-track-badge">
-                <span class="popover-badge-dot" :class="{ 'is-active': audioState.isPlaying }"></span>
-                <span>{{ currentTrack.category === 'nature' ? '自然声景' : '精选电台' }}</span>
+              <div class="popover-tag-row">
+                <span class="popover-track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
               </div>
               <h4 class="popover-track-title">{{ currentTrack.name }}</h4>
               <p class="popover-track-desc">{{ currentTrack.subtitle }}</p>
