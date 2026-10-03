@@ -4,6 +4,7 @@ import { Flower2, MapPin, ArrowUpRight, RefreshCw, BookOpen, Search } from 'luci
 import type { SeasonBloom } from '../types'
 import DetailModal from './DetailModal.vue'
 import BotanicalArt from './BotanicalArt.vue'
+import BotanicalIcon from './BotanicalIcon.vue'
 import ScentIcon from './ScentIcon.vue'
 import rawSeasons from '../data/seasons-bloom.json'
 
@@ -157,7 +158,7 @@ function selectBloomItem(item: SeasonBloom) {
           :key="item.name"
           class="p-3 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-800/30 transition flex items-stretch"
         >
-          <span class="bloom-emoji shrink-0">{{ item.icon }}</span>
+          <BotanicalIcon :name="item.name" :color="item.color" class="shrink-0 mr-3" />
           <div class="bloom-body flex-1 min-w-0 flex flex-col h-full">
             <div class="flex items-center justify-between">
               <h3>
