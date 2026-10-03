@@ -602,7 +602,7 @@ onUnmounted(() => {
   box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 38%, transparent);
   transition: all 0.2s ease;
   flex-shrink: 0;
-  margin: -4px 0;
+  margin: -5px 0;
 }
 
 .play-main-btn:hover {
