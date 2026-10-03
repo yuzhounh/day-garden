@@ -1465,8 +1465,6 @@
 .oauth-divider { display: flex; align-items: center; text-align: center; margin: 18px 0 14px; color: var(--muted); font-size: 12px; }
 .oauth-divider::before, .oauth-divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--line); }
 .oauth-divider span { padding: 0 12px; }
-.oauth-mock-banner { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: rgba(110, 133, 104, 0.08); border: 1px dashed var(--line); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--secondary); margin-top: 10px; }
-.oauth-mock-btn { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; font-size: 11px; cursor: pointer; color: var(--ink); }
 .account-error { color: #a56456; background: var(--peach-bg); padding: 10px 14px; border-radius: 9px; font-size: 13px; line-height: 1.7; margin-top: 12px; }
 .account-backup { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; justify-content: space-between; border-top: 1px solid var(--line); margin-top: 24px; padding-top: 17px; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }

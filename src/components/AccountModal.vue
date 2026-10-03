@@ -8,7 +8,6 @@ import {
   signOut,
   refreshCloud,
   loginWithOAuth,
-  loginWithMock,
   authProviders,
   legacyCustomEvents,
   recoverLegacyEvents,
@@ -65,10 +64,6 @@ async function submit() {
 function handleOAuth() {
   submitted.value = true
   loginWithOAuth('google', mergeGuest.value)
-}
-
-function handleMock() {
-  void loginWithMock('google', mergeGuest.value)
 }
 </script>
 
@@ -156,12 +151,6 @@ function handleMock() {
 
         <p v-if="!authProviders.google" class="auth-hint">Google 登录暂不可用，请选择邮箱与密码。</p>
         <p v-if="submitted && account.error" class="account-error" role="alert">{{ account.error }}</p>
-
-        <!-- 本地调试免配置模拟体验 -->
-        <div v-if="authProviders.dev" class="oauth-mock-banner">
-          <span>🛠️ 本地开发模拟体验：</span>
-          <button class="oauth-mock-btn" type="button" @click="handleMock()">模拟 Google 登录</button>
-        </div>
       </div>
 
       <form v-else class="account-form" @submit.prevent="submit">
