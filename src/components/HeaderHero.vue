@@ -261,8 +261,9 @@ onUnmounted(() => {
           </button>
 
           <!-- 城市搜索与快捷选择面板 -->
-          <div v-if="showCities" id="city-options" class="city-menu glass-panel" @click.stop>
-            <div class="city-search-box">
+          <Transition name="dropdown-pop">
+            <div v-if="showCities" id="city-options" class="city-menu glass-panel" @click.stop>
+              <div class="city-search-box">
               <Search :size="14" class="search-icon" />
               <input
                 ref="searchInputRef"
@@ -349,28 +350,30 @@ onUnmounted(() => {
               </div>
             </div>
           </div>
-        </div>
+        </Transition>
+      </div>
 
-        <span class="toolbar-divider"></span>
+      <span class="toolbar-divider"></span>
 
-        <!-- 1. 音乐：听见花园 · 放松轻音与白噪音入口 (Scheme A) -->
-        <div ref="audioMenu" class="header-audio-control">
-          <button
-            class="icon-button header-audio-btn"
-            :class="{ 'is-playing': audioState.isPlaying, 'is-active': showAudioPopover }"
-            :aria-label="audioState.isPlaying ? '正在播放：' + currentTrack.name : '听见花园 · 放松轻音'"
-            :title="audioState.isPlaying ? '正在播放：' + currentTrack.name : '听见花园 · 放松轻音'"
-            @click="toggleAudioPopover"
-          >
-            <div v-if="audioState.isPlaying" class="header-audio-waves" aria-hidden="true">
-              <span class="bar bar-1"></span>
-              <span class="bar bar-2"></span>
-              <span class="bar bar-3"></span>
-            </div>
-            <Headphones v-else :size="17" />
-          </button>
+      <!-- 1. 音乐：听见花园 · 放松轻音与白噪音入口 (Scheme A) -->
+      <div ref="audioMenu" class="header-audio-control">
+        <button
+          class="icon-button header-audio-btn"
+          :class="{ 'is-playing': audioState.isPlaying, 'is-active': showAudioPopover }"
+          :aria-label="audioState.isPlaying ? '正在播放：' + currentTrack.name : '听见花园 · 放松轻音'"
+          :title="audioState.isPlaying ? '正在播放：' + currentTrack.name : '听见花园 · 放松轻音'"
+          @click="toggleAudioPopover"
+        >
+          <div v-if="audioState.isPlaying" class="header-audio-waves" aria-hidden="true">
+            <span class="bar bar-1"></span>
+            <span class="bar bar-2"></span>
+            <span class="bar bar-3"></span>
+          </div>
+          <Headphones v-else :size="17" />
+        </button>
 
-          <!-- 导航栏悬浮迷你播放器 -->
+        <!-- 导航栏悬浮迷你播放器 -->
+        <Transition name="dropdown-pop">
           <div v-if="showAudioPopover" class="header-audio-popover glass-panel" @click.stop>
             <div class="popover-track-info">
               <div class="popover-tag-row">
@@ -480,7 +483,8 @@ onUnmounted(() => {
               </div>
             </div>
           </div>
-        </div>
+        </Transition>
+      </div>
 
         <!-- 2. 深色模式：主题切换 -->
         <button

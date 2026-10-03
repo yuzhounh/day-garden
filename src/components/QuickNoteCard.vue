@@ -239,6 +239,43 @@ watch(
     nextTick(updateVisibleCount)
   }
 )
+
+function onAccordionEnter(el: Element) {
+  const element = el as HTMLElement
+  element.style.height = '0px'
+  element.style.opacity = '0'
+  element.style.marginTop = '0px'
+  element.style.marginBottom = '0px'
+  element.style.transform = 'translateY(-8px)'
+  element.style.overflow = 'hidden'
+  element.offsetHeight // trigger reflow
+  element.style.transition = 'height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+  element.style.height = `${element.scrollHeight}px`
+  element.style.marginTop = ''
+  element.style.marginBottom = ''
+  element.style.opacity = '1'
+  element.style.transform = 'translateY(0)'
+}
+
+function onAccordionAfterEnter(el: Element) {
+  const element = el as HTMLElement
+  element.style.height = 'auto'
+  element.style.overflow = 'visible'
+  element.style.transition = ''
+}
+
+function onAccordionLeave(el: Element) {
+  const element = el as HTMLElement
+  element.style.height = `${element.scrollHeight}px`
+  element.style.overflow = 'hidden'
+  element.offsetHeight // trigger reflow
+  element.style.transition = 'height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), margin 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+  element.style.height = '0px'
+  element.style.marginTop = '0px'
+  element.style.marginBottom = '0px'
+  element.style.opacity = '0'
+  element.style.transform = 'translateY(-8px)'
+}
 </script>
 
 <template>
@@ -360,7 +397,7 @@ watch(
           :aria-label="showModalInput ? '收起输入框' : '新增笔记'"
           @click="toggleModalInput"
         >
-          <Plus :size="18" />
+          <Plus :size="18" class="plus-icon" />
         </button>
         <button
           type="button"
@@ -387,35 +424,42 @@ watch(
       </template>
 
       <!-- 弹窗内部快捷记录 (默认隐藏，点击右上角“新增笔记”按钮展开) -->
-      <Transition name="fade-slide">
-        <div v-if="showModalInput" class="modal-input-wrap">
-          <textarea
-            ref="modalTextareaRef"
-            v-model="draft"
-            rows="3"
-            class="modal-textarea"
-            placeholder="记下此时此刻的新想法..."
-            @keydown="handleKeydown"
-          ></textarea>
-          <div class="modal-input-footer">
-            <span class="note-input-hint">Ctrl + Enter 记录</span>
-            <div class="modal-input-btns">
-              <button
-                type="button"
-                class="modal-cancel-btn"
-                @click="showModalInput = false"
-              >
-                收起
-              </button>
-              <button
-                type="button"
-                class="note-submit-btn"
-                :disabled="!draft.trim()"
-                @click="submitNote"
-              >
-                <Send :size="12" />
-                <span>记一笔</span>
-              </button>
+      <Transition
+        name="accordion"
+        @enter="onAccordionEnter"
+        @after-enter="onAccordionAfterEnter"
+        @leave="onAccordionLeave"
+      >
+        <div v-if="showModalInput" class="accordion-panel">
+          <div class="modal-input-wrap">
+            <textarea
+              ref="modalTextareaRef"
+              v-model="draft"
+              rows="3"
+              class="modal-textarea"
+              placeholder="记下此时此刻的新想法..."
+              @keydown="handleKeydown"
+            ></textarea>
+            <div class="modal-input-footer">
+              <span class="note-input-hint">Ctrl + Enter 记录</span>
+              <div class="modal-input-btns">
+                <button
+                  type="button"
+                  class="modal-cancel-btn"
+                  @click="showModalInput = false"
+                >
+                  收起
+                </button>
+                <button
+                  type="button"
+                  class="note-submit-btn"
+                  :disabled="!draft.trim()"
+                  @click="submitNote"
+                >
+                  <Send :size="12" />
+                  <span>记一笔</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -773,6 +817,22 @@ watch(
   color: var(--ink);
   background: var(--surface);
   border-color: rgba(68, 107, 78, 0.3);
+}
+
+.accordion-panel {
+  will-change: height, opacity, transform;
+}
+
+.icon-button {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-button .plus-icon {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-button.active .plus-icon {
+  transform: rotate(45deg);
 }
 
 .fade-slide-enter-active,

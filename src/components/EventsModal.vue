@@ -292,6 +292,43 @@ function removeEvent(id: string) {
 }
 
 const formError = ref('')
+
+function onAccordionEnter(el: Element) {
+  const element = el as HTMLElement
+  element.style.height = '0px'
+  element.style.opacity = '0'
+  element.style.marginTop = '0px'
+  element.style.marginBottom = '0px'
+  element.style.transform = 'translateY(-8px)'
+  element.style.overflow = 'hidden'
+  element.offsetHeight // trigger reflow
+  element.style.transition = 'height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+  element.style.height = `${element.scrollHeight}px`
+  element.style.marginTop = ''
+  element.style.marginBottom = ''
+  element.style.opacity = '1'
+  element.style.transform = 'translateY(0)'
+}
+
+function onAccordionAfterEnter(el: Element) {
+  const element = el as HTMLElement
+  element.style.height = 'auto'
+  element.style.overflow = 'visible'
+  element.style.transition = ''
+}
+
+function onAccordionLeave(el: Element) {
+  const element = el as HTMLElement
+  element.style.height = `${element.scrollHeight}px`
+  element.style.overflow = 'hidden'
+  element.offsetHeight // trigger reflow
+  element.style.transition = 'height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), margin 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+  element.style.height = '0px'
+  element.style.marginTop = '0px'
+  element.style.marginBottom = '0px'
+  element.style.opacity = '0'
+  element.style.transform = 'translateY(-8px)'
+}
 </script>
 
 <template>
@@ -310,7 +347,7 @@ const formError = ref('')
         :aria-label="showAddForm ? '收起新增面板' : '添加日程、生日或纪念日'"
         @click="showAddForm = !showAddForm"
       >
-        <Plus :size="18" />
+        <Plus :size="18" class="plus-icon" />
       </button>
     </template>
 
@@ -319,11 +356,16 @@ const formError = ref('')
       <p class="text-xs text-slate-500">农历日程按常规月份计算；当年没有三十日时取廿九，不在闰月重复提醒。公历 2 月 29 日在下一闰年提醒。</p>
 
       <!-- Add Event Form -->
-      <Transition name="fade-slide">
-        <div
-          v-if="showAddForm"
-          class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3"
-        >
+      <Transition
+        name="accordion"
+        @enter="onAccordionEnter"
+        @after-enter="onAccordionAfterEnter"
+        @leave="onAccordionLeave"
+      >
+        <div v-if="showAddForm" class="accordion-panel">
+          <div
+            class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3"
+          >
           <div class="flex items-center justify-between">
             <div class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">
               添加新日程 / 重要日子
@@ -427,6 +469,7 @@ const formError = ref('')
             </button>
           </div>
         </div>
+        </div>
       </Transition>
 
       <!-- 搜索与筛选栏 -->
@@ -461,7 +504,7 @@ const formError = ref('')
           <!-- Inline Edit Form (spans 2 columns if in grid) -->
           <div
             v-if="editingId === ev.id"
-            class="sm:col-span-2 p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition"
+            class="sm:col-span-2 p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition edit-card-panel"
           >
             <div class="flex items-center justify-between text-xs font-semibold text-emerald-800 dark:text-emerald-300">
               <span class="flex items-center gap-1.5">
@@ -688,6 +731,37 @@ const formError = ref('')
 </template>
 
 <style scoped>
+.accordion-panel {
+  will-change: height, opacity, transform;
+}
+
+.icon-button {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-button .plus-icon {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-button.active .plus-icon {
+  transform: rotate(45deg);
+}
+
+.edit-card-panel {
+  animation: editFadeSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes editFadeSlide {
+  from {
+    opacity: 0;
+    transform: scale(0.985) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);

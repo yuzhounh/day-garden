@@ -332,6 +332,20 @@
   backdrop-filter: blur(24px) saturate(170%);
   -webkit-backdrop-filter: blur(24px) saturate(170%);
 }
+/* 下拉弹层通用流畅过渡 */
+.dropdown-pop-enter-active {
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+.dropdown-pop-leave-active {
+  transition: opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: top right;
+}
+.dropdown-pop-enter-from,
+.dropdown-pop-leave-to {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+}
 .popover-track-info { display: flex; flex-direction: column; gap: 6px; }
 .popover-tag-row { display: flex; align-items: center; gap: 8px; }
 .popover-track-tag {

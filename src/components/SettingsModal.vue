@@ -117,8 +117,9 @@ function importData(e: Event) {
 
     <!-- Tab Content Area -->
     <div class="p-6 overflow-y-auto grow space-y-4">
-      <!-- 1. 模块开关 -->
-      <div v-if="currentTab === 'modules'" class="space-y-3">
+      <Transition name="tab-fade" mode="out-in">
+        <!-- 1. 模块开关 -->
+        <div v-if="currentTab === 'modules'" key="modules" class="space-y-3">
         <p class="text-xs text-slate-500 leading-relaxed">
           极简原则：建议首页启用不超过 6 个模块，确保每天 30 秒内扫视完毕，绝不变成让人刷屏的信息流。
         </p>
@@ -234,7 +235,7 @@ function importData(e: Event) {
       </div>
 
       <!-- 2. 提醒与数据备份 -->
-      <div v-if="currentTab === 'notification'" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div v-else-if="currentTab === 'notification'" key="notification" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 grid grid-rows-[auto_1fr_auto] gap-3">
           <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">桌面与 PWA 系统级提醒</div>
           <div class="text-[11.5px] text-slate-500 dark:text-slate-400 leading-relaxed">
@@ -279,6 +280,22 @@ function importData(e: Event) {
           </div>
         </div>
       </div>
+      </Transition>
     </div>
   </DetailModal>
 </template>
+
+<style scoped>
+.tab-fade-enter-active,
+.tab-fade-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tab-fade-enter-from {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.tab-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+</style>
