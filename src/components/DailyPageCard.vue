@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { Feather, ArrowUpRight, RefreshCw, BookOpen, Bookmark, Check, ChevronDown, ChevronUp, Search } from 'lucide-vue-next'
+import { Feather, ArrowUpRight, RefreshCw, BookOpen, Bookmark, Check, ChevronDown, ChevronUp, Search, Quote as QuoteIcon } from 'lucide-vue-next'
 import type { CuratedPoetry } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawPoetry from '../data/poetry-curated.json'
@@ -72,7 +72,7 @@ function setAsHomePoem(poem: CuratedPoetry) {
     </header>
 
     <div class="poetry-body">
-      <span class="poetry-quotes" aria-hidden="true">“</span>
+      <span class="poetry-quotes" aria-hidden="true"><QuoteIcon :size="28" /></span>
       <blockquote>
         <span v-for="(line, i) in quoteLines" :key="i">
           <span v-for="(phrase, j) in (line.match(/[^，]+，?/g) || [line])" :key="j" class="poetry-phrase">{{ phrase }}</span>
