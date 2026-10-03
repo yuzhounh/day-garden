@@ -1,12 +1,12 @@
 import { reactive, ref } from 'vue'
-import type { User, LifeEvent } from '../types'
+import type { User, LifeEvent, CityOption } from '../types'
 import { localDateKey } from './day'
 import { loadUserPreferences, saveUserPreferences, cleanEventGiftAdvice, getPreferencesKey, DEFAULT_PREFERENCES } from './storage'
 import poemIds from '../data/poetry-ids.json'
-import { isRecord, validateEventList, validateLifeEvent } from './validation'
+import { isRecord, validateEventList, validateLifeEvent, validateCityOption } from './validation'
 import { saveLocal } from './persistence'
 
-interface Mutation { id: string; path: string; method: 'PUT' | 'DELETE'; value?: LifeEvent }
+interface Mutation { id: string; path: string; method: 'PUT' | 'DELETE'; value?: LifeEvent | CityOption }
 interface GardenData { savedPoetry: string[]; dailyActions: Record<string, string[]>; pending: Mutation[]; eventsInitialized: boolean }
 
 const validPoems = new Set(poemIds)
@@ -32,7 +32,10 @@ function parseData(raw: unknown): GardenData {
   }
   const pending = Array.isArray(data?.pending)
     ? data.pending.filter(item => {
-      if (!item || typeof item.id !== 'string' || typeof item.path !== 'string' || !/^\/api\/(poetry|habits|events)\//.test(item.path) || !['PUT', 'DELETE'].includes(item.method)) return false
+      if (!item || typeof item.id !== 'string' || typeof item.path !== 'string' || (!/^\/api\/(poetry|habits|events)\//.test(item.path) && item.path !== '/api/city') || !['PUT', 'DELETE'].includes(item.method)) return false
+      if (item.path === '/api/city') {
+        try { item.value = validateCityOption(item.value); return item.method === 'PUT' } catch { return false }
+      }
       if (item.path.startsWith('/api/events/') && item.method === 'PUT') {
         try { item.value = validateLifeEvent(item.value); return item.path === '/api/events/' + item.value.id } catch { return false }
       }
@@ -85,6 +88,14 @@ function persist() {
 }
 
 function activate(user: User | null) {
+  if (user && !account.user) {
+    const cached = read(getPreferencesKey(user.id))
+    if (!isRecord(cached) || cached.selectedCity === undefined) {
+      const prefs = loadUserPreferences(user.id)
+      prefs.selectedCity = loadUserPreferences().selectedCity
+      saveUserPreferences(prefs, user.id)
+    }
+  }
   account.user = user
   const data = user ? parseData(read('daygarden_account_' + user.id)) : guestData()
   savedPoetryIds.value = data.savedPoetry
@@ -117,7 +128,7 @@ async function api<T>(path: string, method = 'GET', value?: unknown): Promise<T>
   return data as T
 }
 
-function enqueue(path: string, method: Mutation['method'], value?: LifeEvent) {
+function enqueue(path: string, method: Mutation['method'], value?: Mutation['value']) {
   pending = pending.filter(item => item.path !== path)
   pending.push({ id: crypto.randomUUID(), path, method, value })
 }
@@ -132,10 +143,11 @@ function queue(path: string, enabled: boolean) {
 }
 
 export function togglePoetry(id: string) {
-  if (!validPoems.has(id)) return
+  if (!validPoems.has(id) || !account.user) return false
   const enabled = !savedPoetryIds.value.includes(id)
   savedPoetryIds.value = enabled ? [...savedPoetryIds.value, id] : savedPoetryIds.value.filter(value => value !== id)
   queue('/api/poetry/' + id, enabled)
+  return true
 }
 
 export function toggleHabit(date: string, id: string) {
@@ -144,6 +156,18 @@ export function toggleHabit(date: string, id: string) {
   const enabled = !ids.includes(id)
   dailyActions.value = { ...dailyActions.value, [date]: enabled ? [...ids, id] : ids.filter(value => value !== id) }
   queue('/api/habits/' + date + '/' + id, enabled)
+}
+
+export async function syncSelectedCity(city: CityOption) {
+  if (!account.user) return
+  const selectedCity = validateCityOption(city)
+  const prefs = loadUserPreferences(account.user.id)
+  prefs.selectedCity = selectedCity
+  saveUserPreferences(prefs, account.user.id)
+  enqueue('/api/city', 'PUT', selectedCity)
+  revision++
+  persist()
+  await flush()
 }
 
 async function flush(): Promise<void> {
@@ -177,7 +201,7 @@ export async function refreshCloud() {
   const userId = account.user.id
   const currentRevision = revision
   try {
-    const data = await api<GardenData & { customEvents?: LifeEvent[] }>('/api/state')
+    const data = await api<GardenData & { customEvents?: LifeEvent[]; selectedCity?: CityOption | null }>('/api/state')
     if (account.user?.id !== userId || revision !== currentRevision || pending.length) return
     const parsed = parseData(data)
     savedPoetryIds.value = parsed.savedPoetry
@@ -204,6 +228,16 @@ export async function refreshCloud() {
       userPrefs.customEvents = cleanedEvents
       saveUserPreferences(userPrefs, userId)
       window.dispatchEvent(new CustomEvent('daygarden:prefs-synced', { detail: { userId, customEvents: cleanedEvents } }))
+    }
+    if (data.selectedCity !== undefined) {
+      const prefs = loadUserPreferences(userId)
+      if (data.selectedCity === null) {
+        await syncSelectedCity(prefs.selectedCity)
+      } else {
+        prefs.selectedCity = validateCityOption(data.selectedCity)
+        saveUserPreferences(prefs, userId)
+        window.dispatchEvent(new CustomEvent('daygarden:city-synced', { detail: { userId, selectedCity: prefs.selectedCity } }))
+      }
     }
   } catch {
     if (account.user?.id !== userId) return

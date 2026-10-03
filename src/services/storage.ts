@@ -1,7 +1,7 @@
 import type { UserPreferences, LifeEvent, QuickNote } from '../types'
 import { DEFAULT_CITIES } from './weather'
 import { sortEventsByDaysLeft, isRedundantMemo, isAnniversaryEvent } from './calendar'
-import { isRecord, validateEventList, validateLifeEvent } from './validation'
+import { isRecord, validateEventList, validateLifeEvent, validateCityOption } from './validation'
 import { saveLocal } from './persistence'
 
 const STORAGE_KEY = 'daygarden_user_preferences_v1'
@@ -81,7 +81,7 @@ export function getNormalizedCardOrder(customOrder?: string[]): string[] {
 
 export const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'auto',
-  selectedCity: DEFAULT_CITIES[4], // 默认杭州（或可根据需要切换）
+  selectedCity: DEFAULT_CITIES[0], // 默认北京
   modules: {
     weather: true,
     calendar: true,
@@ -177,10 +177,7 @@ function normalizePreferences(value: unknown, strict = false, base = freshPrefer
     else prefs.theme = value.theme as UserPreferences['theme']
   }
   if (value.selectedCity !== undefined) {
-    const city = value.selectedCity
-    if (!isRecord(city) || typeof city.name !== 'string' || !city.name.trim() || typeof city.province !== 'string' || typeof city.lat !== 'number' || typeof city.lon !== 'number' || !Number.isFinite(city.lat) || !Number.isFinite(city.lon) || Math.abs(city.lat) > 90 || Math.abs(city.lon) > 180) {
-      if (strict) throw new Error('城市名称或经纬度无效。')
-    } else prefs.selectedCity = { name: city.name.trim(), province: city.province, lat: city.lat, lon: city.lon }
+    try { prefs.selectedCity = validateCityOption(value.selectedCity) } catch (error) { if (strict) throw error }
   }
   if (value.modules !== undefined) {
     if (!isRecord(value.modules)) { if (strict) throw new Error('模块设置格式无效。') }

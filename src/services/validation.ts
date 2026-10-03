@@ -1,7 +1,14 @@
-import type { LifeEvent } from '../types'
+import type { LifeEvent, CityOption } from '../types'
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value)
+}
+
+export function validateCityOption(value: unknown): CityOption {
+  if (!isRecord(value) || typeof value.name !== 'string' || !value.name.trim() || value.name.trim().length > 100 || typeof value.province !== 'string' || value.province.length > 100 || typeof value.lat !== 'number' || typeof value.lon !== 'number' || !Number.isFinite(value.lat) || !Number.isFinite(value.lon) || Math.abs(value.lat) > 90 || Math.abs(value.lon) > 180) {
+    throw new Error('城市名称、省份或经纬度无效。')
+  }
+  return { name: value.name.trim(), province: value.province.trim(), lat: value.lat, lon: value.lon }
 }
 
 export function parseEventDate(value: unknown, isLunar = false) {

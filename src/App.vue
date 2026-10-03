@@ -13,7 +13,7 @@ const GardenAudioCard = defineAsyncComponent(() => import('./components/GardenAu
 const DailyContentCard = defineAsyncComponent(() => import('./components/DailyContentCard.vue'))
 const SettingsModal = defineAsyncComponent(() => import('./components/SettingsModal.vue'))
 const AccountModal = defineAsyncComponent(() => import('./components/AccountModal.vue'))
-import { initializeSync, refreshCloud, account, syncCustomEvents } from './services/sync'
+import { initializeSync, refreshCloud, account, syncCustomEvents, syncSelectedCity } from './services/sync'
 import type { UserPreferences, WeatherDay, CityOption, LifeEvent, AttractionStatusType } from './types'
 import { fetch7DayWeather } from './services/weather'
 import { getUpcomingEvents } from './services/calendar'
@@ -49,14 +49,17 @@ function toggleTheme() {
 function handleCityChange(city: CityOption) {
   prefs.value.selectedCity = city
   saveUserPreferences(prefs.value, account.user?.id)
+  if (account.user) void syncSelectedCity(city)
 }
 function handleUpdatePreferences(newPrefs: UserPreferences) {
   const previousEvents = prefs.value.customEvents
+  const previousCity = prefs.value.selectedCity
   prefs.value = newPrefs
   saveUserPreferences(newPrefs, account.user?.id)
   if (account.user && JSON.stringify(previousEvents) !== JSON.stringify(newPrefs.customEvents)) {
     void syncCustomEvents(newPrefs.customEvents, previousEvents)
   }
+  if (account.user && JSON.stringify(previousCity) !== JSON.stringify(newPrefs.selectedCity)) void syncSelectedCity(newPrefs.selectedCity)
 }
 let weatherRequest = 0
 async function loadWeather() {
@@ -210,6 +213,10 @@ function handlePrefsSynced(e: Event) {
     prefs.value.customEvents = custom.detail.customEvents
   }
 }
+function handleCitySynced(e: Event) {
+  const custom = e as CustomEvent<{ userId: string; selectedCity: CityOption }>
+  if (account.user?.id === custom.detail.userId) prefs.value.selectedCity = custom.detail.selectedCity
+}
 watch(() => prefs.value.theme, applyTheme, { immediate: true })
 watch(() => [account.user?.id, prefs.value.selectedCity.name, prefs.value.selectedCity.lat, prefs.value.selectedCity.lon, prefs.value.modules.weather], () => {
   if (prefs.value.modules.weather) void loadWeather()
@@ -224,12 +231,14 @@ onMounted(() => {
   document.addEventListener('visibilitychange', handleVisibility)
   window.addEventListener('online', handleOnline)
   window.addEventListener('daygarden:prefs-synced', handlePrefsSynced)
+  window.addEventListener('daygarden:city-synced', handleCitySynced)
 })
 onUnmounted(() => {
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleSystemTheme)
   document.removeEventListener('visibilitychange', handleVisibility)
   window.removeEventListener('online', handleOnline)
   window.removeEventListener('daygarden:prefs-synced', handlePrefsSynced)
+  window.removeEventListener('daygarden:city-synced', handleCitySynced)
 })
 </script>
 

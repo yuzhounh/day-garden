@@ -23,9 +23,13 @@ const passwordConfirmation = ref('')
 const formError = ref('')
 const mergeGuest = ref(true)
 const submitted = ref(false)
+const intro = computed(() => {
+  if (account.user) return '城市选择、诗词收藏、每日打卡和重要日子会在你的设备间同步。'
+  return '无需登录即可浏览和使用花园。登录后可收藏诗词，城市、收藏、打卡和重要日子会在你的设备间同步。'
+})
 
 const message = computed(() => {
-  if (account.status === 'synced') return '收藏、打卡和重要日子已同步到云端。'
+  if (account.status === 'synced') return '城市、收藏、打卡和重要日子已同步到云端。'
   if (account.status === 'syncing') return '正在同步你的花园…'
   return '内容已保存在本机，等待云端同步。'
 })
@@ -72,7 +76,7 @@ function handleMock() {
   <DetailModal class="account-modal" :title="account.user ? '我的花园账户' : '登录我的花园'" subtitle="DAY GARDEN" @close="emit('close')">
     <div class="account-intro">
       <span class="icon-tile sage"><Cloud :size="19" /></span>
-      <p>登录后，诗词收藏、每日打卡和重要日子会在你的设备间同步。</p>
+      <p>{{ intro }}</p>
     </div>
 
     <!-- 登录后账户概览 -->
@@ -135,7 +139,7 @@ function handleMock() {
           <p>无需单独注册，首次登录会自动创建账户。</p>
         </div>
         <label class="merge-choice">
-          <input v-model="mergeGuest" type="checkbox" />合并此浏览器里的收藏、打卡和重要日子
+          <input v-model="mergeGuest" type="checkbox" />合并此浏览器里的打卡、重要日子与旧版收藏
         </label>
         <div class="oauth-grid">
           <!-- Google 登录按钮 -->
@@ -203,7 +207,7 @@ function handleMock() {
           <p class="auth-hint">暂不提供密码找回，请妥善保存密码。</p>
         </template>
         <label class="merge-choice">
-          <input v-model="mergeGuest" type="checkbox" />合并此浏览器里的收藏、打卡和重要日子
+          <input v-model="mergeGuest" type="checkbox" />合并此浏览器里的打卡、重要日子与旧版收藏
         </label>
         <p v-if="formError || (submitted && account.error)" class="account-error" role="alert">{{ formError || account.error }}</p>
         <button class="soft-button account-submit" :disabled="account.busy">
@@ -215,7 +219,7 @@ function handleMock() {
         </p>
       </form>
 
-      <p class="auth-local-note">城市、主题与随笔仅保存在当前浏览器。</p>
+      <p class="auth-local-note">登录后会记住你的城市；主题与随笔仅保存在当前浏览器。</p>
     </template>
 
   </DetailModal>

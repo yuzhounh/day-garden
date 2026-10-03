@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Feather, ArrowUpRight, RefreshCw, BookOpen, Bookmark, Check, ChevronDown, ChevronUp, Search } from 'lucide-vue-next'
 import type { CuratedPoetry } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawPoetry from '../data/poetry-curated.json'
-import { savedPoetryIds as savedIds, togglePoetry } from '../services/sync'
+import { account, savedPoetryIds as savedIds, togglePoetry } from '../services/sync'
 
 const props = defineProps<{ poetry: CuratedPoetry }>()
 const emit = defineEmits<{ 'next-poetry': []; 'select-poetry': [poetry: CuratedPoetry] }>()
@@ -12,13 +12,16 @@ const showFull = ref(false)
 const showLibrary = ref(false)
 const filter = ref('全部')
 const searchQuery = ref('')
-const isSaved = computed(() => savedIds.value.includes(props.poetry.id))
+const filters = computed(() => ['全部', '春', '夏', '秋', '冬', '豁达励志', ...(account.user ? ['收藏'] : [])])
+function isPoemSaved(id: string) { return Boolean(account.user) && savedIds.value.includes(id) }
+const isSaved = computed(() => isPoemSaved(props.poetry.id))
+watch(() => account.user?.id, () => { if (!account.user && filter.value === '收藏') filter.value = '全部' })
 const poems = rawPoetry as CuratedPoetry[]
 const filteredPoems = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
   return poems.filter(poem => {
     let matchCat = true
-    if (filter.value === '收藏') matchCat = savedIds.value.includes(poem.id)
+    if (filter.value === '收藏') matchCat = isPoemSaved(poem.id)
     else if (filter.value === '全部') matchCat = true
     else if (filter.value === '豁达励志') matchCat = poem.season === '通'
     else matchCat = poem.season === filter.value
@@ -95,7 +98,7 @@ function setAsHomePoem(poem: CuratedPoetry) {
         <BookOpen :size="14" />诗词小集
       </button>
       <div class="inline-actions">
-        <button class="icon-button small" :aria-label="isSaved ? '取消收藏诗词' : '收藏诗词'" :aria-pressed="isSaved" @click="toggleSave()">
+        <button v-if="account.user" class="icon-button small" :aria-label="isSaved ? '取消收藏诗词' : '收藏诗词'" :aria-pressed="isSaved" @click="toggleSave()">
           <Check v-if="isSaved" :size="15" />
           <Bookmark v-else :size="15" />
         </button>
@@ -109,6 +112,7 @@ function setAsHomePoem(poem: CuratedPoetry) {
     <DetailModal v-if="showFull" :title="poetry.title" :subtitle="'〔' + poetry.dynasty + '〕' + poetry.author" @close="showFull = false">
       <template #actions>
         <button
+          v-if="account.user"
           class="icon-button"
           :class="{ active: isSaved }"
           :title="isSaved ? '已收藏 · 点击取消' : '收藏这首诗'"
@@ -138,13 +142,13 @@ function setAsHomePoem(poem: CuratedPoetry) {
       </div>
 
       <div class="filter-pills">
-        <button v-for="season in ['全部', '春', '夏', '秋', '冬', '豁达励志', '收藏']" :key="season" :class="{ active: filter === season }" :aria-pressed="filter === season" @click="filter = season">
+        <button v-for="season in filters" :key="season" :class="{ active: filter === season }" :aria-pressed="filter === season" @click="filter = season">
           {{ season }}
         </button>
       </div>
 
       <div v-if="!filteredPoems.length" class="p-8 text-center text-sm text-slate-400">
-        未找到匹配的诗词名句，试着换个词搜搜看
+        {{ filter === '收藏' ? '还没有收藏。遇见喜欢的诗，点一下书签留下它。' : '未找到匹配的诗词名句，试着换个词搜搜看' }}
       </div>
 
       <div v-else class="quote-library-list">
@@ -178,13 +182,15 @@ function setAsHomePoem(poem: CuratedPoetry) {
           <div class="quote-item-actions">
             <div class="flex items-center gap-4">
               <button
+                v-if="account.user"
                 class="text-button text-xs"
-                :title="savedIds.includes(poem.id) ? '已收藏 · 点击取消' : '收藏这首诗'"
+                :title="isPoemSaved(poem.id) ? '已收藏 · 点击取消' : '收藏这首诗'"
+                :aria-pressed="isPoemSaved(poem.id)"
                 @click="togglePoetry(poem.id)"
               >
-                <Check v-if="savedIds.includes(poem.id)" :size="13" class="text-emerald-500" />
+                <Check v-if="isPoemSaved(poem.id)" :size="13" class="text-emerald-500" />
                 <Bookmark v-else :size="13" />
-                <span>{{ savedIds.includes(poem.id) ? '已收藏' : '收藏' }}</span>
+                <span>{{ isPoemSaved(poem.id) ? '已收藏' : '收藏' }}</span>
               </button>
 
               <button
@@ -208,10 +214,6 @@ function setAsHomePoem(poem: CuratedPoetry) {
             </button>
           </div>
         </article>
-
-        <p v-if="!filteredPoems.length" class="empty-state">
-          还没有收藏。遇见喜欢的诗，点一下书签留下它。
-        </p>
       </div>
     </DetailModal>
   </article>

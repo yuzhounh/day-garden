@@ -1,5 +1,5 @@
 import poetry from '../src/data/poetry-ids.json'
-import { validateEventList, validateLifeEvent } from '../src/services/validation'
+import { validateEventList, validateLifeEvent, validateCityOption } from '../src/services/validation'
 
 interface Env {
   DB: D1Database
@@ -538,10 +538,11 @@ async function api(request: Request, env: Env): Promise<Response> {
 
   // 13. State fetch
   if (path === '/api/state' && request.method === 'GET') {
-    const [saved, actions, events] = await Promise.all([
+    const [saved, actions, events, preferences] = await Promise.all([
       env.DB.prepare('SELECT poem_id FROM saved_poetry WHERE user_id = ?').bind(user.id).all<{ poem_id: string }>(),
       env.DB.prepare('SELECT date, action_id FROM daily_actions WHERE user_id = ? ORDER BY date DESC LIMIT 1098').bind(user.id).all<{ date: string; action_id: string }>(),
       env.DB.prepare('SELECT id, title, date, is_lunar, type, role, gift_advice FROM custom_events WHERE user_id = ? ORDER BY created_at ASC').bind(user.id).all<{ id: string; title: string; date: string; is_lunar: number; type: string; role?: string; gift_advice?: string }>(),
+      env.DB.prepare('SELECT selected_city FROM users WHERE id = ?').bind(user.id).first<{ selected_city: string | null }>(),
     ])
     const dailyActions: Record<string, string[]> = {}
     for (const action of actions.results) (dailyActions[action.date] ||= []).push(action.action_id)
@@ -554,7 +555,18 @@ async function api(request: Request, env: Env): Promise<Response> {
       role: e.role || undefined,
       giftAdvice: e.gift_advice || undefined,
     }))
-    return json({ savedPoetry: saved.results.map(row => row.poem_id), dailyActions, customEvents })
+    const selectedCity = preferences?.selected_city ? validateCityOption(JSON.parse(preferences.selected_city)) : null
+    return json({ savedPoetry: saved.results.map(row => row.poem_id), dailyActions, customEvents, selectedCity })
+  }
+
+  if (path === '/api/city' && request.method === 'PUT') {
+    let city
+    try { city = validateCityOption(await body(request)) } catch (error) {
+      if (error instanceof ApiError) throw error
+      throw new ApiError(400, (error as Error).message)
+    }
+    await env.DB.prepare('UPDATE users SET selected_city = ? WHERE id = ?').bind(JSON.stringify(city), user.id).run()
+    return json({ ok: true })
   }
 
   // 14. Custom events sync and mutations

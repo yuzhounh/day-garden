@@ -8,6 +8,122 @@ function accountStorage() {
   return memoryStorage(new Map([['daygarden_last_user', JSON.stringify(user)], ['daygarden_account_user-a', JSON.stringify({ eventsInitialized: true })]]))
 }
 
+test('Guest favorite attempts never mutate storage; signing in does not save a guest attempt', async () => {
+  const guest = JSON.stringify({ savedPoetry: ['meng-chunxiao'], dailyActions: {} })
+  const storage = memoryStorage(new Map([['daygarden_guest_data', guest]]))
+  let rejectLogin = true
+  const app = await loadApp({ storage, fetch: async path => {
+    if (path === '/api/login') return rejectLogin ? json({ error: '登录失败' }, 401) : json({ user })
+    if (path === '/api/state') return json({ savedPoetry: [], dailyActions: {}, customEvents: [] })
+    return json({ ok: true })
+  } })
+  assert.equal(app.sync.togglePoetry('dumu-shanxing'), false)
+  assert.deepEqual([...app.sync.savedPoetryIds.value], ['meng-chunxiao'])
+  assert.equal(storage.getItem('daygarden_guest_data'), guest)
+  assert.equal(app.calls.length, 0)
+  await assert.rejects(app.sync.signIn('account_a', 'password', false, false), /登录失败/)
+  assert.equal(storage.getItem('daygarden_guest_data'), guest)
+  rejectLogin = false
+  await app.sync.signIn('account_a', 'password', false, false)
+  assert.equal(app.sync.savedPoetryIds.value.length, 0)
+  assert.ok(!app.calls.some(([path]) => path.startsWith('/api/poetry/')))
+})
+
+test('Favorites can be added and removed only by a signed-in account', async () => {
+  const cloud = new Set(['meng-chunxiao'])
+  const app = await loadApp({ fetch: async (path, options = {}) => {
+    if (path === '/api/login') return json({ user })
+    if (path === '/api/state') return json({ savedPoetry: [...cloud], dailyActions: {}, customEvents: [] })
+    if (path.startsWith('/api/poetry/')) {
+      const id = path.slice('/api/poetry/'.length)
+      if (options.method === 'PUT') cloud.add(id)
+      else cloud.delete(id)
+    }
+    return json({ ok: true })
+  } })
+  assert.equal(app.sync.togglePoetry('dumu-shanxing'), false)
+  await app.sync.signIn('account_a', 'password', false, false)
+  assert.ok(!cloud.has('dumu-shanxing'))
+  assert.equal(app.sync.togglePoetry('dumu-shanxing'), true)
+  await app.sync.refreshCloud()
+  assert.ok(cloud.has('dumu-shanxing'))
+  assert.equal(app.calls.filter(([path]) => path === '/api/poetry/dumu-shanxing').length, 1)
+  await app.sync.signIn('account_a', 'password', false, false)
+  assert.ok(cloud.has('meng-chunxiao'))
+  assert.ok(!app.calls.some(([path]) => path === '/api/poetry/meng-chunxiao'))
+  assert.equal(app.sync.togglePoetry('dumu-shanxing'), true)
+  await app.sync.refreshCloud()
+  assert.ok(!cloud.has('dumu-shanxing'))
+  await app.sync.signOut()
+  assert.equal(app.sync.togglePoetry('dumu-shanxing'), false)
+})
+
+test('City defaults to Beijing, seeds a new account from the guest choice and restores its cloud choice on another browser', async () => {
+  const city = { name: '上海', province: '上海', lat: 31.23, lon: 121.47 }
+  const storage = memoryStorage(new Map([['daygarden_guest_preferences_v1', JSON.stringify({ selectedCity: city })]]))
+  let cloudCity = null
+  const fetch = async (path, options = {}) => {
+    if (path === '/api/login') return json({ user })
+    if (path === '/api/state') return json({ savedPoetry: [], dailyActions: {}, customEvents: [], selectedCity: cloudCity })
+    if (path === '/api/city') cloudCity = JSON.parse(options.body)
+    return json({ ok: true })
+  }
+  const app = await loadApp({ storage, fetch })
+  assert.equal(app.storage.DEFAULT_PREFERENCES.selectedCity.name, '北京')
+  await app.sync.signIn('account_a', 'password', false, false)
+  assert.equal(cloudCity.name, '上海')
+  assert.equal(app.storage.loadUserPreferences(user.id).selectedCity.name, '上海')
+  await app.sync.signOut()
+  storage.values.delete('daygarden_user_prefs_' + user.id)
+  const guestPrefs = app.storage.loadUserPreferences()
+  guestPrefs.selectedCity = { name: '广州', province: '广东', lat: 23.13, lon: 113.26 }
+  app.storage.saveUserPreferences(guestPrefs)
+  await app.sync.signIn('account_a', 'password', false, false)
+  assert.equal(app.storage.loadUserPreferences(user.id).selectedCity.name, '上海')
+  assert.equal(cloudCity.name, '上海')
+  assert.equal(app.storage.loadUserPreferences().selectedCity.name, '广州')
+})
+
+test('Offline city changes coalesce and survive reload; stale cloud responses cannot undo a newer city choice', async () => {
+  const storage = accountStorage()
+  const shanghai = { name: '上海', province: '上海', lat: 31.23, lon: 121.47 }
+  const beijing = { name: '北京', province: '北京', lat: 39.9, lon: 116.4 }
+  let online = false
+  let cloudCity = null
+  let delayed = false
+  let release
+  const fetch = async (path, options = {}) => {
+    if (!online) throw new Error('offline')
+    if (path === '/api/city') cloudCity = JSON.parse(options.body)
+    if (path === '/api/state') {
+      const selectedCity = cloudCity
+      if (delayed) await new Promise(resolve => { release = resolve })
+      return json({ savedPoetry: [], dailyActions: {}, customEvents: [], selectedCity })
+    }
+    return json({ ok: true })
+  }
+  const app = await loadApp({ storage, fetch })
+  await app.sync.syncSelectedCity(shanghai)
+  await app.sync.syncSelectedCity(beijing)
+  const queued = JSON.parse(storage.getItem('daygarden_account_' + user.id)).pending
+  assert.equal(queued.length, 1)
+  assert.equal(queued[0].value.name, '北京')
+  assert.equal(app.sync.account.status, 'offline')
+  const reloaded = await loadApp({ storage, fetch })
+  assert.equal(reloaded.storage.loadUserPreferences(user.id).selectedCity.name, '北京')
+  online = true
+  await reloaded.sync.refreshCloud()
+  assert.equal(cloudCity.name, '北京')
+  assert.equal(JSON.parse(storage.getItem('daygarden_account_' + user.id)).pending.length, 0)
+  delayed = true
+  const refresh = reloaded.sync.refreshCloud()
+  await new Promise(resolve => setTimeout(resolve, 0))
+  await reloaded.sync.syncSelectedCity(shanghai)
+  release()
+  await refresh
+  assert.equal(reloaded.storage.loadUserPreferences(user.id).selectedCity.name, '上海')
+})
+
 test('Gregorian validation rejects normalization; lunar and leap-day recurrence agree with the calendar', async () => {
   const { validation: v, calendar: c, day } = await loadApp()
   for (const date of ['2026-02-30', '2026-02-29', '13-01', '02-31']) assert.equal(v.parseEventDate(date), null)
