@@ -15,10 +15,8 @@ const emit = defineEmits<{
 }>()
 
 const showModal = ref(false)
-const initialAdd = ref(false)
 
-function openModal(withAdd: boolean) {
-  initialAdd.value = withAdd
+function openModal() {
   showModal.value = true
 }
 </script>
@@ -31,7 +29,7 @@ function openModal(withAdd: boolean) {
         <h2>岁月里程</h2>
         <span class="eyebrow">MILESTONES</span>
       </div>
-      <button class="icon-button small" aria-label="添加纪念日" @click="openModal(true)">
+      <button class="icon-button small" aria-label="添加纪念日" @click="openModal">
         <Plus :size="16" />
       </button>
     </header>
@@ -39,7 +37,7 @@ function openModal(withAdd: boolean) {
     <div v-if="!events.length" class="event-empty">
       <Heart :size="28" :stroke-width="1" />
       <p>暂无临近的纪念日，记下那些温暖的时刻。</p>
-      <button class="text-button" @click="openModal(true)">
+      <button class="text-button" @click="openModal">
         记下一个纪念日<Plus :size="14" />
       </button>
     </div>
@@ -63,7 +61,7 @@ function openModal(withAdd: boolean) {
     </div>
 
     <footer class="card-footer">
-      <button class="text-button" type="button" @click="openModal(false)">
+      <button class="text-button" type="button" @click="openModal">
         <BookOpen :size="14" />管理纪念日
       </button>
       <span class="muted">未来 30 天 · {{ events.length }} 个日子</span>
@@ -73,7 +71,6 @@ function openModal(withAdd: boolean) {
     <EventsModal
       v-if="showModal"
       :custom-events="customEvents"
-      :initial-add="initialAdd"
       @close="showModal = false"
       @update:custom-events="emit('update:customEvents', $event)"
     />

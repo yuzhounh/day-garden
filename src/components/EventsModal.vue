@@ -12,15 +12,9 @@ import {
 import DetailModal from './DetailModal.vue'
 import { validateLifeEvent, validateEventList, parseEventDate } from '../services/validation'
 
-const props = withDefaults(
-  defineProps<{
-    customEvents: LifeEvent[]
-    initialAdd?: boolean
-  }>(),
-  {
-    initialAdd: false,
-  }
-)
+const props = defineProps<{
+  customEvents: LifeEvent[]
+}>()
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -28,7 +22,7 @@ const emit = defineEmits<{
 }>()
 
 // 新增事件表单
-const showAddForm = ref(props.initialAdd)
+const showAddForm = ref(false)
 const newEventTitle = ref('')
 const newEventDate = ref('')
 const newEventType = ref<'birthday' | 'anniversary' | 'custom'>('birthday')
@@ -255,7 +249,7 @@ const formError = ref('')
         :aria-label="showAddForm ? '收起新增面板' : '新增日子/纪念日'"
         @click="showAddForm = !showAddForm"
       >
-        <Plus :size="18" class="transition-transform duration-200" :class="{ 'rotate-45': showAddForm }" />
+        <Plus :size="18" />
       </button>
     </template>
 
