@@ -1931,6 +1931,7 @@
   color: var(--muted);
   cursor: pointer;
   transition: all 0.15s;
+  white-space: nowrap;
 }
 .status-btn:hover {
   border-color: var(--ink);
@@ -2077,6 +2078,8 @@
   .bloom-copy { width: 72%; }
   .bloom-scene > svg { width: 135px; right: -18px; opacity: .6; }
   .wellbeing-layout { grid-template-columns: .8fr 1.2fr; gap: 20px; }
+  .spot-actions-group { flex-direction: column; gap: 5px; flex-shrink: 0; align-self: center; }
+  .status-btn { min-height: 28px; padding: 3px 8px; font-size: 11.5px; text-align: center; white-space: nowrap; min-width: 44px; }
 }
 @media (max-width: 720px) {
   .calendar-upcoming-row { grid-template-columns: 1fr; gap: 16px; }
@@ -2190,7 +2193,8 @@
 }
 
 @media (min-width: 744px) and (min-height: 600px) and (pointer: coarse) {
-  .garden-shell button:not(.cal-cell) { min-width: 44px; min-height: 44px; }
+  .garden-shell button:not(.cal-cell):not(.status-btn) { min-width: 44px; min-height: 44px; }
+  .garden-shell .status-btn { min-width: 44px; min-height: 28px; }
   .garden-shell input:not([type="range"]), .garden-shell select, .garden-shell textarea { font-size: 16px; }
   .month-calendar-card .card-heading { flex-wrap: wrap; }
   .month-calendar-card .cal-controls { margin-left: auto; }

@@ -381,3 +381,37 @@ test('Calendar legend displays side-by-side on desktop and stacked into two line
     expect(boxes[1].x).toBeGreaterThan(boxes[0].x + 30)
   }
 })
+
+test('Attractions status buttons display side-by-side on wide desktop and stacked into two lines on mobile and tablet', async ({ page, isMobile }) => {
+  await page.goto('/')
+  const card = page.locator('.lazy-card', { hasText: '华夏胜景' })
+  await card.scrollIntoViewIfNeeded()
+  const firstSpot = page.locator('.spot-mini-row').first()
+  await expect(firstSpot).toBeVisible()
+  const buttons = firstSpot.locator('.spot-actions-group .status-btn')
+  await expect(buttons).toHaveCount(2)
+  await expect(buttons.nth(0)).toContainText('去过')
+  await expect(buttons.nth(1)).toContainText('想去')
+
+  const boxes = await Promise.all([
+    buttons.nth(0).boundingBox(),
+    buttons.nth(1).boundingBox(),
+  ])
+  expect(boxes[0]).not.toBeNull()
+  expect(boxes[1]).not.toBeNull()
+
+  if (isMobile) {
+    expect(boxes[1].y).toBeGreaterThan(boxes[0].y + 15)
+  } else {
+    expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThan(5)
+    expect(boxes[1].x).toBeGreaterThan(boxes[0].x + 30)
+
+    await page.setViewportSize({ width: 820, height: 1180 })
+    await firstSpot.scrollIntoViewIfNeeded()
+    const tabletBoxes = await Promise.all([
+      buttons.nth(0).boundingBox(),
+      buttons.nth(1).boundingBox(),
+    ])
+    expect(tabletBoxes[1].y).toBeGreaterThan(tabletBoxes[0].y + 15)
+  }
+})
