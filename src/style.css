@@ -2199,3 +2199,65 @@
   .month-calendar-card .cal-cell { min-width: 0; width: 100%; aspect-ratio: auto; }
 }
 
+/* 黑胶唱片深色模式：限定典雅白胶唱片 (Limited Edition Porcelain White Vinyl)
+   解决深色背景下黑胶融底与同心圆靶心生硬感，形成明月般温润高级的视觉轮廓 */
+.dark .garden-audio-card .vinyl-record-wrap {
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.45));
+}
+.dark .garden-audio-card .vinyl-disc {
+  background:
+    /* 珍珠白双向各向异性沙漏型光泽 (Pearlescent conic reflection) */
+    conic-gradient(
+      from 45deg at 50% 50%,
+      rgba(255, 255, 255, 0.65) 0deg,
+      transparent 48deg,
+      rgba(255, 255, 255, 0.95) 90deg,
+      transparent 132deg,
+      rgba(255, 255, 255, 0.65) 180deg,
+      transparent 228deg,
+      rgba(255, 255, 255, 0.95) 270deg,
+      transparent 312deg,
+      rgba(255, 255, 255, 0.65) 360deg
+    ),
+    /* 极细腻浅灰微音轨暗纹 (Delicate graphite micro-grooves) */
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(18, 30, 22, 0.038) 0px,
+      rgba(18, 30, 22, 0.038) 1px,
+      transparent 1.5px,
+      transparent 4px
+    ),
+    /* 温润象牙白胶底色渐变 (Ivory/porcelain white body) */
+    radial-gradient(
+      circle at 50% 50%,
+      #f6f8f6 0%,
+      #eaefeb 35%,
+      #dbe3de 70%,
+      #cfdad2 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.95),
+    inset 0 0 16px rgba(20, 35, 25, 0.12),
+    0 10px 26px rgba(0, 0, 0, 0.38);
+}
+.dark .garden-audio-card .vinyl-groove-ring.ring-1 {
+  border-color: rgba(30, 48, 36, 0.07);
+}
+.dark .garden-audio-card .vinyl-groove-ring.ring-2 {
+  border-color: rgba(30, 48, 36, 0.045);
+}
+.dark .garden-audio-card .vinyl-groove-ring.ring-3 {
+  border-color: rgba(30, 48, 36, 0.07);
+}
+.dark .garden-audio-card .vinyl-groove-ring.ring-4 {
+  border-color: rgba(30, 48, 36, 0.045);
+}
+.dark .garden-audio-card .vinyl-center-label {
+  background: #3a6249;
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.22);
+}
+
+
+

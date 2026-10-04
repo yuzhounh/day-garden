@@ -474,13 +474,15 @@ onUnmounted(() => {
   margin: auto 0;
 }
 
-/* 黑胶唱片 */
+/* 黑胶唱片 (外包层阴影与层级) */
 .vinyl-record-wrap {
   position: relative;
   flex-shrink: 0;
-  filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.22));
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.18));
+  transition: filter 0.3s ease;
 }
 
+/* 唱片盘体：浅色模式为经典曜石黑胶 (Classic Obsidian Vinyl) */
 .vinyl-disc {
   width: 142px;
   height: 142px;
@@ -489,41 +491,42 @@ onUnmounted(() => {
   display: grid;
   place-items: center;
   background:
-    /* 柔和黑胶唱片沙漏型光泽反射 (Soft conic reflection) */
+    /* 物理级各向异性双扇形沙漏漫反射 (Anisotropic specular sheen) */
     conic-gradient(
       from 45deg at 50% 50%,
-      rgba(255, 255, 255, 0.07) 0deg,
-      transparent 55deg,
-      rgba(255, 255, 255, 0.13) 90deg,
-      transparent 135deg,
-      rgba(255, 255, 255, 0.07) 180deg,
-      transparent 235deg,
-      rgba(255, 255, 255, 0.13) 270deg,
-      transparent 315deg,
-      rgba(255, 255, 255, 0.07) 360deg
+      rgba(255, 255, 255, 0.04) 0deg,
+      transparent 50deg,
+      rgba(255, 255, 255, 0.09) 90deg,
+      transparent 130deg,
+      rgba(255, 255, 255, 0.04) 180deg,
+      transparent 230deg,
+      rgba(255, 255, 255, 0.09) 270deg,
+      transparent 310deg,
+      rgba(255, 255, 255, 0.04) 360deg
     ),
     /* 细腻柔和微纹音轨暗纹 (Subtle micro-grooves) */
     repeating-radial-gradient(
       circle at 50% 50%,
-      rgba(255, 255, 255, 0.07) 0px,
-      rgba(255, 255, 255, 0.07) 1px,
+      rgba(255, 255, 255, 0.035) 0px,
+      rgba(255, 255, 255, 0.035) 1px,
       transparent 1.5px,
-      transparent 4.5px
+      transparent 4px
     ),
-    /* 黑胶唱片本体渐变底色 */
+    /* 曜石黑胶唱片底色渐变 */
     radial-gradient(
       circle at 50% 50%,
-      #323a42 0%,
-      #22272c 35%,
-      #15181b 70%,
-      #0b0d0f 100%
+      #2e343b 0%,
+      #202428 35%,
+      #131618 70%,
+      #0c0e10 100%
     );
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-    inset 0 0 20px rgba(0, 0, 0, 0.7),
+    inset 0 0 18px rgba(0, 0, 0, 0.75),
     0 10px 24px rgba(0, 0, 0, 0.22);
   animation: vinyl-spin 16s linear infinite;
   animation-play-state: paused;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .vinyl-disc.spinning {
@@ -535,33 +538,36 @@ onUnmounted(() => {
   to { transform: rotate(360deg); }
 }
 
+/* 音轨分段微圈 (轻微音轨分界线，杜绝粗糙刺眼的靶心感) */
 .vinyl-groove-ring {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
+  transition: border-color 0.3s ease;
 }
 
 .vinyl-groove-ring.ring-1 {
   width: 126px;
   height: 126px;
-  border: 1px solid rgba(255, 255, 255, 0.11);
+  border: 1px solid rgba(255, 255, 255, 0.045);
 }
 .vinyl-groove-ring.ring-2 {
   width: 108px;
   height: 108px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.032);
 }
 .vinyl-groove-ring.ring-3 {
   width: 90px;
   height: 90px;
-  border: 1px solid rgba(255, 255, 255, 0.11);
+  border: 1px solid rgba(255, 255, 255, 0.045);
 }
 .vinyl-groove-ring.ring-4 {
   width: 72px;
   height: 72px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.032);
 }
 
+/* 盘心纸质标签 */
 .vinyl-center-label {
   width: 52px;
   height: 52px;
@@ -574,6 +580,7 @@ onUnmounted(() => {
   border: 1.5px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
   z-index: 2;
+  transition: all 0.3s ease;
 }
 
 .vinyl-icon-inner {

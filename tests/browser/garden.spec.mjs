@@ -472,3 +472,26 @@ test('Wellbeing tip banner pill is vertically centered with the tip text', async
   const textCenterY = textBox.y + textBox.height / 2
   expect(Math.abs(pillCenterY - textCenterY)).toBeLessThan(4)
 })
+
+test('Vinyl record displays adaptive obsidian black disc in light mode and porcelain white disc in dark mode without harsh bullseye rings', async ({ page }) => {
+  await page.goto('/')
+  const card = page.locator('.lazy-card', { hasText: '听见花园' })
+  await card.scrollIntoViewIfNeeded()
+  const disc = page.locator('.vinyl-disc')
+  await expect(disc).toBeVisible()
+
+  // In light mode, the disc has obsidian black base gradient
+  const lightBg = await disc.evaluate((el) => window.getComputedStyle(el).backgroundImage)
+  expect(lightBg).toContain('rgb(46, 52, 59)')
+
+  // Switch to dark mode
+  await page.evaluate(() => document.documentElement.classList.add('dark'))
+  const darkBg = await disc.evaluate((el) => window.getComputedStyle(el).backgroundImage)
+  expect(darkBg).toContain('rgb(246, 248, 246)')
+
+  // Verify groove ring border is subtle translucent instead of solid stark white
+  const ring1 = page.locator('.vinyl-groove-ring.ring-1')
+  const ring1Border = await ring1.evaluate((el) => window.getComputedStyle(el).borderColor)
+  expect(ring1Border).not.toBe('rgb(255, 255, 255)')
+})
+
