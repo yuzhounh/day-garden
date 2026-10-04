@@ -2087,6 +2087,7 @@
   .status-btn { min-height: 28px; padding: 3px 8px; font-size: 11.5px; text-align: center; white-space: nowrap; min-width: 44px; }
 }
 @media (max-width: 720px) {
+  .note-action-btn { min-width: 36px; min-height: 36px; width: 36px; height: 36px; }
   .calendar-upcoming-row { grid-template-columns: 1fr; gap: 16px; }
   .two-column-cards-grid { grid-template-columns: 1fr; gap: 16px; }
   .account-summary { flex-direction: column; align-items: stretch; }
@@ -2195,7 +2196,7 @@
   .glass-panel { background: var(--glass); }
 }
 
-@media (min-width: 744px) and (min-height: 600px) and (pointer: coarse) {
+@media (min-width: 744px) and (pointer: coarse) {
   .garden-shell button:not(.cal-cell):not(.status-btn) { min-width: 44px; min-height: 44px; }
   .garden-shell .status-btn { min-width: 44px; min-height: 28px; }
   .garden-shell input:not([type="range"]), .garden-shell select, .garden-shell textarea { font-size: 16px; }
@@ -2206,7 +2207,7 @@
 }
 
 @media (min-width: 721px) and (max-width: 1050px),
-       (min-width: 744px) and (min-height: 600px) and (pointer: coarse) {
+       (min-width: 744px) and (pointer: coarse) {
   .month-calendar-card .cal-footer {
     display: grid;
     grid-template-columns: 1fr auto;

@@ -701,6 +701,15 @@ function onAccordionLeave(el: Element) {
   transition: all 0.15s ease;
 }
 
+@media (max-width: 720px), (pointer: coarse) {
+  .note-action-btn {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+}
+
 .note-action-btn:hover {
   background: var(--sage-bg);
   color: var(--ink);
