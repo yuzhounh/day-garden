@@ -384,6 +384,49 @@ test('Calendar legend displays side-by-side on desktop and stacked into two line
   }
 })
 
+test('Calendar footer displays solar and lunar on the same line, and holiday extra with legend on the next line on tablet', async ({ page, isMobile }) => {
+  if (isMobile) return
+  await page.goto('/')
+  await page.setViewportSize({ width: 820, height: 1180 })
+  const calendarCard = page.locator('.month-calendar-card')
+  await calendarCard.scrollIntoViewIfNeeded()
+
+  // Click on a cell with holiday/rest status (like Oct 4 National Day)
+  const restCell = calendarCard.locator('.cal-cell.is-rest').first()
+  if (await restCell.count() > 0) {
+    await restCell.click()
+  }
+
+  const solar = calendarCard.locator('.detail-solar')
+  const lunar = calendarCard.locator('.detail-lunar')
+  const extra = calendarCard.locator('.detail-extra')
+  const legendItems = calendarCard.locator('.cal-legend .legend-item')
+
+  await expect(solar).toBeVisible()
+  await expect(lunar).toBeVisible()
+  await expect(extra).toBeVisible()
+
+  const [solarBox, lunarBox, extraBox, legendBox0, legendBox1] = await Promise.all([
+    solar.boundingBox(),
+    lunar.boundingBox(),
+    extra.boundingBox(),
+    legendItems.nth(0).boundingBox(),
+    legendItems.nth(1).boundingBox(),
+  ])
+
+  // 1. 公历和农历放到同一行
+  expect(Math.abs(solarBox.y - lunarBox.y)).toBeLessThan(5)
+  expect(lunarBox.x).toBeGreaterThan(solarBox.x + 20)
+
+  // 2. 下一行放国庆节 (extra 在 solar 下方)
+  expect(extraBox.y).toBeGreaterThan(solarBox.y + 12)
+
+  // 3. 放假和调休可以跟国庆节放同一行
+  expect(Math.abs(extraBox.y - legendBox0.y)).toBeLessThan(6)
+  expect(Math.abs(legendBox0.y - legendBox1.y)).toBeLessThan(5)
+  expect(legendBox0.x).toBeGreaterThan(extraBox.x + 20)
+})
+
 test('Attractions status buttons display side-by-side on wide desktop and stacked into two lines on mobile and tablet', async ({ page, isMobile }) => {
   await page.goto('/')
   const card = page.locator('.lazy-card', { hasText: '华夏胜景' })
@@ -417,6 +460,81 @@ test('Attractions status buttons display side-by-side on wide desktop and stacke
     expect(tabletBoxes[1].y).toBeGreaterThan(tabletBoxes[0].y + 15)
   }
 })
+
+test('Attractions card displays spot name and location tag in two separate lines on tablet', async ({ page, isMobile }) => {
+  if (isMobile) return
+  await page.goto('/')
+  await page.setViewportSize({ width: 820, height: 1180 })
+  const card = page.locator('.lazy-card', { hasText: '华夏胜景' })
+  await card.scrollIntoViewIfNeeded()
+  const firstSpot = page.locator('.spot-mini-row').first()
+  await expect(firstSpot).toBeVisible()
+
+  const name = firstSpot.locator('.spot-title-row strong')
+  const loc = firstSpot.locator('.spot-title-row .spot-location-tag')
+  await expect(name).toBeVisible()
+  await expect(loc).toBeVisible()
+
+  const [nameBox, locBox] = await Promise.all([
+    name.boundingBox(),
+    loc.boundingBox(),
+  ])
+  expect(nameBox).not.toBeNull()
+  expect(locBox).not.toBeNull()
+
+  // 分两行排版：loc 的 y 坐标明显大于 name 的 y 坐标
+  expect(locBox.y).toBeGreaterThan(nameBox.y + nameBox.height - 4)
+})
+
+test('Garden audio card shrinks vinyl disc, places sound wave bars above text, and displays timer popover on tablet', async ({ page, isMobile }) => {
+  if (isMobile) return
+  await page.goto('/')
+  await page.setViewportSize({ width: 820, height: 1180 })
+  const card = page.locator('.lazy-card', { hasText: '听见花园' })
+  await card.scrollIntoViewIfNeeded()
+
+  // 1. 唱片缩小 (<= 110px)
+  const disc = card.locator('.vinyl-disc')
+  await expect(disc).toBeVisible()
+  const discBox = await disc.boundingBox()
+  expect(discBox).not.toBeNull()
+  expect(discBox.width).toBeLessThan(120)
+
+  // 2. 律动波形在歌曲名与副标题文字上方
+  const waveBars = card.locator('.sound-wave-bars')
+  const trackTitle = card.locator('.vinyl-track-title')
+  await expect(waveBars).toBeVisible()
+  await expect(trackTitle).toBeVisible()
+  const [waveBox, titleBox] = await Promise.all([
+    waveBars.boundingBox(),
+    trackTitle.boundingBox(),
+  ])
+  expect(waveBox).not.toBeNull()
+  expect(titleBox).not.toBeNull()
+  expect(waveBox.y).toBeLessThan(titleBox.y)
+
+  // 3. 定时选项弹出菜单
+  const desktopPills = card.locator('.desktop-timer-group')
+  await expect(desktopPills).toBeHidden()
+  const dropdownBtn = card.locator('.timer-dropdown-btn')
+  await expect(dropdownBtn).toBeVisible()
+  await expect(dropdownBtn).toContainText('定时')
+
+  // 点击定时按钮，弹出窗口
+  await dropdownBtn.click()
+  const popoverMenu = card.locator('.timer-popover-menu')
+  await expect(popoverMenu).toBeVisible()
+  const popoverItems = popoverMenu.locator('.timer-popover-item')
+  await expect(popoverItems).toHaveCount(4)
+  await expect(popoverItems.nth(0)).toContainText('不限时')
+  await expect(popoverItems.nth(1)).toContainText('15分')
+
+  // 点击 15分
+  await popoverItems.nth(1).click()
+  await expect(popoverMenu).toBeHidden()
+  await expect(dropdownBtn).toContainText('15分')
+})
+
 
 test('Insight and reading callouts unify icon and text layout with top-aligned icon and hanging indent', async ({ page }) => {
   await page.goto('/')

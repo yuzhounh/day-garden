@@ -301,8 +301,10 @@ function selectCell(cell: CalendarCell) {
     <!-- 底部状态说明与选中日期详情 -->
     <footer class="card-footer cal-footer">
       <div v-if="selectedDayDetail" class="cal-selected-info">
-        <span class="detail-solar">{{ selectedDayDetail.dateStr }}</span>
-        <span class="detail-lunar">农历{{ selectedDayDetail.lunarStr }}</span>
+        <div class="cal-date-row">
+          <span class="detail-solar">{{ selectedDayDetail.dateStr }}</span>
+          <span class="detail-lunar">农历{{ selectedDayDetail.lunarStr }}</span>
+        </div>
         <span v-if="selectedDayDetail.detailExtra" class="detail-extra">{{ selectedDayDetail.detailExtra }}</span>
       </div>
       <div class="cal-legend">

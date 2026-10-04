@@ -1208,6 +1208,12 @@
   font-size: 12.5px;
   flex-wrap: wrap;
 }
+.cal-date-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
 .cal-selected-info .detail-solar { font-weight: 500; color: var(--ink); }
 .cal-selected-info .detail-lunar { color: var(--secondary); }
 .cal-selected-info .detail-extra {
@@ -2198,6 +2204,78 @@
   .month-calendar-card .cal-week-row, .month-calendar-card .cal-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
   .month-calendar-card .cal-cell { min-width: 0; width: 100%; aspect-ratio: auto; }
 }
+
+@media (min-width: 721px) and (max-width: 1050px),
+       (min-width: 744px) and (min-height: 600px) and (pointer: coarse) {
+  .month-calendar-card .cal-footer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 6px 12px;
+    min-height: 52px;
+  }
+  .month-calendar-card .cal-selected-info {
+    display: contents;
+  }
+  .month-calendar-card .cal-date-row {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  .month-calendar-card .detail-extra {
+    grid-column: 1 / 2;
+    grid-row: 2;
+    justify-self: start;
+    white-space: nowrap;
+  }
+  .month-calendar-card .cal-legend {
+    grid-column: 2 / 3;
+    grid-row: 2;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-direction: row;
+    flex-shrink: 0;
+  }
+
+  /* 华夏胜景卡片平板端：景点名与省份地市分两行排版，杜绝各自折行 */
+  .attractions-card .spot-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+
+  /* 听见花园卡片平板端：黑胶唱片适当缩小，为右侧文字留出充裕空间 */
+  .garden-audio-card .audio-vinyl-stage {
+    gap: 16px;
+  }
+  .garden-audio-card .vinyl-disc {
+    width: 106px;
+    height: 106px;
+  }
+  .garden-audio-card .vinyl-groove-ring.ring-1 { width: 94px; height: 94px; }
+  .garden-audio-card .vinyl-groove-ring.ring-2 { width: 80px; height: 80px; }
+  .garden-audio-card .vinyl-groove-ring.ring-3 { width: 66px; height: 66px; }
+  .garden-audio-card .vinyl-groove-ring.ring-4 { width: 52px; height: 52px; }
+  .garden-audio-card .vinyl-center-label {
+    width: 38px;
+    height: 38px;
+  }
+  .garden-audio-card .vinyl-center-label svg {
+    width: 18px;
+    height: 18px;
+  }
+  .garden-audio-card .vinyl-track-title {
+    font-size: 19px;
+  }
+}
+
 
 /* 黑胶唱片深色模式：限定典雅白胶唱片 (Limited Edition Porcelain White Vinyl)
    解决深色背景下黑胶融底与同心圆靶心生硬感，形成明月般温润高级的视觉轮廓 */

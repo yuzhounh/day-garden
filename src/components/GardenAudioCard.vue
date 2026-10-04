@@ -19,6 +19,9 @@ import {
   SunMedium,
   ListMusic,
   Search,
+  Timer,
+  ChevronDown,
+  Check,
 } from 'lucide-vue-next'
 import {
   AUDIO_TRACKS,
@@ -115,25 +118,41 @@ const timerPills = [
   { label: '60分', val: 60 },
 ]
 
+const showTimerPopover = ref(false)
+const timerWrapRef = ref<HTMLElement | null>(null)
+
+const activeTimerLabel = computed(() => {
+  if (audioState.sleepTimerMinutes === 0) return '不限时'
+  return `${audioState.sleepTimerMinutes}分`
+})
+
+function onSelectTimer(mins: number) {
+  setSleepTimer(mins)
+  showTimerPopover.value = false
+}
+
 function formatRemainingTime(seconds: number): string {
   const m = Math.floor(seconds / 60)
   const s = seconds % 60
   return `${m}:${String(s).padStart(2, '0')}`
 }
 
-function closeVolumeBar(event: MouseEvent) {
+function handleDocumentClick(event: MouseEvent) {
   if (!volumeWrapRef.value?.contains(event.target as Node)) {
     showVolumeBar.value = false
     isDraggingCardVol.value = false
   }
+  if (!timerWrapRef.value?.contains(event.target as Node)) {
+    showTimerPopover.value = false
+  }
 }
 
 onMounted(() => {
-  document.addEventListener('click', closeVolumeBar)
+  document.addEventListener('click', handleDocumentClick)
 })
 
 onUnmounted(() => {
-  document.removeEventListener('click', closeVolumeBar)
+  document.removeEventListener('click', handleDocumentClick)
 })
 </script>
 
@@ -181,19 +200,18 @@ onUnmounted(() => {
         <div class="vinyl-meta-right">
           <div class="vinyl-tag-row">
             <span class="track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
+            <!-- 律动波形放在三行文字上方 -->
+            <div class="sound-wave-bars" :class="{ playing: audioState.isPlaying }" aria-hidden="true">
+              <span class="bar bar-1"></span>
+              <span class="bar bar-2"></span>
+              <span class="bar bar-3"></span>
+              <span class="bar bar-4"></span>
+              <span class="bar bar-5"></span>
+              <span class="bar bar-6"></span>
+            </div>
           </div>
           <h3 class="vinyl-track-title">{{ currentTrack.name }}</h3>
           <p class="vinyl-track-sub">{{ currentTrack.subtitle }}</p>
-        </div>
-
-        <!-- 右侧：与黑胶唱片垂直居中对齐的律动竖线 -->
-        <div class="sound-wave-bars" :class="{ playing: audioState.isPlaying }" aria-hidden="true">
-          <span class="bar bar-1"></span>
-          <span class="bar bar-2"></span>
-          <span class="bar bar-3"></span>
-          <span class="bar bar-4"></span>
-          <span class="bar bar-5"></span>
-          <span class="bar bar-6"></span>
         </div>
       </div>
 
@@ -312,8 +330,8 @@ onUnmounted(() => {
         <ListMusic :size="14" />曲目库
       </button>
 
-      <!-- 定时关闭切换 -->
-      <div class="sleep-timer-group">
+      <!-- 桌面端平铺定时关闭切换 -->
+      <div class="sleep-timer-group desktop-timer-group">
         <span class="timer-label">定时：</span>
         <button
           v-for="p in timerPills"
@@ -328,6 +346,44 @@ onUnmounted(() => {
         >
           {{ p.label }}
         </button>
+      </div>
+
+      <!-- 平板端及窄屏：弹出式定时选择器 -->
+      <div ref="timerWrapRef" class="timer-popover-wrapper">
+        <button
+          type="button"
+          class="timer-dropdown-btn"
+          :class="{
+            active: audioState.sleepTimerMinutes > 0,
+            'is-open': showTimerPopover
+          }"
+          title="选择定时关闭"
+          aria-label="选择定时关闭"
+          @click.stop="showTimerPopover = !showTimerPopover"
+        >
+          <Timer :size="13" />
+          <span class="timer-btn-text">定时: {{ activeTimerLabel }}</span>
+          <ChevronDown :size="12" class="timer-arrow" :class="{ 'rotate-180': showTimerPopover }" />
+        </button>
+
+        <Transition name="fade-slide">
+          <div v-if="showTimerPopover" class="timer-popover-menu" @click.stop>
+            <div class="timer-popover-title">定时关闭</div>
+            <div class="timer-popover-list">
+              <button
+                v-for="p in timerPills"
+                :key="p.val"
+                type="button"
+                class="timer-popover-item"
+                :class="{ active: audioState.sleepTimerMinutes === p.val }"
+                @click="onSelectTimer(p.val)"
+              >
+                <span>{{ p.label }}</span>
+                <Check v-if="audioState.sleepTimerMinutes === p.val" :size="13" class="timer-check-icon" />
+              </button>
+            </div>
+          </div>
+        </Transition>
       </div>
     </footer>
   </article>
@@ -600,8 +656,9 @@ onUnmounted(() => {
 .vinyl-tag-row {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 8px;
+  width: 100%;
 }
 
 .track-tag {
@@ -1081,6 +1138,127 @@ onUnmounted(() => {
   gap: 4px;
 }
 
+.desktop-timer-group {
+  display: flex;
+}
+
+.timer-popover-wrapper {
+  display: none;
+  position: relative;
+}
+
+.timer-dropdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--secondary);
+  font-size: 11.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.timer-dropdown-btn:hover,
+.timer-dropdown-btn.is-open {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+
+.timer-dropdown-btn.active {
+  background: var(--sage-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 500;
+}
+
+.timer-arrow {
+  color: var(--muted);
+  transition: transform 0.2s ease;
+}
+
+.timer-arrow.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.timer-popover-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 116px;
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid var(--line);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.14);
+  z-index: 60;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+:global(.dark) .timer-popover-menu {
+  background: rgba(30, 33, 40, 0.96);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+.timer-popover-title {
+  font-size: 10.5px;
+  color: var(--muted);
+  padding: 3px 8px 5px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+
+.timer-popover-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timer-popover-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--secondary);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s ease;
+}
+
+.timer-popover-item:hover {
+  background: var(--sage-bg);
+  color: var(--accent);
+}
+
+.timer-popover-item.active {
+  background: var(--sage-bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.timer-check-icon {
+  color: var(--accent);
+}
+
+@media (max-width: 1050px) {
+  .desktop-timer-group {
+    display: none;
+  }
+  .timer-popover-wrapper {
+    display: block;
+  }
+}
+
 .timer-label {
   font-size: 11px;
   color: var(--muted);
@@ -1116,21 +1294,21 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-@media (max-width: 480px) {
+@media (min-width: 721px) and (max-width: 1050px), (max-width: 480px) {
   .audio-vinyl-stage {
     gap: 16px;
   }
   .vinyl-disc {
-    width: 108px;
-    height: 108px;
+    width: 106px;
+    height: 106px;
   }
-  .vinyl-groove-ring.ring-1 { width: 96px; height: 96px; }
-  .vinyl-groove-ring.ring-2 { width: 82px; height: 82px; }
-  .vinyl-groove-ring.ring-3 { width: 68px; height: 68px; }
-  .vinyl-groove-ring.ring-4 { width: 54px; height: 54px; }
+  .vinyl-groove-ring.ring-1 { width: 94px; height: 94px; }
+  .vinyl-groove-ring.ring-2 { width: 80px; height: 80px; }
+  .vinyl-groove-ring.ring-3 { width: 66px; height: 66px; }
+  .vinyl-groove-ring.ring-4 { width: 52px; height: 52px; }
   .vinyl-center-label {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
   }
   .vinyl-track-title {
     font-size: 18px;
