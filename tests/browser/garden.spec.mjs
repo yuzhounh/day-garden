@@ -453,3 +453,22 @@ test('Insight and reading callouts unify icon and text layout with top-aligned i
     expect(textBox.x).toBeGreaterThanOrEqual(iconBox.x + iconBox.width + 4)
   }
 })
+
+test('Wellbeing tip banner pill is vertically centered with the tip text', async ({ page }) => {
+  await page.goto('/')
+  const card = page.locator('.lazy-card', { hasText: '好好照顾自己' })
+  await card.scrollIntoViewIfNeeded()
+  const banner = page.locator('.wellbeing-tip-banner')
+  await expect(banner).toBeVisible()
+  const pill = banner.locator('.pill')
+  const text = banner.locator('.wellbeing-tip-text')
+
+  const pillBox = await pill.boundingBox()
+  const textBox = await text.boundingBox()
+  expect(pillBox).not.toBeNull()
+  expect(textBox).not.toBeNull()
+
+  const pillCenterY = pillBox.y + pillBox.height / 2
+  const textCenterY = textBox.y + textBox.height / 2
+  expect(Math.abs(pillCenterY - textCenterY)).toBeLessThan(4)
+})

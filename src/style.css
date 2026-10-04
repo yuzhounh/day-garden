@@ -1442,7 +1442,7 @@
 .completed .habit-check { background: #5a9e6a; border-color: #5a9e6a; }
 .wellbeing-tip-banner {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   padding: 10px 14px;
   background: var(--surface);
@@ -1452,7 +1452,7 @@
   line-height: 1.6;
 }
 .wellbeing-tip-banner .pill {
-  margin-top: 2px;
+  margin-top: 0;
 }
 .wellbeing-tip-text {
   font-size: 13.5px;
