@@ -150,7 +150,11 @@ test('Disabled modules do not load their content libraries; loaded poetry remain
 test('Favorite controls stay hidden for guests and appear after login', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('daygarden_guest_data', JSON.stringify({ savedPoetry: ['dumu-shanxing'], dailyActions: {}, pending: [], eventsInitialized: false })))
   await page.goto('/')
-  await page.locator('.garden-footer').scrollIntoViewIfNeeded()
+  for (const card of await page.locator('.dashboard-card-wrapper').all()) {
+    await card.scrollIntoViewIfNeeded()
+    await page.waitForTimeout(100)
+  }
+  await expect(page.locator('.poetry-work-title')).toBeVisible()
   const guest = await page.evaluate(() => localStorage.getItem('daygarden_guest_data'))
   const bookmark = page.locator('.poetry-card .inline-actions button[aria-pressed]')
   await expect(bookmark).toHaveCount(0)
