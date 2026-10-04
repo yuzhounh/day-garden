@@ -357,3 +357,27 @@ test('Production CSP permits overseas geocoding, provider avatars and all radio 
   expect(results.filter(result => !result.ok)).toEqual([])
   expect(await page.evaluate(() => window.cspViolations)).toEqual([])
 })
+
+test('Calendar legend displays side-by-side on desktop and stacked into two lines on mobile without character breaks', async ({ page, isMobile }) => {
+  await page.goto('/')
+  const legendItems = page.locator('.cal-legend .legend-item')
+  await expect(legendItems).toHaveCount(2)
+  await expect(legendItems.nth(0)).toContainText('放假')
+  await expect(legendItems.nth(1)).toContainText('调休')
+
+  const boxes = await Promise.all([
+    legendItems.nth(0).boundingBox(),
+    legendItems.nth(1).boundingBox(),
+  ])
+  expect(boxes[0]).not.toBeNull()
+  expect(boxes[1]).not.toBeNull()
+
+  if (isMobile) {
+    // On mobile, items are stacked vertically into two lines
+    expect(boxes[1].y).toBeGreaterThan(boxes[0].y + 10)
+  } else {
+    // On desktop, items are laid out horizontally
+    expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThan(5)
+    expect(boxes[1].x).toBeGreaterThan(boxes[0].x + 30)
+  }
+})

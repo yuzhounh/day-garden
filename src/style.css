@@ -1224,7 +1224,7 @@
   font-size: 12px;
   color: var(--muted);
 }
-.legend-item { display: inline-flex; align-items: center; gap: 4px; }
+.legend-item { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; flex-shrink: 0; }
 .icon-tile { width: 34px; height: 34px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sage { color: var(--accent); background: var(--sage-bg); }
 .peach { color: #a9824e; background: var(--peach-bg); }
@@ -2097,6 +2097,9 @@
   .month-calendar-card { padding-left: 14px; padding-right: 14px; }
   .month-calendar-card .cal-week-row, .month-calendar-card .cal-grid { gap: 2px; }
   .cal-cell { min-height: 40px; aspect-ratio: auto; width: 100%; min-width: 0; padding: 3px 1px; }
+  .cal-footer { display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; }
+  .cal-selected-info { flex: 1; min-width: 0; }
+  .cal-legend { flex-direction: column; align-items: flex-start; gap: 3px; flex-shrink: 0; }
   .seasonal-card .section-label > .eyebrow { display: none; }
   .live-clock, .toolbar-divider { display: none; }
   .account-button > span { display: none; }
@@ -2153,7 +2156,6 @@
   .cal-cell { aspect-ratio: auto; min-height: 38px; width: 100%; min-width: 0; padding: 2px 1px; }
   .cell-solar-num { font-size: 14px; }
   .cell-sub-text { font-size: 9.5px; }
-  .cal-footer { flex-direction: column; align-items: flex-start; gap: 8px; }
   .garden-tabs { width: 100%; justify-content: space-between; }
   .garden-tabs a { padding: 9px 12px; font-size: 12px; }
   .weather-panel { padding: 18px 15px; min-height: 400px; }
