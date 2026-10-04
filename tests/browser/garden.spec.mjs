@@ -5,7 +5,22 @@ test.afterEach(async ({ page }, info) => {
   if (info.status === info.expectedStatus) return
   console.log('Failure geometry:', await page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth, scrollX, viewport: visualViewport && { width: visualViewport.width, left: visualViewport.offsetLeft, scale: visualViewport.scale }, close: [...document.querySelectorAll('button[aria-label="关闭"]')].map(button => { const r = button.getBoundingClientRect(); return { x: r.x, y: r.y, width: r.width, hit: document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)?.outerHTML.slice(0, 200) } }) })))
 })
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, context }, info) => {
+  if (/^(Mock sign-in|Favorite controls|Account city defaults|Two accounts)/.test(info.title)) {
+    await page.route('**/api/auth/providers', async route => {
+      const response = await route.fetch()
+      await route.fulfill({ response, json: { ...await response.json(), google: true } })
+    })
+    await context.route('**/api/auth/google?*', async route => {
+      const url = new URL(route.request().url())
+      if (!['127.0.0.1', 'localhost'].includes(url.hostname)) throw new Error('OAuth fixture must remain local')
+      const payload = JSON.stringify({ type: 'daygarden-oauth-success', provider: 'google', attempt: url.searchParams.get('attempt') })
+      await route.fulfill({ contentType: 'text/html', body: `<!doctype html><script>
+        fetch('/api/auth/mock', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ provider: 'google' }) })
+          .then(response => { if (!response.ok) throw new Error('Local mock authentication failed'); window.opener.postMessage(${payload}, location.origin); setTimeout(() => window.close(), 100); });
+      </script>` })
+    })
+  }
   await page.route('https://api.open-meteo.com/**', async route => {
     const temperature = new URL(route.request().url()).searchParams.get('latitude') === String(city.lat) ? 25 : 18
     const dates = ['2026-10-01', '2026-10-02', '2026-10-03']
@@ -56,7 +71,7 @@ test('Invalid imports and impossible dates leave existing preferences intact; va
 test('Mock sign-in changes account theme and city together; event creation queues offline and synchronizes after reconnect', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
-  await page.getByRole('button', { name: '模拟 Google 登录', exact: true }).click()
+  await page.getByRole('button', { name: '使用 Google 账户登录', exact: true }).click()
   await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= visualViewport.width + 1)).toBe(true)
   await page.getByRole('button', { name: '关闭', exact: true }).click()
@@ -71,8 +86,8 @@ test('Mock sign-in changes account theme and city together; event creation queue
   await expect(page.getByRole('button', { name: '选择或搜索城市' })).toContainText('上海')
   await expect(page.locator('.weather-panel')).toContainText('25')
   await page.locator('.dashboard-card-wrapper').nth(1).scrollIntoViewIfNeeded()
-  await page.getByRole('button', { name: '添加纪念日' }).click()
-  const addBtn = page.getByRole('button', { name: '新增日子/纪念日' })
+  await page.getByRole('button', { name: '添加重要日子与日程' }).click()
+  const addBtn = page.getByRole('button', { name: '添加日程、生日或纪念日' })
   await expect(addBtn).toBeVisible()
   await expect(addBtn).not.toHaveClass(/active/)
   await expect(addBtn.locator('svg')).not.toHaveClass(/rotate/)
@@ -80,8 +95,8 @@ test('Mock sign-in changes account theme and city together; event creation queue
   const collapseBtn = page.getByRole('button', { name: '收起新增面板' })
   await expect(collapseBtn).toBeVisible()
   await expect(collapseBtn.locator('svg')).not.toHaveClass(/rotate/)
-  await page.getByPlaceholder('事件名 (如: 妈妈生日)', { exact: true }).fill('浏览器回归生日')
-  const date = page.getByPlaceholder('日期 MM-DD (如: 10-08)', { exact: true })
+  await page.getByPlaceholder('寿星姓名/事件 (如: 妈妈生日)', { exact: true }).fill('浏览器回归生日')
+  const date = page.getByPlaceholder('日期 MM-DD 或 YYYY-MM-DD', { exact: true })
   await date.fill('2026-02-30')
   await page.getByRole('button', { name: '确认添加', exact: true }).click()
   await expect(page.getByRole('alert')).toContainText('日期无效')
@@ -97,7 +112,7 @@ test('Mock sign-in changes account theme and city together; event creation queue
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await page.getByRole('button', { name: '云端已同步' }).click()
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
-  await expect(page.getByRole('button', { name: '模拟 Google 登录', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: '使用 Google 账户登录', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(page.locator('html')).not.toHaveClass(/dark/)
   await expect(page.getByRole('button', { name: '选择或搜索城市' })).toContainText('北京')
@@ -158,7 +173,7 @@ test('Favorite controls stay hidden for guests and appear after login', async ({
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   expect(await page.evaluate(() => localStorage.getItem('daygarden_guest_data'))).toBe(guest)
   await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
-  await page.getByRole('button', { name: '模拟 Google 登录', exact: true }).click()
+  await page.getByRole('button', { name: '使用 Google 账户登录', exact: true }).click()
   await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(bookmark).toBeVisible()
@@ -179,7 +194,7 @@ test('Favorite controls stay hidden for guests and appear after login', async ({
   expect(await page.evaluate(() => document.body.style.overflow)).toBe('')
   await page.getByRole('button', { name: '云端已同步', exact: true }).click()
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
-  await expect(page.getByRole('button', { name: '模拟 Google 登录', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: '使用 Google 账户登录', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(bookmark).toHaveCount(0)
   await page.getByRole('button', { name: '诗词小集', exact: true }).click()
@@ -213,7 +228,7 @@ test('Account city defaults to Beijing, adopts the guest choice and restores fro
   await expect.poll(async () => (await (await page.request.get('/api/state')).json()).selectedCity?.name).toBe('广州')
   await page.getByRole('button', { name: '云端已同步', exact: true }).click()
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
-  await expect(page.getByRole('button', { name: '模拟 Google 登录', exact: true })).toBeVisible()
+  await expect(page.getByRole('button', { name: '使用 Google 账户登录', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(cityPicker).toContainText('上海')
   await cityPicker.click()
@@ -281,7 +296,7 @@ test('Two accounts and guest apply their own city, weather and theme; an upgrade
   }, { accounts, city, legacyId })
   await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
   await expect(page.getByRole('button', { name: /GitHub/ })).toHaveCount(0)
-  await page.getByRole('button', { name: '模拟 Google 登录', exact: true }).click()
+  await page.getByRole('button', { name: '使用 Google 账户登录', exact: true }).click()
   await expect(page.getByRole('button', { name: '合并旧本机日程', exact: true })).toBeVisible()
   expect((await (await page.request.get('/api/state')).json()).customEvents.some(event => event.id === legacyId)).toBe(false)
   await page.getByRole('button', { name: '合并旧本机日程', exact: true }).click()
