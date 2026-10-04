@@ -83,14 +83,15 @@ function setAsCurrentGuide(g: EvidenceGuide) {
     </div>
 
     <footer class="card-footer">
-      <button class="text-button" @click="showLibrary = true">
+      <button class="text-button shrink-0" @click="showLibrary = true">
         <BookOpen :size="14" />生活指南集
       </button>
       <div class="inline-actions">
-        <a class="source-name" :href="guide.sourceUrl" target="_blank" rel="noopener noreferrer">
-          {{ guide.source }}<ArrowUpRight :size="12" />
+        <a class="source-name" :href="guide.sourceUrl" target="_blank" rel="noopener noreferrer" :title="guide.source">
+          <span class="source-text">{{ guide.source }}</span>
+          <ArrowUpRight :size="12" class="source-icon shrink-0" />
         </a>
-        <button class="text-button" @click="showDetail = true">
+        <button class="text-button shrink-0" @click="showDetail = true">
           了解更多<ArrowUpRight :size="14" />
         </button>
       </div>

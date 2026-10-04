@@ -215,7 +215,7 @@ function selectCell(cell: CalendarCell) {
 
 <template>
   <article class="glass-panel dashboard-card month-calendar-card" aria-label="月历">
-    <header class="card-heading">
+    <header class="card-heading month-cal-heading">
       <div class="section-label">
         <span class="icon-tile sage"><CalendarDays :size="17" /></span>
         <h2>{{ currentYear }} 年 {{ currentMonth }} 月</h2>
@@ -223,10 +223,10 @@ function selectCell(cell: CalendarCell) {
         <span v-if="isCurrentViewToday" class="current-month-badge">本月</span>
       </div>
       <div class="cal-controls">
-        <button class="icon-button small" aria-label="上一月" type="button" @click="prevMonth">
+        <button class="icon-button small cal-nav-btn" aria-label="上一个月" title="上一个月" type="button" @click="prevMonth">
           <ChevronLeft :size="16" />
         </button>
-        <button class="icon-button small" aria-label="下一月" type="button" @click="nextMonth">
+        <button class="icon-button small cal-nav-btn" aria-label="下一个月" title="下一个月" type="button" @click="nextMonth">
           <ChevronRight :size="16" />
         </button>
         <button

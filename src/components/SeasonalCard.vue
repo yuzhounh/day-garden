@@ -79,8 +79,8 @@ function selectBloomItem(item: SeasonBloom) {
     </div>
 
     <div class="bloom-spot-row">
-      <span class="spot-label"><MapPin :size="13" />寻芳赏鉴：{{ bloom.bestSpot }}</span>
-      <span class="spot-term">{{ bloom.solarTerms.join(' · ') }}</span>
+      <div class="spot-label"><MapPin :size="13" /><span>寻芳赏鉴：{{ bloom.bestSpot }}</span></div>
+      <div class="spot-term">适逢节气：{{ bloom.solarTerms.join(' · ') }}</div>
     </div>
 
     <footer class="card-footer">

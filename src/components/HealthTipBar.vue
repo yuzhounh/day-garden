@@ -103,22 +103,20 @@ function toggle(id: string) {
       </div>
     </div>
 
-    <!-- 底部状态栏：左侧健康习惯小集，中间今日微提醒，右侧科学依据 -->
-    <footer class="health-tip">
-      <button class="text-button shrink-0" @click="showLibrary = true">
+    <!-- 倒数第二行：微习惯健康提醒（完整换行显示） -->
+    <div class="wellbeing-tip-banner">
+      <span class="pill sage shrink-0">{{ tip.tag }}</span>
+      <p class="wellbeing-tip-text">{{ tip.tip }}</p>
+    </div>
+
+    <!-- 倒数第一行：健康习惯集与科学指引操作入口 -->
+    <footer class="card-footer wellbeing-footer">
+      <button class="text-button" @click="showLibrary = true">
         <BookOpen :size="14" />健康习惯集
       </button>
-
-      <div class="health-tip-center flex-1 min-w-0 flex items-center gap-2.5 px-3">
-        <span class="pill sage shrink-0">{{ tip.tag }}</span>
-        <p class="truncate text-secondary">{{ tip.tip }}</p>
-      </div>
-
-      <div class="inline-actions shrink-0">
-        <button class="text-button" @click="showSources = true">
-          科学指引<ArrowUpRight :size="14" />
-        </button>
-      </div>
+      <button class="text-button" @click="showSources = true">
+        科学指引<ArrowUpRight :size="14" />
+      </button>
     </footer>
 
     <!-- 科学指引与依据弹窗 -->
