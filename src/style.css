@@ -1961,8 +1961,7 @@
   .section-label > .eyebrow { display: none; }
   .weather-panel { grid-template-columns: 190px minmax(0, 1fr); gap: 16px; padding: 20px; }
   .forecast-heading small { display: none; }
-  .calendar-upcoming-row { grid-template-columns: 1fr; gap: 16px; }
-  .two-column-cards-grid { grid-template-columns: 1fr; gap: 16px; }
+  .two-column-cards-grid { gap: 16px; }
   .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
   .poetry-body blockquote { font-size: 24px; letter-spacing: 1px; }
   .poetry-reading { align-items: flex-start; flex-direction: column; gap: 7px; }
@@ -1970,7 +1969,9 @@
   .bloom-scene > svg { width: 135px; right: -18px; opacity: .6; }
   .wellbeing-layout { grid-template-columns: .8fr 1.2fr; gap: 20px; }
 }
-@media (max-width: 760px) {
+@media (max-width: 720px) {
+  .calendar-upcoming-row { grid-template-columns: 1fr; gap: 16px; }
+  .two-column-cards-grid { grid-template-columns: 1fr; gap: 16px; }
   .account-summary { flex-direction: column; align-items: stretch; }
   .account-summary > .account-actions { flex-direction: row; flex-wrap: wrap; }
   .garden-shell { width: calc(100% - 36px); }
