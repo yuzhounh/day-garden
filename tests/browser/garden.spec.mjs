@@ -325,6 +325,8 @@ test('Two accounts and guest apply their own city, weather and theme; an upgrade
 test('Header and calendar stay on the same local date across midnight', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-10-01T23:59:50+08:00') })
   await page.goto('/')
+  const calendarCard = page.locator('.month-calendar-card')
+  await calendarCard.scrollIntoViewIfNeeded()
   await expect(page.locator('.cal-cell.is-today .cell-solar-num')).toHaveText('1')
   await page.clock.fastForward(40000)
   await expect(page.locator('.cal-cell.is-today .cell-solar-num')).toHaveText('2')
