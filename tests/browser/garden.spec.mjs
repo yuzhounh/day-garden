@@ -415,3 +415,41 @@ test('Attractions status buttons display side-by-side on wide desktop and stacke
     expect(tabletBoxes[1].y).toBeGreaterThan(tabletBoxes[0].y + 15)
   }
 })
+
+test('Insight and reading callouts unify icon and text layout with top-aligned icon and hanging indent', async ({ page }) => {
+  await page.goto('/')
+  // 1. Poetry reading
+  const poetryCard = page.locator('.lazy-card', { hasText: '今日诗笺' })
+  await poetryCard.scrollIntoViewIfNeeded()
+  const poetryReading = page.locator('.poetry-reading').first()
+  await expect(poetryReading).toBeVisible()
+  const poetryIcon = poetryReading.locator('.poetry-reading-icon')
+  const poetryText = poetryReading.locator('p')
+
+  // 2. Quote insight
+  const quoteCard = page.locator('.lazy-card', { hasText: '名言语录' })
+  await quoteCard.scrollIntoViewIfNeeded()
+  const quoteInsight = page.locator('.quote-insight').first()
+  await expect(quoteInsight).toBeVisible()
+  const quoteIcon = quoteInsight.locator('.quote-insight-icon')
+  const quoteText = quoteInsight.locator('p')
+
+  // 3. Sport insight
+  const sportCard = page.locator('.lazy-card', { hasText: '动健身心' })
+  await sportCard.scrollIntoViewIfNeeded()
+  const sportInsight = page.locator('.sport-insight-box').first()
+  await expect(sportInsight).toBeVisible()
+  const sportIcon = sportInsight.locator('.sport-insight-icon')
+  const sportText = sportInsight.locator('.sport-insight-text')
+
+  for (const [icon, text] of [[poetryIcon, poetryText], [quoteIcon, quoteText], [sportIcon, sportText]]) {
+    const iconBox = await icon.boundingBox()
+    const textBox = await text.boundingBox()
+    expect(iconBox).not.toBeNull()
+    expect(textBox).not.toBeNull()
+    // Icon is top-aligned with the first line of text
+    expect(Math.abs(iconBox.y - textBox.y)).toBeLessThan(6)
+    // Text is in its own column on the right (hanging indent)
+    expect(textBox.x).toBeGreaterThanOrEqual(iconBox.x + iconBox.width + 4)
+  }
+})

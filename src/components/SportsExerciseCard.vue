@@ -115,10 +115,8 @@ function getIntensityColor(intensity: string) {
 
       <!-- 循证科学解析 -->
       <div class="sport-insight-box">
-        <p class="sport-insight-text">
-          <HeartPulse :size="16" class="text-rose-500 shrink-0 inline-block mr-1.5 align-text-bottom" />
-          <span>{{ sport.evidenceInsight }}</span>
-        </p>
+        <HeartPulse :size="16" class="sport-insight-icon text-rose-500 shrink-0" />
+        <p class="sport-insight-text">{{ sport.evidenceInsight }}</p>
       </div>
 
       <!-- 涉及目标主要肌群 -->
@@ -340,15 +338,29 @@ function getIntensityColor(intensity: string) {
   color: var(--ink);
 }
 .sport-insight-box {
-  padding: 12px 15px;
-  border-radius: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 14px;
   background: rgba(16, 185, 129, 0.05);
   border: 1px solid rgba(16, 185, 129, 0.16);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.sport-insight-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 .sport-insight-text {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--ink);
+  margin: 0;
+  flex: 1;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--secondary);
+}
+.dark .sport-insight-text {
+  color: #cbd5e1;
 }
 .sport-muscles-row {
   display: flex;

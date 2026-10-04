@@ -2074,7 +2074,6 @@
   .two-column-cards-grid { gap: 16px; }
   .dashboard-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
   .poetry-body blockquote { font-size: 24px; letter-spacing: 1px; }
-  .poetry-reading { align-items: flex-start; flex-direction: column; gap: 7px; }
   .bloom-copy { width: 72%; }
   .bloom-scene > svg { width: 135px; right: -18px; opacity: .6; }
   .wellbeing-layout { grid-template-columns: .8fr 1.2fr; gap: 20px; }
@@ -2124,7 +2123,6 @@
   .dashboard-card { padding: 22px 22px 0; }
   .poetry-card { min-height: 285px; }
   .section-label > .eyebrow { display: inline; }
-  .poetry-reading { flex-direction: row; align-items: center; }
   .bloom-scene { min-height: 152px; }
   .bloom-scene > svg { right: -2px; width: 158px; opacity: .75; }
   .bloom-copy { width: 72%; }
@@ -2169,7 +2167,6 @@
   .section-label > .eyebrow { font-size: 10px; }
   .poetry-body { padding: 4px 6px 14px; }
   .poetry-body blockquote { font-size: 22px; letter-spacing: 1px; }
-  .poetry-reading { flex-direction: column; align-items: flex-start; }
   .bloom-copy { width: 74%; }
   .bloom-copy h3 { font-size: 22px; }
   .bloom-scene > svg { width: 127px; right: -12px; top: 6px; opacity: .58; }
