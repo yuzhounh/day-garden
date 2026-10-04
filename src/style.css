@@ -2073,3 +2073,13 @@
 @supports not (backdrop-filter: blur(1px)) {
   .glass-panel { background: var(--glass); }
 }
+
+@media (min-width: 744px) and (min-height: 600px) and (pointer: coarse) {
+  .garden-shell button:not(.cal-cell) { min-width: 44px; min-height: 44px; }
+  .garden-shell input:not([type="range"]), .garden-shell select, .garden-shell textarea { font-size: 16px; }
+  .month-calendar-card .card-heading { flex-wrap: wrap; }
+  .month-calendar-card .cal-controls { margin-left: auto; }
+  .month-calendar-card .cal-week-row, .month-calendar-card .cal-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .month-calendar-card .cal-cell { min-width: 0; width: 100%; aspect-ratio: auto; }
+}
+
