@@ -23,6 +23,7 @@ import {
   Volume2,
   VolumeX,
   Timer,
+  Menu,
 } from 'lucide-vue-next'
 import BrandLogo from './BrandLogo.vue'
 import { getTodayCalendarInfo } from '../services/calendar'
@@ -168,8 +169,34 @@ function closeCities(event: MouseEvent) {
   }
 }
 
+const showMobileDrawer = ref(false)
+
+function openDrawer() {
+  showMobileDrawer.value = true
+}
+
+function closeDrawer() {
+  showMobileDrawer.value = false
+}
+
+function handleDrawerAction(action: 'city' | 'audio' | 'account' | 'sort' | 'settings') {
+  closeDrawer()
+  if (action === 'city') {
+    toggleCities()
+  } else if (action === 'audio') {
+    toggleAudioPopover()
+  } else if (action === 'account') {
+    emit('open-account')
+  } else if (action === 'sort') {
+    emit('toggle-sort-mode')
+  } else if (action === 'settings') {
+    emit('open-settings')
+  }
+}
+
 function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') {
+    showMobileDrawer.value = false
     showCities.value = false
     showAudioPopover.value = false
     showPopoverVolume.value = false
@@ -219,6 +246,12 @@ function updateSystem(event: MediaQueryListEvent) {
   systemDark.value = event.matches
 }
 
+function onResize() {
+  if (window.innerWidth > 768 && showMobileDrawer.value) {
+    showMobileDrawer.value = false
+  }
+}
+
 onMounted(() => {
   const query = window.matchMedia('(prefers-color-scheme: dark)')
   systemDark.value = query.matches
@@ -226,6 +259,7 @@ onMounted(() => {
   document.addEventListener('click', closeCities)
   document.addEventListener('click', closeAudioPopover)
   document.addEventListener('keydown', onKey)
+  window.addEventListener('resize', onResize)
 })
 
 onUnmounted(() => {
@@ -234,6 +268,7 @@ onUnmounted(() => {
   document.removeEventListener('click', closeCities)
   document.removeEventListener('click', closeAudioPopover)
   document.removeEventListener('keydown', onKey)
+  window.removeEventListener('resize', onResize)
 })
 </script>
 
@@ -245,7 +280,7 @@ onUnmounted(() => {
         <span>Day Garden<small>今 日 花 园</small></span>
       </a>
 
-      <div class="header-actions">
+      <div class="header-actions header-actions-desktop">
         <!-- 城市选择及搜索入口 -->
         <div ref="cityMenu" class="city-control">
           <button
@@ -531,6 +566,27 @@ onUnmounted(() => {
           <Settings2 :size="17" />
         </button>
       </div>
+
+      <!-- Mobile header actions -->
+      <div class="header-actions-mobile">
+        <button
+          class="icon-button"
+          :aria-label="isDark ? '切换浅色模式' : '切换深色模式'"
+          :title="isDark ? '切换浅色模式' : '切换深色模式'"
+          @click="emit('toggle-theme')"
+        >
+          <Sun v-if="isDark" :size="18" />
+          <Moon v-else :size="18" />
+        </button>
+        <button
+          class="icon-button hamburger-btn"
+          aria-label="展开导航菜单"
+          title="展开导航菜单"
+          @click="openDrawer"
+        >
+          <Menu :size="20" />
+        </button>
+      </div>
     </div>
 
     <div class="hero-intro">
@@ -559,4 +615,124 @@ onUnmounted(() => {
       </div>
     </div>
   </header>
+
+  <!-- Slide-out Drawer for Mobile / Tablet -->
+  <Teleport to="body">
+    <Transition name="drawer-fade">
+      <div
+        v-if="showMobileDrawer"
+        class="garden-drawer-backdrop"
+        aria-hidden="true"
+        @click="closeDrawer"
+      />
+    </Transition>
+    <Transition name="drawer-slide">
+      <aside
+        v-if="showMobileDrawer"
+        class="garden-drawer-panel"
+        role="dialog"
+        aria-label="导航与功能菜单"
+        aria-modal="true"
+      >
+        <div class="drawer-header">
+          <div class="drawer-brand">
+            <span class="drawer-brand-symbol"><BrandLogo :size="28" /></span>
+            <div class="drawer-brand-text">
+              <span class="drawer-title">Day Garden</span>
+              <span class="drawer-subtitle">今日花园</span>
+            </div>
+          </div>
+          <button
+            class="modal-close-btn"
+            aria-label="关闭菜单"
+            title="关闭菜单"
+            @click="closeDrawer"
+          >
+            <X :size="20" />
+          </button>
+        </div>
+
+        <div class="drawer-body">
+          <div class="drawer-nav-group">
+            <button
+              class="drawer-nav-btn"
+              type="button"
+              @click="handleDrawerAction('city')"
+            >
+              <div class="drawer-nav-left">
+                <MapPin :size="18" class="drawer-nav-icon" />
+                <span class="drawer-nav-label">城市定位</span>
+              </div>
+              <span class="drawer-nav-badge">{{ selectedCity.name }}</span>
+            </button>
+
+            <button
+              class="drawer-nav-btn"
+              type="button"
+              @click="handleDrawerAction('audio')"
+            >
+              <div class="drawer-nav-left">
+                <Headphones :size="18" class="drawer-nav-icon" />
+                <span class="drawer-nav-label">听见花园</span>
+              </div>
+              <span class="drawer-nav-badge">{{ audioState.isPlaying ? '正在播放' : '轻音白噪音' }}</span>
+            </button>
+
+            <button
+              class="drawer-nav-btn"
+              type="button"
+              @click="handleDrawerAction('account')"
+            >
+              <div class="drawer-nav-left">
+                <Cloud v-if="account.user" :size="18" class="drawer-nav-icon" />
+                <UserRound v-else :size="18" class="drawer-nav-icon" />
+                <span class="drawer-nav-label">账户与同步</span>
+              </div>
+              <span class="drawer-nav-badge">{{ account.user ? '已登录' : '本地使用' }}</span>
+            </button>
+
+            <button
+              class="drawer-nav-btn"
+              type="button"
+              :class="{ 'is-active': sortMode }"
+              @click="handleDrawerAction('sort')"
+            >
+              <div class="drawer-nav-left">
+                <GripVertical :size="18" class="drawer-nav-icon" />
+                <span class="drawer-nav-label">卡片排序模式</span>
+              </div>
+              <span class="drawer-nav-badge">{{ sortMode ? '排序中' : '点击开启' }}</span>
+            </button>
+
+            <button
+              class="drawer-nav-btn"
+              type="button"
+              @click="handleDrawerAction('settings')"
+            >
+              <div class="drawer-nav-left">
+                <Settings2 :size="18" class="drawer-nav-icon" />
+                <span class="drawer-nav-label">布置我的花园</span>
+              </div>
+              <span class="drawer-nav-badge">设置</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="drawer-footer">
+          <div class="drawer-theme-row">
+            <span class="drawer-theme-label">外观主题</span>
+            <button
+              class="icon-button"
+              :aria-label="isDark ? '切换浅色模式' : '切换深色模式'"
+              :title="isDark ? '切换浅色模式' : '切换深色模式'"
+              @click="emit('toggle-theme')"
+            >
+              <Sun v-if="isDark" :size="18" />
+              <Moon v-else :size="18" />
+            </button>
+          </div>
+        </div>
+      </aside>
+    </Transition>
+  </Teleport>
 </template>

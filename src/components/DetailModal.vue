@@ -45,7 +45,7 @@ onUnmounted(() => {
           </div>
           <div class="modal-header-actions">
             <slot name="actions" />
-            <button class="icon-button" aria-label="关闭" title="关闭" @click="emit('close')"><X :size="18" /></button>
+            <button class="modal-close-btn" aria-label="关闭" title="关闭" @click="emit('close')"><X :size="20" /></button>
           </div>
         </header>
         <div class="modal-content"><slot /></div>
