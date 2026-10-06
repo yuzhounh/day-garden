@@ -434,7 +434,7 @@ onUnmounted(() => {
 
         <!-- 导航栏悬浮迷你播放器 -->
         <Transition name="dropdown-pop">
-          <div v-if="showAudioPopover" class="header-audio-popover glass-panel" @click.stop>
+          <div v-if="showAudioPopover" class="header-audio-popover" @click.stop>
             <div class="popover-track-info">
               <div class="popover-tag-row">
                 <span class="popover-track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
@@ -852,7 +852,7 @@ onUnmounted(() => {
       <div
         v-if="showAudioPopoverMobile"
         ref="audioPopoverMobileRef"
-        class="header-audio-popover glass-panel is-mobile"
+        class="header-audio-popover is-mobile"
         @click.stop
       >
         <div class="popover-track-info">
