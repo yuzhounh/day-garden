@@ -2484,3 +2484,17 @@
   .header-actions-mobile { display: none !important; }
   .garden-drawer-backdrop, .garden-drawer-panel { display: none !important; }
 }
+
+/* 手机/触屏端：所有弹出卡片（城市定位、设置、收藏等）统一为不透明底色，
+   并去掉卡片自身的 backdrop-filter —— 嵌套的 backdrop-filter 在移动端浏览器上
+   会让遮罩层的模糊失效，同时卡片半透明会让背景文字干扰阅读。 */
+@media (max-width: 720px), (pointer: coarse) {
+  .detail-modal.glass-panel {
+    background: #f8faf8;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .dark .detail-modal.glass-panel { background: #1c1e24; }
+  .modal-backdrop { background: rgba(15, 22, 18, .62); }
+  .dark .modal-backdrop { background: rgba(8, 10, 12, .78); }
+}
