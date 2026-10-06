@@ -38,8 +38,6 @@ import {
 import type { CityOption } from '../types'
 import { account } from '../services/sync'
 import {
-  AUDIO_TRACKS,
-  playTrack,
   audioState,
   currentTrack,
   togglePlay,
@@ -174,7 +172,7 @@ function closeCities(event: MouseEvent) {
 
 const showMobileDrawer = ref(false)
 const showCitiesMobile = ref(false)
-const showAudioMobile = ref(false)
+const showAudioPopoverMobile = ref(false)
 
 function openDrawer() {
   showMobileDrawer.value = true
@@ -193,11 +191,8 @@ function handleDrawerAction(action: 'city' | 'audio' | 'account' | 'sort' | 'set
       showCitiesMobile.value = true
     })
   } else if (action === 'audio') {
-    if (!audioState.isPlaying) {
-      togglePlay()
-    }
     nextTick(() => {
-      showAudioMobile.value = true
+      showAudioPopoverMobile.value = true
     })
   } else if (action === 'account') {
     nextTick(() => {
@@ -214,26 +209,13 @@ function handleDrawerAction(action: 'city' | 'audio' | 'account' | 'sort' | 'set
   }
 }
 
-function selectTrackMobile(trackId: string) {
-  if (audioState.currentTrackId === trackId) {
-    togglePlay()
-  } else {
-    playTrack(trackId)
-  }
-}
-
-function onMobileVolInput(e: Event) {
-  const val = Number((e.target as HTMLInputElement).value)
-  setVolume(val)
-}
-
 function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     showMobileDrawer.value = false
     showCities.value = false
     showCitiesMobile.value = false
-    showAudioMobile.value = false
     showAudioPopover.value = false
+    showAudioPopoverMobile.value = false
     showPopoverVolume.value = false
     clearSearch()
   }
@@ -857,121 +839,140 @@ onUnmounted(() => {
     </div>
   </DetailModal>
 
-  <!-- Mobile Audio Player Dialog -->
-  <DetailModal
-    v-if="showAudioMobile"
-    title="听见花园"
-    subtitle="SOUNDS OF GARDEN"
-    class="audio-modal"
-    @close="showAudioMobile = false"
-  >
-    <div class="audio-modal-body">
-      <!-- 当前曲目展示卡片 -->
-      <div class="audio-modal-hero">
-        <div class="audio-modal-hero-left">
-          <span class="track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
-          <h3 class="audio-modal-title">{{ currentTrack.name }}</h3>
-          <p class="audio-modal-sub">{{ currentTrack.subtitle }}</p>
-        </div>
-        <div class="header-audio-waves" :class="{ 'is-playing': audioState.isPlaying }" aria-hidden="true">
-          <span class="bar bar-1"></span>
-          <span class="bar bar-2"></span>
-          <span class="bar bar-3"></span>
-        </div>
-      </div>
-
-      <!-- 播放控制行 -->
-      <div class="audio-modal-controls">
-        <button class="ctrl-icon-btn" title="随机切换" aria-label="随机切换" @click="randomTrack">
-          <Shuffle :size="17" />
-        </button>
-        <button class="ctrl-icon-btn" title="上一首" aria-label="上一首" @click="prevTrack">
-          <SkipBack :size="17" />
-        </button>
+  <!-- Mobile Audio Popover Card (与导航栏弹出的音乐卡片完全一致) -->
+  <Teleport to="body">
+    <Transition name="drawer-fade">
+      <div
+        v-if="showAudioPopoverMobile"
+        class="audio-popover-backdrop"
+        aria-hidden="true"
+        @click="showAudioPopoverMobile = false"
+      />
+    </Transition>
+    <Transition name="dropdown-pop">
+      <div
+        v-if="showAudioPopoverMobile"
+        class="header-audio-popover glass-panel is-mobile"
+        @click.stop
+      >
         <button
-          class="audio-modal-play-btn"
-          :title="audioState.isPlaying ? '暂停' : '播放'"
-          :aria-label="audioState.isPlaying ? '暂停' : '播放'"
-          @click="togglePlay"
+          class="popover-close-btn"
+          type="button"
+          aria-label="关闭音乐卡片"
+          title="关闭"
+          @click="showAudioPopoverMobile = false"
         >
-          <Pause v-if="audioState.isPlaying" :size="20" />
-          <Play v-else :size="20" class="translate-x-0.5" />
+          <X :size="15" />
         </button>
-        <button class="ctrl-icon-btn" title="下一首" aria-label="下一首" @click="nextTrack">
-          <SkipForward :size="17" />
-        </button>
-      </div>
 
-      <!-- 音量控制条 -->
-      <div class="audio-modal-volume-row">
-        <button
-          class="ctrl-icon-btn"
-          :title="audioState.isMuted ? '取消静音' : '静音'"
-          :aria-label="audioState.isMuted ? '取消静音' : '静音'"
-          @click="toggleMute"
-        >
-          <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="16" />
-          <Volume2 v-else :size="16" />
-        </button>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          step="1"
-          :value="audioState.isMuted ? 0 : audioState.volume"
-          class="volume-slider flex-1"
-          aria-label="音量调节"
-          @input="onMobileVolInput"
-        />
-        <span class="audio-modal-vol-num">{{ audioState.isMuted ? '0%' : audioState.volume + '%' }}</span>
-      </div>
+        <div class="popover-track-info">
+          <div class="popover-tag-row">
+            <span class="popover-track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
+          </div>
+          <h4 class="popover-track-title">{{ currentTrack.name }}</h4>
+          <p class="popover-track-desc">{{ currentTrack.subtitle }}</p>
+        </div>
 
-      <!-- 定时关闭行 -->
-      <div class="popover-timer-row">
-        <span class="popover-timer-label">
-          <Timer :size="13" />
-          <span v-if="audioState.sleepTimerRemaining > 0">{{ formatSleepRemaining(audioState.sleepTimerRemaining) }} 后静止</span>
-          <span v-else>定时关闭</span>
-        </span>
-        <div class="popover-timer-pills">
-          <button
-            v-for="m in [0, 15, 30, 60]"
-            :key="m"
-            class="popover-timer-pill"
-            :class="{
-              active: audioState.sleepTimerMinutes === m,
-              'is-off': m === 0
-            }"
-            @click="setSleepTimer(m)"
-          >
-            {{ m === 0 ? '关' : m + '分' }}
-          </button>
+        <!-- 控制按钮：随机在左、三键居中、音量在右（点击弹出音量条） -->
+        <div class="popover-controls-row">
+          <!-- 左：随机切换 -->
+          <div class="popover-ctrls-left">
+            <button class="popover-ctrl-btn" title="随机切换" aria-label="随机切换" @click="randomTrack">
+              <Shuffle :size="16" />
+            </button>
+          </div>
+
+          <!-- 中：后退、播放、前进居中 -->
+          <div class="popover-ctrls-center">
+            <button class="popover-ctrl-btn" title="上一曲" aria-label="上一曲" @click="prevTrack">
+              <SkipBack :size="16" />
+            </button>
+            <button
+              class="popover-play-btn"
+              :title="audioState.isPlaying ? '暂停' : '播放'"
+              :aria-label="audioState.isPlaying ? '暂停' : '播放'"
+              @click="togglePlay"
+            >
+              <Pause v-if="audioState.isPlaying" :size="18" />
+              <Play v-else :size="18" />
+            </button>
+            <button class="popover-ctrl-btn" title="下一曲" aria-label="下一曲" @click="nextTrack">
+              <SkipForward :size="16" />
+            </button>
+          </div>
+
+          <!-- 右：音量键与弹出滑块 -->
+          <div class="popover-ctrls-right popover-volume-wrapper">
+            <button
+              class="popover-ctrl-btn vol-toggle-btn"
+              :class="{ 'is-active': showPopoverVolume }"
+              :title="showPopoverVolume ? '收起音量' : '调节音量'"
+              @click.stop="showPopoverVolume = !showPopoverVolume"
+            >
+              <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="16" />
+              <Volume2 v-else :size="16" />
+            </button>
+
+            <!-- 点击音量键后弹出的滑块浮层 -->
+            <Transition name="fade-slide">
+              <div v-if="showPopoverVolume" class="popover-volume-pop" @click.stop>
+                <button
+                  class="popover-mute-mini-btn"
+                  :title="audioState.isMuted ? '取消静音' : '静音'"
+                  @click="toggleMute"
+                >
+                  <VolumeX v-if="audioState.isMuted || audioState.volume === 0" :size="13" />
+                  <Volume2 v-else :size="13" />
+                </button>
+                <div class="popover-volume-slider-track">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    :value="audioState.isMuted ? 0 : audioState.volume"
+                    class="popover-volume-slider"
+                    aria-label="音量调节"
+                    @input="onPopoverVolInput"
+                    @pointerdown="onPopoverVolPointerDown"
+                    @pointerup="onPopoverVolPointerUp"
+                  />
+                  <div
+                    class="volume-thumb-tooltip"
+                    :class="{ 'is-visible': isDraggingPopoverVol }"
+                    :style="{ left: popoverVolumeTooltipLeft }"
+                  >
+                    {{ audioState.isMuted ? '0%' : audioState.volume + '%' }}
+                  </div>
+                </div>
+              </div>
+            </Transition>
+          </div>
+        </div>
+
+        <!-- 定时关闭 -->
+        <div class="popover-timer-row">
+          <span class="popover-timer-label">
+            <Timer :size="12" />
+            <span v-if="audioState.sleepTimerRemaining > 0">{{ formatSleepRemaining(audioState.sleepTimerRemaining) }} 后静止</span>
+            <span v-else>定时关闭</span>
+          </span>
+          <div class="popover-timer-pills">
+            <button
+              v-for="m in [0, 15, 30, 60]"
+              :key="m"
+              class="popover-timer-pill"
+              :class="{
+                active: audioState.sleepTimerMinutes === m,
+                'is-off': m === 0
+              }"
+              @click="setSleepTimer(m)"
+            >
+              {{ m === 0 ? '关' : m + '分' }}
+            </button>
+          </div>
         </div>
       </div>
-
-      <!-- 曲目精选列表 -->
-      <div class="audio-modal-tracks-wrap">
-        <p class="city-section-title">精选曲目与白噪音</p>
-        <div class="audio-modal-tracks-list">
-          <button
-            v-for="track in AUDIO_TRACKS"
-            :key="track.id"
-            type="button"
-            class="audio-modal-track-item"
-            :class="{ active: currentTrack.id === track.id }"
-            @click="selectTrackMobile(track.id)"
-          >
-            <div class="audio-modal-track-info">
-              <span class="audio-modal-track-name">{{ track.name }}</span>
-              <span class="audio-modal-track-sub">{{ track.subtitle }}</span>
-            </div>
-            <div class="audio-modal-track-right">
-              <span class="audio-modal-track-pill">{{ track.category === 'nature' ? '自然' : '轻音' }}</span>
-              <span v-if="currentTrack.id === track.id && audioState.isPlaying" class="audio-modal-active-dot"></span>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  </DetailModal>
+    </Transition>
+  </Teleport>
 </template>
