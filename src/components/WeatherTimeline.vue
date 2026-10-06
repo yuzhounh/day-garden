@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import {
   Sun,
   Cloud,
@@ -57,17 +57,109 @@ function uvLevel(value?: number) {
     : '极高'
 }
 
-function getDayTitle(day: WeatherDay, index: number): string {
+function getDayTitle(day: WeatherDay): string {
   if (day.isToday) return '今天'
   const todayIdx = props.days.findIndex(d => d.isToday)
-  if (todayIdx !== -1) {
-    if (index === todayIdx - 1) return '昨天'
-    if (index === todayIdx - 2) return '前天'
-    if (index === todayIdx + 1) return '明天'
-    if (index === todayIdx + 2) return '后天'
+  const currentIdx = props.days.findIndex(d => d.date === day.date)
+  if (todayIdx !== -1 && currentIdx !== -1) {
+    if (currentIdx === todayIdx - 1) return '昨天'
+    if (currentIdx === todayIdx - 2) return '前天'
+    if (currentIdx === todayIdx + 1) return '明天'
+    if (currentIdx === todayIdx + 2) return '后天'
   }
   return day.dayOfWeek
 }
+
+// 动态根据天气区域宽度自适应列数，杜绝横向挤压与横向滚动条
+const forecastAreaRef = ref<HTMLElement | null>(null)
+const containerWidth = ref(0)
+let ro: ResizeObserver | null = null
+
+onMounted(() => {
+  if (forecastAreaRef.value) {
+    containerWidth.value = forecastAreaRef.value.clientWidth
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver((entries) => {
+        window.requestAnimationFrame(() => {
+          for (const entry of entries) {
+            if (entry.contentRect.width > 0) {
+              containerWidth.value = entry.contentRect.width
+            }
+          }
+        })
+      })
+      ro.observe(forecastAreaRef.value)
+    }
+  }
+})
+
+onUnmounted(() => {
+  if (ro) {
+    ro.disconnect()
+    ro = null
+  }
+})
+
+const visibleCount = computed(() => {
+  const total = props.days.length
+  if (!total) return 0
+  const width = containerWidth.value
+  if (!width) {
+    if (typeof window !== 'undefined' && window.innerWidth) {
+      const estWidth = window.innerWidth <= 720 ? window.innerWidth - 60 : 600
+      return Math.min(total, Math.max(3, Math.floor((estWidth + 4) / 60)))
+    }
+    return total
+  }
+  // 每列约 56px 加上 4px 间隙 = 60px
+  const count = Math.floor((width + 4) / 60)
+  return Math.min(total, Math.max(3, count))
+})
+
+const visibleDays = computed(() => {
+  if (!props.days || props.days.length === 0) return []
+  const count = visibleCount.value
+  if (count >= props.days.length) return props.days
+
+  const todayIdx = props.days.findIndex(d => d.isToday)
+  if (todayIdx === -1) {
+    return props.days.slice(0, count)
+  }
+
+  // 保证包含“今天”；列数充裕时保留“昨天”或“前天”，其余空间留给未来预报
+  let pastDaysWanted = 0
+  if (count >= 10 && todayIdx >= 2) {
+    pastDaysWanted = 2
+  } else if (count >= 4 && todayIdx >= 1) {
+    pastDaysWanted = 1
+  }
+
+  const actualPast = Math.min(pastDaysWanted, todayIdx)
+  const startIdx = todayIdx - actualPast
+  let endIdx = startIdx + count
+
+  if (endIdx > props.days.length) {
+    endIdx = props.days.length
+    const adjustedStart = Math.max(0, endIdx - count)
+    return props.days.slice(adjustedStart, endIdx)
+  }
+
+  return props.days.slice(startIdx, endIdx)
+})
+
+const forecastSubtitle = computed(() => {
+  if (!visibleDays.value.length) return ''
+  const pastDays = visibleDays.value.filter(d => d.isPast).length
+  const futureDays = visibleDays.value.filter(d => !d.isPast && !d.isToday).length
+  const parts: string[] = []
+  if (pastDays >= 2) parts.push('前两天')
+  else if (pastDays === 1) parts.push('昨天')
+  parts.push('今天')
+  if (futureDays === 1) parts.push('明天')
+  else if (futureDays === 2) parts.push('未来 2 天')
+  else if (futureDays > 2) parts.push(`未来 ${futureDays} 天`)
+  return parts.join(' · ')
+})
 
 interface ChartPoint {
   x: number
@@ -98,13 +190,14 @@ function buildSpline(points: { x: number; y: number }[]): string {
 }
 
 const chartData = computed(() => {
-  if (!props.days || props.days.length === 0) return null
-  const count = props.days.length
+  const currentDays = visibleDays.value
+  if (!currentDays || currentDays.length === 0) return null
+  const count = currentDays.length
   const colWidth = 90
   const totalWidth = count * colWidth
 
-  const allMin = props.days.map(d => d.tempMin)
-  const allMax = props.days.map(d => d.tempMax)
+  const allMin = currentDays.map(d => d.tempMin)
+  const allMax = currentDays.map(d => d.tempMax)
   let minTemp = Math.min(...allMin)
   let maxTemp = Math.max(...allMax)
 
@@ -121,7 +214,7 @@ const chartData = computed(() => {
   const botPad = 32
   const availHeight = chartHeight - topPad - botPad
 
-  const points: ChartPoint[] = props.days.map((d, i) => {
+  const points: ChartPoint[] = currentDays.map((d, i) => {
     const x = Math.round(i * colWidth + colWidth / 2)
     const yMax = Math.round(topPad + ((maxTemp - d.tempMax) / (maxTemp - minTemp)) * availHeight)
     const yMin = Math.round(topPad + ((maxTemp - d.tempMin) / (maxTemp - minTemp)) * availHeight)
@@ -188,9 +281,9 @@ const chartData = computed(() => {
       <p class="today-hint">{{ weatherHint }}</p>
     </div>
 
-    <div class="forecast-area">
+    <div ref="forecastAreaRef" class="forecast-area">
       <div class="forecast-heading">
-        <span>气温流转趋势<small>前两天 · 今天 · 未来 7 天</small></span>
+        <span>气温流转趋势<small>{{ forecastSubtitle }}</small></span>
         <span role="status">
           <a
             v-if="source === 'Open-Meteo'"
@@ -214,10 +307,10 @@ const chartData = computed(() => {
       </div>
 
       <div v-else-if="chartData" class="trend-scroll-container">
-        <div class="trend-grid-wrapper" :style="{ gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }">
-          <!-- 7 background clickable columns spanning full height -->
+        <div class="trend-grid-wrapper" :style="{ gridTemplateColumns: `repeat(${visibleDays.length}, minmax(0, 1fr))` }">
+          <!-- background clickable columns spanning full height -->
           <button
-            v-for="(day, idx) in days"
+            v-for="(day, idx) in visibleDays"
             :key="'card-' + day.date"
             class="trend-col-card"
             :class="{ today: day.isToday, past: day.isPast }"
@@ -228,12 +321,12 @@ const chartData = computed(() => {
 
           <!-- Row 1: Day header, date, weather icon and condition text -->
           <div
-            v-for="(day, idx) in days"
+            v-for="(day, idx) in visibleDays"
             :key="'top-' + day.date"
             class="trend-cell-top"
             :style="{ gridColumn: idx + 1 }"
           >
-            <strong class="trend-day-name">{{ getDayTitle(day, idx) }}</strong>
+            <strong class="trend-day-name">{{ getDayTitle(day) }}</strong>
             <span class="trend-date-text">{{ shortDate(day.date) }}</span>
             <component
               :is="icon(day.iconName)"
@@ -274,7 +367,7 @@ const chartData = computed(() => {
 
           <!-- Row 3: Bottom info (precipitation chance) -->
           <div
-            v-for="(day, idx) in days"
+            v-for="(day, idx) in visibleDays"
             :key="'bot-' + day.date"
             class="trend-cell-bot"
             :style="{ gridColumn: idx + 1 }"
