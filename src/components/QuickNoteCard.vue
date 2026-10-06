@@ -286,14 +286,6 @@ function onAccordionLeave(el: Element) {
         <h2>片刻随想</h2>
         <span class="eyebrow">MOMENTS</span>
       </div>
-      <button
-        class="icon-button small"
-        aria-label="查看全部随笔"
-        title="查看全部随笔"
-        @click="showModal = true"
-      >
-        <BookOpen :size="15" />
-      </button>
     </header>
 
     <!-- 卡片主体内容 -->
