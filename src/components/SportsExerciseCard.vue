@@ -90,14 +90,16 @@ function getIntensityColor(intensity: string) {
     <!-- 运动主卡展示区 -->
     <div class="sport-main-display">
       <div class="sport-title-badge-row">
-        <div class="sport-headline">
+        <div class="sport-title-group">
           <strong class="sport-name">{{ sport.name }}</strong>
           <span class="pill sage">{{ sport.category }}</span>
-          <span class="pill" :class="getIntensityColor(sport.intensity)">{{ sport.intensity }}</span>
         </div>
-        <div class="sport-calorie-chip" title="每小时约消耗能量">
-          <Flame :size="14" class="text-orange-500" />
-          <span>{{ sport.caloriesPerHour }} kcal/h</span>
+        <div class="sport-meta-pills">
+          <span class="pill" :class="getIntensityColor(sport.intensity)">{{ sport.intensity }}</span>
+          <div class="sport-calorie-chip" title="每小时约消耗能量">
+            <Flame :size="14" class="text-orange-500" />
+            <span>{{ sport.caloriesPerHour }} kcal/h</span>
+          </div>
         </div>
       </div>
 
@@ -296,11 +298,17 @@ function getIntensityColor(intensity: string) {
   gap: 10px;
   flex-wrap: wrap;
 }
-.sport-headline {
+.sport-title-group {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+.sport-meta-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 .sport-name {
   font-size: 17px;
@@ -312,13 +320,14 @@ function getIntensityColor(intensity: string) {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 11px;
+  padding: 3px 10px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: normal;
   background: rgba(249, 115, 22, 0.08);
   color: #ea580c;
   border: 1px solid rgba(249, 115, 22, 0.2);
+  white-space: nowrap;
 }
 .sport-benefits-pills {
   display: flex;
