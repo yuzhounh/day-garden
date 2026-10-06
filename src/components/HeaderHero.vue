@@ -143,9 +143,19 @@ function toggleAudioPopover() {
   }
 }
 
+const showMobileDrawer = ref(false)
+const showCitiesMobile = ref(false)
+const showAudioPopoverMobile = ref(false)
+const audioPopoverMobileRef = ref<HTMLElement | null>(null)
+
 function closeAudioPopover(event: MouseEvent) {
-  if (!audioMenu.value?.contains(event.target as Node)) {
+  const target = event.target as Node
+  if (
+    !audioMenu.value?.contains(target) &&
+    !audioPopoverMobileRef.value?.contains(target)
+  ) {
     showAudioPopover.value = false
+    showAudioPopoverMobile.value = false
     showPopoverVolume.value = false
     isDraggingPopoverVol.value = false
   }
@@ -170,11 +180,8 @@ function closeCities(event: MouseEvent) {
   }
 }
 
-const showMobileDrawer = ref(false)
-const showCitiesMobile = ref(false)
-const showAudioPopoverMobile = ref(false)
-
 function openDrawer() {
+  showAudioPopoverMobile.value = false
   showMobileDrawer.value = true
 }
 
@@ -191,9 +198,9 @@ function handleDrawerAction(action: 'city' | 'audio' | 'account' | 'sort' | 'set
       showCitiesMobile.value = true
     })
   } else if (action === 'audio') {
-    nextTick(() => {
+    window.setTimeout(() => {
       showAudioPopoverMobile.value = true
-    })
+    }, 50)
   } else if (action === 'account') {
     nextTick(() => {
       emit('open-account')
@@ -841,30 +848,13 @@ onUnmounted(() => {
 
   <!-- Mobile Audio Popover Card (与导航栏弹出的音乐卡片完全一致) -->
   <Teleport to="body">
-    <Transition name="drawer-fade">
-      <div
-        v-if="showAudioPopoverMobile"
-        class="audio-popover-backdrop"
-        aria-hidden="true"
-        @click="showAudioPopoverMobile = false"
-      />
-    </Transition>
     <Transition name="dropdown-pop">
       <div
         v-if="showAudioPopoverMobile"
+        ref="audioPopoverMobileRef"
         class="header-audio-popover glass-panel is-mobile"
         @click.stop
       >
-        <button
-          class="popover-close-btn"
-          type="button"
-          aria-label="关闭音乐卡片"
-          title="关闭"
-          @click="showAudioPopoverMobile = false"
-        >
-          <X :size="15" />
-        </button>
-
         <div class="popover-track-info">
           <div class="popover-tag-row">
             <span class="popover-track-tag">{{ currentTrack.category === 'nature' ? '自然白噪音' : '舒缓轻电台' }}</span>
