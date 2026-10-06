@@ -1076,6 +1076,12 @@
   color: var(--accent);
   border-color: rgba(90, 158, 106, 0.4);
 }
+@container cal-card (max-width: 500px) {
+  .month-calendar-card .cal-nav-btn { display: none !important; }
+  .month-calendar-card .current-month-badge { display: none !important; }
+  .month-calendar-card .section-label > .eyebrow { display: inline-flex !important; }
+  .month-calendar-card .detail-extra { display: none !important; }
+}
 .cal-week-row {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -1375,8 +1381,16 @@
 .dark .bloom-observation svg {
   color: #e6b36d;
 }
+.seasonal-card {
+  container-type: inline-size;
+  container-name: seasonal-card;
+}
 .seasonal-card .section-label > .eyebrow {
   white-space: nowrap;
+}
+@container seasonal-card (max-width: 480px) {
+  .seasonal-card .bloom-status-pill { display: none !important; }
+  .seasonal-card .section-label > .eyebrow { display: inline-flex !important; }
 }
 .bloom-spot-row {
   display: flex;
@@ -2179,10 +2193,24 @@
     flex-shrink: 0 !important;
   }
   .month-calendar-card .detail-solar,
-  .month-calendar-card .detail-lunar,
-  .month-calendar-card .detail-extra {
+  .month-calendar-card .detail-lunar {
     white-space: nowrap !important;
     flex-shrink: 0 !important;
+  }
+  .month-calendar-card .detail-extra {
+    display: none !important;
+  }
+  .month-calendar-card .cal-nav-btn {
+    display: none !important;
+  }
+  .month-calendar-card .current-month-badge {
+    display: none !important;
+  }
+  .month-calendar-card .section-label > .eyebrow {
+    display: inline-flex !important;
+  }
+  .month-calendar-card .cal-today-pill {
+    display: inline-flex !important;
   }
   .month-calendar-card .cal-legend {
     display: flex !important;
@@ -2192,7 +2220,8 @@
     flex-shrink: 0 !important;
     white-space: nowrap !important;
   }
-  .seasonal-card .section-label > .eyebrow { display: none; }
+  .seasonal-card .bloom-status-pill { display: none !important; }
+  .seasonal-card .section-label > .eyebrow { display: inline-flex !important; }
   .live-clock, .toolbar-divider { display: none; }
   .account-button > span { display: none; }
   .toolbar-button { padding: 8px 11px; }

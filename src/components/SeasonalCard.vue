@@ -52,7 +52,7 @@ function selectBloomItem(item: SeasonBloom) {
         <span class="eyebrow">IN SEASON</span>
       </div>
       <div class="flex items-center gap-2">
-        <span class="pill peach"><span class="status-dot"></span>{{ bloom.status }}</span>
+        <span class="pill peach bloom-status-pill"><span class="status-dot"></span>{{ bloom.status }}</span>
         <button
           class="icon-button small"
           aria-label="换一朵花信"

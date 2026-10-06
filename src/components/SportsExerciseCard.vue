@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Activity, Flame, ArrowUpRight, Search, RefreshCw, ShieldCheck, HeartPulse, Sparkles, BookOpen } from 'lucide-vue-next'
+import { Activity, Flame, ArrowUpRight, Search, RefreshCw, ShieldCheck, HeartPulse, Sparkles, BookOpen, Check } from 'lucide-vue-next'
 import type { SportExercise } from '../types'
 import DetailModal from './DetailModal.vue'
 import rawSports from '../data/sports-exercise.json'

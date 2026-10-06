@@ -70,30 +70,76 @@ function getDayTitle(day: WeatherDay): string {
   return day.dayOfWeek
 }
 
-// 动态根据天气区域宽度自适应列数，杜绝横向挤压与横向滚动条
+// 动态根据天气卡片宽度自适应列数，杜绝横向挤压与横向滚动条
+const weatherPanelRef = ref<HTMLElement | null>(null)
 const forecastAreaRef = ref<HTMLElement | null>(null)
-const containerWidth = ref(0)
+
+function getAvailableForecastWidth(): number {
+  if (forecastAreaRef.value) {
+    const rect = forecastAreaRef.value.getBoundingClientRect()
+    if (rect.width > 0 && rect.width <= (typeof window !== 'undefined' ? window.innerWidth : 2000)) {
+      return rect.width
+    }
+  }
+  if (weatherPanelRef.value) {
+    const rect = weatherPanelRef.value.getBoundingClientRect()
+    if (rect.width > 0) {
+      const isMobile = typeof window !== 'undefined' && window.innerWidth <= 720
+      return isMobile ? rect.width - 32 : Math.max(260, rect.width - 296)
+    }
+  }
+  if (typeof window !== 'undefined') {
+    const winW = window.innerWidth
+    return winW <= 720 ? winW - 56 : Math.max(300, winW - 360)
+  }
+  return 680
+}
+
+function getDesiredColumns(availableWidth: number): number {
+  // 每列约 68px - 72px 宽，保证日期、图标、气温、无雨/降水胶囊完全舒展
+  if (availableWidth >= 680) return 10
+  if (availableWidth >= 600) return 9
+  if (availableWidth >= 520) return 8
+  if (availableWidth >= 440) return 7
+  if (availableWidth >= 370) return 6
+  if (availableWidth >= 300) return 5
+  if (availableWidth >= 230) return 4
+  return 3
+}
+
+const containerWidth = ref(
+  typeof window !== 'undefined'
+    ? (window.innerWidth <= 720 ? window.innerWidth - 56 : 680)
+    : 680
+)
+
 let ro: ResizeObserver | null = null
 
+function updateWidth() {
+  const w = getAvailableForecastWidth()
+  if (w > 0) {
+    containerWidth.value = w
+  }
+}
+
 onMounted(() => {
-  if (forecastAreaRef.value) {
-    containerWidth.value = forecastAreaRef.value.clientWidth
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver((entries) => {
-        window.requestAnimationFrame(() => {
-          for (const entry of entries) {
-            if (entry.contentRect.width > 0) {
-              containerWidth.value = entry.contentRect.width
-            }
-          }
-        })
-      })
-      ro.observe(forecastAreaRef.value)
-    }
+  updateWidth()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', updateWidth, { passive: true })
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    ro = new ResizeObserver(() => {
+      updateWidth()
+    })
+    if (forecastAreaRef.value) ro.observe(forecastAreaRef.value)
+    if (weatherPanelRef.value) ro.observe(weatherPanelRef.value)
   }
 })
 
 onUnmounted(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateWidth)
+  }
   if (ro) {
     ro.disconnect()
     ro = null
@@ -104,16 +150,8 @@ const visibleCount = computed(() => {
   const total = props.days.length
   if (!total) return 0
   const width = containerWidth.value
-  if (!width) {
-    if (typeof window !== 'undefined' && window.innerWidth) {
-      const estWidth = window.innerWidth <= 720 ? window.innerWidth - 60 : 600
-      return Math.min(total, Math.max(3, Math.floor((estWidth + 4) / 60)))
-    }
-    return total
-  }
-  // 每列约 56px 加上 4px 间隙 = 60px
-  const count = Math.floor((width + 4) / 60)
-  return Math.min(total, Math.max(3, count))
+  const desired = getDesiredColumns(width)
+  return Math.min(total, desired)
 })
 
 const visibleDays = computed(() => {
@@ -244,7 +282,7 @@ const chartData = computed(() => {
 </script>
 
 <template>
-  <section class="glass-panel weather-panel" aria-label="七日天气">
+  <section ref="weatherPanelRef" class="glass-panel weather-panel" aria-label="七日天气">
     <div class="weather-summary">
       <div class="summary-header">
         <span class="eyebrow">天气 · 刚刚好</span>
