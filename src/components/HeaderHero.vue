@@ -26,6 +26,7 @@ import {
   Menu,
 } from 'lucide-vue-next'
 import BrandLogo from './BrandLogo.vue'
+import DetailModal from './DetailModal.vue'
 import { getTodayCalendarInfo } from '../services/calendar'
 import { useCurrentTime } from '../services/day'
 import {
@@ -170,6 +171,7 @@ function closeCities(event: MouseEvent) {
 }
 
 const showMobileDrawer = ref(false)
+const showCitiesMobile = ref(false)
 
 function openDrawer() {
   showMobileDrawer.value = true
@@ -182,15 +184,25 @@ function closeDrawer() {
 function handleDrawerAction(action: 'city' | 'audio' | 'account' | 'sort' | 'settings') {
   closeDrawer()
   if (action === 'city') {
-    toggleCities()
+    recentCities.value = getRecentCities()
+    clearSearch()
+    nextTick(() => {
+      showCitiesMobile.value = true
+    })
   } else if (action === 'audio') {
-    toggleAudioPopover()
+    togglePlay()
   } else if (action === 'account') {
-    emit('open-account')
+    nextTick(() => {
+      emit('open-account')
+    })
   } else if (action === 'sort') {
-    emit('toggle-sort-mode')
+    nextTick(() => {
+      emit('toggle-sort-mode')
+    })
   } else if (action === 'settings') {
-    emit('open-settings')
+    nextTick(() => {
+      emit('open-settings')
+    })
   }
 }
 
@@ -198,6 +210,7 @@ function onKey(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     showMobileDrawer.value = false
     showCities.value = false
+    showCitiesMobile.value = false
     showAudioPopover.value = false
     showPopoverVolume.value = false
     clearSearch()
@@ -239,6 +252,7 @@ function selectCity(city: CityOption) {
   recentCities.value = getRecentCities()
   emit('update:city', city)
   showCities.value = false
+  showCitiesMobile.value = false
   clearSearch()
 }
 
@@ -570,15 +584,6 @@ onUnmounted(() => {
       <!-- Mobile header actions -->
       <div class="header-actions-mobile">
         <button
-          class="icon-button"
-          :aria-label="isDark ? '切换浅色模式' : '切换深色模式'"
-          :title="isDark ? '切换浅色模式' : '切换深色模式'"
-          @click="emit('toggle-theme')"
-        >
-          <Sun v-if="isDark" :size="18" />
-          <Moon v-else :size="18" />
-        </button>
-        <button
           class="icon-button hamburger-btn"
           aria-label="展开导航菜单"
           title="展开导航菜单"
@@ -735,4 +740,98 @@ onUnmounted(() => {
       </aside>
     </Transition>
   </Teleport>
+
+  <!-- Mobile City Selection Dialog -->
+  <DetailModal
+    v-if="showCitiesMobile"
+    title="选择城市定位"
+    subtitle="CITY LOCATION"
+    class="city-modal"
+    @close="showCitiesMobile = false"
+  >
+    <div class="city-modal-body">
+      <div class="city-search-box">
+        <Search :size="15" class="search-icon" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="搜索城市（如：杭州、拉萨、tokyo）"
+          class="city-search-input"
+          @input="onSearchInput"
+          @keydown.enter="onSearchEnter"
+        />
+        <button
+          v-if="searchQuery"
+          class="clear-search-btn"
+          type="button"
+          aria-label="清空搜索"
+          @click="clearSearch"
+        >
+          <X :size="13" />
+        </button>
+      </div>
+
+      <div class="city-scroll-body" style="max-height: 52vh;">
+        <div v-if="searchLoading" class="city-loading-hint">
+          <Loader2 :size="16" class="animate-spin" /> 正在检索城市...
+        </div>
+
+        <template v-else-if="searchQuery">
+          <div v-if="searchResults.length === 0" class="city-empty-hint">
+            未找到匹配的城市
+          </div>
+          <div v-else class="city-result-list">
+            <button
+              v-for="city in searchResults"
+              :key="city.name + '_' + city.lat"
+              type="button"
+              class="city-result-item"
+              :aria-pressed="selectedCity.name === city.name"
+              @click="selectCity(city)"
+            >
+              <span>
+                <strong>{{ city.name }}</strong>
+                <small>{{ city.province }}</small>
+              </span>
+              <Check v-if="selectedCity.name === city.name" :size="15" />
+            </button>
+          </div>
+        </template>
+
+        <template v-else>
+          <div v-if="recentCities.length > 0" class="city-section">
+            <span class="city-section-title">最近访问</span>
+            <div class="city-pills-wrap">
+              <button
+                v-for="city in recentCities"
+                :key="'mobile-recent-' + city.name"
+                type="button"
+                class="city-pill-btn"
+                :class="{ active: selectedCity.name === city.name }"
+                @click="selectCity(city)"
+              >
+                {{ city.name }}
+              </button>
+            </div>
+          </div>
+
+          <div class="city-section">
+            <span class="city-section-title">热门城市</span>
+            <div class="city-pills-wrap">
+              <button
+                v-for="city in DEFAULT_CITIES"
+                :key="'mobile-default-' + city.name"
+                type="button"
+                class="city-pill-btn"
+                :class="{ active: selectedCity.name === city.name }"
+                @click="selectCity(city)"
+              >
+                {{ city.name }}
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </DetailModal>
 </template>
