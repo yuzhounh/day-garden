@@ -1080,6 +1080,8 @@
   .month-calendar-card .cal-nav-btn { display: none !important; }
   .month-calendar-card .current-month-badge { display: none !important; }
   .month-calendar-card .section-label > .eyebrow { display: inline-flex !important; }
+}
+@container cal-card (max-width: 535px) {
   .month-calendar-card .detail-extra { display: none !important; }
 }
 .cal-week-row {
@@ -1253,6 +1255,7 @@
   flex-wrap: nowrap;
   white-space: nowrap;
   min-width: 0;
+  overflow: hidden;
 }
 .cal-date-row {
   display: inline-flex;

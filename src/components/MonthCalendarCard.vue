@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-vue-next'
 import { Solar, HolidayUtil } from 'lunar-javascript'
 import type { LifeEvent } from '../types'
@@ -211,6 +211,75 @@ function selectCell(cell: CalendarCell) {
     currentMonth.value = cell.month
   }
 }
+
+const footerRef = ref<HTMLElement | null>(null)
+const dateRowRef = ref<HTMLElement | null>(null)
+const extraRef = ref<HTMLElement | null>(null)
+const legendRef = ref<HTMLElement | null>(null)
+const hideExtra = ref(false)
+let cachedExtraWidth = 0
+let resizeObserver: ResizeObserver | null = null
+
+function checkOverlap() {
+  if (!footerRef.value) return
+  const footerWidth = footerRef.value.clientWidth
+  if (!footerWidth) return
+
+  if (extraRef.value && extraRef.value.offsetWidth > 0) {
+    cachedExtraWidth = extraRef.value.offsetWidth
+  }
+
+  const dateRowWidth = dateRowRef.value?.offsetWidth || 0
+  const legendWidth = legendRef.value?.offsetWidth || 0
+  const extraWidth = cachedExtraWidth || 95
+  const minSpacing = 16
+
+  const neededWidth = dateRowWidth + extraWidth + legendWidth + minSpacing
+  if (neededWidth > footerWidth) {
+    hideExtra.value = true
+    return
+  }
+
+  if (!hideExtra.value && extraRef.value && legendRef.value) {
+    const extraRect = extraRef.value.getBoundingClientRect()
+    const legendRect = legendRef.value.getBoundingClientRect()
+    if (extraRect.right + 10 >= legendRect.left) {
+      hideExtra.value = true
+      return
+    }
+  }
+
+  hideExtra.value = false
+}
+
+watch(selectedDayDetail, () => {
+  cachedExtraWidth = 0
+  hideExtra.value = false
+  nextTick(() => {
+    checkOverlap()
+  })
+})
+
+onMounted(() => {
+  nextTick(() => {
+    checkOverlap()
+  })
+  if (typeof ResizeObserver !== 'undefined' && footerRef.value) {
+    resizeObserver = new ResizeObserver(() => {
+      checkOverlap()
+    })
+    resizeObserver.observe(footerRef.value)
+  }
+  window.addEventListener('resize', checkOverlap)
+})
+
+onUnmounted(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+  window.removeEventListener('resize', checkOverlap)
+})
 </script>
 
 <template>
@@ -299,15 +368,20 @@ function selectCell(cell: CalendarCell) {
     </div>
 
     <!-- 底部状态说明与选中日期详情 -->
-    <footer class="card-footer cal-footer">
+    <footer ref="footerRef" class="card-footer cal-footer">
       <div v-if="selectedDayDetail" class="cal-selected-info">
-        <div class="cal-date-row">
+        <div ref="dateRowRef" class="cal-date-row">
           <span class="detail-solar">{{ selectedDayDetail.dateStr }}</span>
           <span class="detail-lunar">农历{{ selectedDayDetail.lunarStr }}</span>
         </div>
-        <span v-if="selectedDayDetail.detailExtra" class="detail-extra">{{ selectedDayDetail.detailExtra }}</span>
+        <span
+          v-if="selectedDayDetail.detailExtra"
+          v-show="!hideExtra"
+          ref="extraRef"
+          class="detail-extra"
+        >{{ selectedDayDetail.detailExtra }}</span>
       </div>
-      <div class="cal-legend">
+      <div ref="legendRef" class="cal-legend">
         <span class="legend-item"><span class="cell-badge badge-rest mini">休</span> 放假</span>
         <span class="legend-item"><span class="cell-badge badge-work mini">班</span> 调休</span>
       </div>
