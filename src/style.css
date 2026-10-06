@@ -1060,7 +1060,13 @@
   border-radius: 10px;
 }
 .cal-today-pill {
-  padding: 3px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-height: 26px;
+  max-height: 26px;
+  padding: 0 12px;
   font-size: 12px;
   font-weight: 500;
   border-radius: 999px;
@@ -1070,6 +1076,7 @@
   transition: all .2s;
   cursor: pointer;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 .cal-today-pill:hover {
   background: var(--sage-bg);
@@ -2252,6 +2259,14 @@
   }
   .month-calendar-card .cal-today-pill {
     display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 26px !important;
+    min-height: 26px !important;
+    max-height: 26px !important;
+    min-width: unset !important;
+    width: auto !important;
+    padding: 0 12px !important;
   }
   .month-calendar-card .cal-legend {
     display: flex !important;
@@ -2348,7 +2363,7 @@
 }
 
 @media (min-width: 744px) and (pointer: coarse) {
-  .garden-shell button:not(.cal-cell):not(.status-btn) { min-width: 44px; min-height: 44px; }
+  .garden-shell button:not(.cal-cell):not(.status-btn):not(.cal-today-pill) { min-width: 44px; min-height: 44px; }
   .garden-shell .status-btn { min-width: 44px; min-height: 28px; }
   .garden-shell input:not([type="range"]), .garden-shell select, .garden-shell textarea { font-size: 16px; }
   .month-calendar-card .card-heading { flex-wrap: nowrap; }
