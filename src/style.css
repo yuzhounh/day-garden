@@ -1016,16 +1016,19 @@
 .month-calendar-card { display: flex; flex-direction: column; container-type: inline-size; container-name: cal-card; }
 .month-calendar-card .card-heading {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
   margin-bottom: 14px;
+  flex-wrap: nowrap;
 }
 .month-calendar-card .section-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
+  min-width: 0;
+  flex-shrink: 1;
 }
 .month-calendar-card .current-month-badge {
   font-size: 11.5px;
@@ -1035,13 +1038,15 @@
   background: var(--sage-bg);
   color: var(--accent);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .month-calendar-card .cal-controls {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  width: 100%;
+  flex-shrink: 0;
+  width: auto;
 }
 .month-calendar-card .cal-controls .icon-button.small {
   width: 34px;
@@ -2272,7 +2277,7 @@
   .garden-shell button:not(.cal-cell):not(.status-btn) { min-width: 44px; min-height: 44px; }
   .garden-shell .status-btn { min-width: 44px; min-height: 28px; }
   .garden-shell input:not([type="range"]), .garden-shell select, .garden-shell textarea { font-size: 16px; }
-  .month-calendar-card .card-heading { flex-wrap: wrap; }
+  .month-calendar-card .card-heading { flex-wrap: nowrap; }
   .month-calendar-card .cal-controls { margin-left: auto; }
   .month-calendar-card .cal-week-row, .month-calendar-card .cal-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
   .month-calendar-card .cal-cell { min-width: 0; width: 100%; aspect-ratio: auto; }
