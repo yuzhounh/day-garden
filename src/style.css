@@ -1012,7 +1012,7 @@
 .section-label { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .section-label h2 { font-size: 17px; font-weight: 600; letter-spacing: .5px; white-space: nowrap; }
 .section-label > .eyebrow { font-size: 12px; letter-spacing: 1px; margin-left: 2px; }
-@container (max-width: 520px) {
+@container (max-width: 380px) {
   .section-label > .eyebrow { display: none !important; }
 }
 
@@ -1079,12 +1079,9 @@
   color: var(--accent);
   border-color: rgba(90, 158, 106, 0.4);
 }
-@container cal-card (max-width: 500px) {
+@container cal-card (max-width: 415px) {
   .month-calendar-card .cal-nav-btn { display: none !important; }
   .month-calendar-card .current-month-badge { display: none !important; }
-}
-@container cal-card (max-width: 535px) {
-  .month-calendar-card .detail-extra { display: none !important; }
 }
 .cal-week-row {
   display: grid;
@@ -1404,7 +1401,7 @@
 .seasonal-card .section-label > .eyebrow {
   white-space: nowrap;
 }
-@container seasonal-card (max-width: 480px) {
+@container seasonal-card (max-width: 390px) {
   .seasonal-card .bloom-status-pill { display: none !important; }
 }
 .bloom-spot-row {
@@ -2148,7 +2145,6 @@
   .topbar { flex-wrap: wrap; gap: 14px; }
   .header-actions { flex-wrap: wrap; }
   .hero-botanical { width: 175px; }
-  .section-label > .eyebrow { display: none; }
   .weather-panel { grid-template-columns: 190px minmax(0, 1fr); gap: 16px; padding: 20px; }
   .forecast-heading small { display: none; }
   .two-column-cards-grid { gap: 16px; }
@@ -2214,15 +2210,6 @@
     white-space: nowrap !important;
     flex-shrink: 0 !important;
   }
-  .month-calendar-card .detail-extra {
-    display: none !important;
-  }
-  .month-calendar-card .cal-nav-btn {
-    display: none !important;
-  }
-  .month-calendar-card .current-month-badge {
-    display: none !important;
-  }
   .month-calendar-card .cal-today-pill {
     display: inline-flex !important;
   }
@@ -2234,7 +2221,6 @@
     flex-shrink: 0 !important;
     white-space: nowrap !important;
   }
-  .seasonal-card .bloom-status-pill { display: none !important; }
   .live-clock, .toolbar-divider { display: none; }
   .account-button > span { display: none; }
   .toolbar-button { padding: 8px 11px; }
