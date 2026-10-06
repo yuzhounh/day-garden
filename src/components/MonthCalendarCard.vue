@@ -362,8 +362,10 @@ onUnmounted(() => {
           {{ cell.subText }}
         </span>
 
-        <!-- 纪念日标记圆点 -->
-        <span v-if="cell.hasEvent" class="cell-event-dot" :title="cell.eventTitle"></span>
+        <!-- 纪念日/日程标记圆点槽位 -->
+        <span class="cell-event-slot">
+          <span v-if="cell.hasEvent" class="cell-event-dot" :title="cell.eventTitle"></span>
+        </span>
       </button>
     </div>
 

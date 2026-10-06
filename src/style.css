@@ -1116,11 +1116,11 @@
   width: 100%;
   min-width: 0;
   aspect-ratio: auto;
-  min-height: 44px;
+  min-height: 46px;
   border-radius: 10px;
   border: 1.5px solid transparent;
   background: transparent;
-  padding: 3px 1px;
+  padding: 3px 1px 2px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1136,17 +1136,17 @@
 }
 .cell-solar-num {
   font-family: inherit;
-  font-size: 17px;
+  font-size: 16.5px;
   font-weight: 450;
-  line-height: 1.15;
+  line-height: 1.1;
   color: var(--ink);
 }
 .cal-cell.is-weekend .cell-solar-num { color: #2e7d55; }
 .dark .cal-cell.is-weekend .cell-solar-num { color: #4ade80; }
 .cal-cell.other-month { opacity: .32; }
 .cell-sub-text {
-  font-size: 11px;
-  margin-top: 2px;
+  font-size: 10.5px;
+  margin-top: 1px;
   color: var(--muted);
   line-height: 1.1;
   white-space: nowrap;
@@ -1226,13 +1226,24 @@
   font-size: 9.5px;
   padding: 1px 4px;
 }
+.cell-event-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 5px;
+  width: 100%;
+  margin-top: 1.5px;
+  pointer-events: none;
+}
 .cell-event-dot {
-  width: 4px;
-  height: 4px;
+  width: 3.5px;
+  height: 3.5px;
   border-radius: 50%;
   background: #e04b4b;
-  position: absolute;
-  bottom: 3px;
+  flex-shrink: 0;
+}
+.dark .cell-event-dot {
+  background: #f87171;
 }
 .cal-footer {
   display: flex;
@@ -2173,7 +2184,9 @@
   .header-actions .header-audio-popover { position: fixed; top: 150px; left: 14px; right: 14px; width: auto; max-width: none; max-height: calc(100dvh - 164px); overflow-y: auto; overscroll-behavior: contain; }
   .month-calendar-card { padding-left: 14px; padding-right: 14px; }
   .month-calendar-card .cal-week-row, .month-calendar-card .cal-grid { gap: 2px; }
-  .cal-cell { min-height: 40px; aspect-ratio: auto; width: 100%; min-width: 0; padding: 3px 1px; }
+  .cal-cell { min-height: 42px; aspect-ratio: auto; width: 100%; min-width: 0; padding: 2px 1px; }
+  .cell-event-slot { height: 4px; margin-top: 1px; }
+  .cell-event-dot { width: 3px; height: 3px; }
   .month-calendar-card .cal-footer {
     display: flex !important;
     align-items: center !important;
@@ -2276,9 +2289,11 @@
   .date-card-secondary { font-size: 12.5px; }
   .date-card-term { font-size: 12px; padding: 7px 10px; }
   .month-calendar-card { padding-left: 10px; padding-right: 10px; }
-  .cal-cell { aspect-ratio: auto; min-height: 38px; width: 100%; min-width: 0; padding: 2px 1px; }
+  .cal-cell { aspect-ratio: auto; min-height: 40px; width: 100%; min-width: 0; padding: 2px 1px; }
   .cell-solar-num { font-size: 14px; }
   .cell-sub-text { font-size: 9.5px; }
+  .cell-event-slot { height: 4px; margin-top: 1px; }
+  .cell-event-dot { width: 3px; height: 3px; }
   .garden-tabs { width: 100%; justify-content: space-between; }
   .garden-tabs a { padding: 9px 12px; font-size: 12px; }
   .weather-panel { padding: 18px 15px; min-height: 400px; }
