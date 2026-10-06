@@ -249,8 +249,8 @@ onUnmounted(() => {
             :aria-label="audioState.isPlaying ? '暂停' : '播放'"
             @click="togglePlay"
           >
-            <Pause v-if="audioState.isPlaying" :size="21" />
-            <Play v-else :size="21" class="translate-x-0.5" />
+            <Pause v-if="audioState.isPlaying" :size="20" />
+            <Play v-else :size="20" class="translate-x-0.5" />
           </button>
 
           <button
@@ -525,8 +525,8 @@ onUnmounted(() => {
 .audio-vinyl-stage {
   display: flex;
   align-items: center;
-  gap: 26px;
-  padding: 10px 8px;
+  gap: 22px;
+  padding: 8px 6px;
   margin: auto 0;
 }
 
@@ -540,8 +540,8 @@ onUnmounted(() => {
 
 /* 唱片盘体：浅色模式为经典曜石黑胶 (Classic Obsidian Vinyl) */
 .vinyl-disc {
-  width: 142px;
-  height: 142px;
+  width: 122px;
+  height: 122px;
   border-radius: 50%;
   position: relative;
   display: grid;
@@ -603,30 +603,30 @@ onUnmounted(() => {
 }
 
 .vinyl-groove-ring.ring-1 {
-  width: 126px;
-  height: 126px;
+  width: 108px;
+  height: 108px;
   border: 1px solid rgba(255, 255, 255, 0.045);
 }
 .vinyl-groove-ring.ring-2 {
-  width: 108px;
-  height: 108px;
+  width: 92px;
+  height: 92px;
   border: 1px solid rgba(255, 255, 255, 0.032);
 }
 .vinyl-groove-ring.ring-3 {
-  width: 90px;
-  height: 90px;
+  width: 76px;
+  height: 76px;
   border: 1px solid rgba(255, 255, 255, 0.045);
 }
 .vinyl-groove-ring.ring-4 {
-  width: 72px;
-  height: 72px;
+  width: 60px;
+  height: 60px;
   border: 1px solid rgba(255, 255, 255, 0.032);
 }
 
 /* 盘心纸质标签 */
 .vinyl-center-label {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--sage-bg);
   color: var(--accent);
@@ -642,6 +642,11 @@ onUnmounted(() => {
 .vinyl-icon-inner {
   display: grid;
   place-items: center;
+}
+
+.vinyl-icon-inner svg {
+  width: 22px;
+  height: 22px;
 }
 
 /* 右侧信息展示 */
@@ -729,15 +734,15 @@ onUnmounted(() => {
   100% { transform: scaleY(1.3); }
 }
 
-/* 播放控制条：精简卡片高度，主播放键直径超出卡片边界 */
+/* 播放控制条：精炼卡片高度，主播放键对称居中并微突显 */
 .audio-controls-row {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   width: 100%;
-  height: 40px;
+  height: 42px;
   padding: 0 14px;
-  border-radius: 20px;
+  border-radius: 21px;
   background: var(--surface);
   border: 1px solid var(--line);
   position: relative;
@@ -749,6 +754,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  height: 100%;
 }
 
 .controls-center {
@@ -758,6 +764,7 @@ onUnmounted(() => {
   gap: 12px;
   position: relative;
   z-index: 2;
+  height: 100%;
 }
 
 .controls-right {
@@ -765,6 +772,7 @@ onUnmounted(() => {
   justify-content: flex-end;
   align-items: center;
   position: relative;
+  height: 100%;
 }
 
 .ctrl-icon-btn {
@@ -774,11 +782,14 @@ onUnmounted(() => {
   border: none;
   background: transparent;
   color: var(--secondary);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  line-height: 1;
   cursor: pointer;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .ctrl-icon-btn:hover {
@@ -792,20 +803,22 @@ onUnmounted(() => {
 }
 
 .play-main-btn {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   border: none;
   background: var(--accent);
   color: #ffffff;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  line-height: 1;
   cursor: pointer;
   box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 38%, transparent);
   transition: all 0.2s ease;
   flex-shrink: 0;
-  margin: -5px 0;
+  margin: 0;
 }
 
 .play-main-btn:hover {
@@ -1309,6 +1322,10 @@ onUnmounted(() => {
   .vinyl-center-label {
     width: 38px;
     height: 38px;
+  }
+  .vinyl-icon-inner svg {
+    width: 18px;
+    height: 18px;
   }
   .vinyl-track-title {
     font-size: 18px;
