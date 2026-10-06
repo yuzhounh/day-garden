@@ -997,7 +997,7 @@
 }
 
 .dashboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.dashboard-card { border-radius: 22px; padding: 24px 26px 0; min-width: 0; display: flex; flex-direction: column; height: 100%; transition: box-shadow .25s ease; }
+.dashboard-card { border-radius: 22px; padding: 24px 26px 0; min-width: 0; display: flex; flex-direction: column; height: 100%; transition: box-shadow .25s ease; container-type: inline-size; }
 .dashboard-card:hover { box-shadow: var(--card-shadow-hover); }
 .card-heading { display: flex; justify-content: space-between; align-items: center; gap: 9px; margin-bottom: 20px; }
 .card-footer {
@@ -1012,6 +1012,9 @@
 .section-label { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .section-label h2 { font-size: 17px; font-weight: 600; letter-spacing: .5px; white-space: nowrap; }
 .section-label > .eyebrow { font-size: 12px; letter-spacing: 1px; margin-left: 2px; }
+@container (max-width: 520px) {
+  .section-label > .eyebrow { display: none !important; }
+}
 
 /* 月历卡片样式 */
 .month-calendar-card { display: flex; flex-direction: column; container-type: inline-size; container-name: cal-card; }
@@ -1079,7 +1082,6 @@
 @container cal-card (max-width: 500px) {
   .month-calendar-card .cal-nav-btn { display: none !important; }
   .month-calendar-card .current-month-badge { display: none !important; }
-  .month-calendar-card .section-label > .eyebrow { display: inline-flex !important; }
 }
 @container cal-card (max-width: 535px) {
   .month-calendar-card .detail-extra { display: none !important; }
@@ -1404,7 +1406,6 @@
 }
 @container seasonal-card (max-width: 480px) {
   .seasonal-card .bloom-status-pill { display: none !important; }
-  .seasonal-card .section-label > .eyebrow { display: inline-flex !important; }
 }
 .bloom-spot-row {
   display: flex;
@@ -2222,9 +2223,6 @@
   .month-calendar-card .current-month-badge {
     display: none !important;
   }
-  .month-calendar-card .section-label > .eyebrow {
-    display: inline-flex !important;
-  }
   .month-calendar-card .cal-today-pill {
     display: inline-flex !important;
   }
@@ -2237,7 +2235,6 @@
     white-space: nowrap !important;
   }
   .seasonal-card .bloom-status-pill { display: none !important; }
-  .seasonal-card .section-label > .eyebrow { display: inline-flex !important; }
   .live-clock, .toolbar-divider { display: none; }
   .account-button > span { display: none; }
   .toolbar-button { padding: 8px 11px; }
@@ -2257,7 +2254,6 @@
   .dashboard-grid { gap: 16px; grid-template-columns: 1fr; }
   .dashboard-card { padding: 22px 22px 0; }
   .poetry-card { min-height: 285px; }
-  .section-label > .eyebrow { display: inline; }
   .bloom-scene { min-height: 152px; }
   .bloom-scene > svg { right: -2px; width: 158px; opacity: .75; }
   .bloom-copy { width: 72%; }
@@ -2301,7 +2297,6 @@
   .trend-grid-wrapper { min-width: 0; }
   .dashboard-card { padding: 20px 18px 0; }
   .section-label { gap: 8px; }
-  .section-label > .eyebrow { font-size: 10px; }
   .poetry-body { padding: 4px 6px 14px; }
   .poetry-body blockquote { font-size: 22px; letter-spacing: 1px; }
   .bloom-copy { width: 74%; }
