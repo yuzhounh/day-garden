@@ -124,13 +124,13 @@ function importData(e: Event) {
           极简原则：建议首页启用不超过 6 个模块，确保每天 30 秒内扫视完毕，绝不变成让人刷屏的信息流。
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-2">
+        <div class="settings-modules-grid">
           <label
             class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700/60 transition"
             @click.prevent="toggleModule('weather')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">7天天气时间轴</span>
-            <input type="checkbox" :checked="preferences.modules.weather ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.weather ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -138,7 +138,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('calendar')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">月历与休班节气</span>
-            <input type="checkbox" :checked="preferences.modules.calendar ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.calendar ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -146,7 +146,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('quickNotes')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">片刻随想 · 所思所想便签</span>
-            <input type="checkbox" :checked="preferences.modules.quickNotes ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.quickNotes ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -154,7 +154,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('upcoming')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">岁月里程 · 重要日子与日程</span>
-            <input type="checkbox" :checked="preferences.modules.upcoming ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.upcoming ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -162,7 +162,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('gardenAudio')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">听见花园 · 放松轻音与白噪音</span>
-            <input type="checkbox" :checked="preferences.modules.gardenAudio ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.gardenAudio ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -170,7 +170,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('chinaAttractions')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">华夏胜景 · 中国旅游景点</span>
-            <input type="checkbox" :checked="preferences.modules.chinaAttractions ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.chinaAttractions ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -178,7 +178,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('seasonal')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">四时花信 · 物候与花期</span>
-            <input type="checkbox" :checked="preferences.modules.seasonal ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.seasonal ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -186,7 +186,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('evidence')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">生活有方 · 循证生活锦囊</span>
-            <input type="checkbox" :checked="preferences.modules.evidence ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.evidence ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -194,7 +194,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('sportsExercise')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">动健身心 · 运动项目指南</span>
-            <input type="checkbox" :checked="preferences.modules.sportsExercise ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.sportsExercise ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -202,7 +202,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('dailyPoetry')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">今日诗笺 · 今日一页诗词</span>
-            <input type="checkbox" :checked="preferences.modules.dailyPoetry ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.dailyPoetry ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -210,7 +210,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('inspirationalQuote')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">名言语录 · 积极励志语录</span>
-            <input type="checkbox" :checked="preferences.modules.inspirationalQuote ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.inspirationalQuote ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
 
           <label
@@ -218,7 +218,7 @@ function importData(e: Event) {
             @click.prevent="toggleModule('healthTip')"
           >
             <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">底部健康微提醒</span>
-            <input type="checkbox" :checked="preferences.modules.healthTip ?? true" class="rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
+            <input type="checkbox" :checked="preferences.modules.healthTip ?? true" class="shrink-0 rounded text-emerald-600 focus:ring-emerald-500 pointer-events-none" />
           </label>
         </div>
 

@@ -1618,6 +1618,8 @@
 .detail-modal.settings-content {
   width: min(920px, 100%);
   font-family: "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
+  container-type: inline-size;
+  container-name: settings-modal;
 }
 .settings-content,
 .settings-content * {
@@ -1627,6 +1629,32 @@
 .settings-content > .modal-content { padding: 0; }
 .settings-content .modal-heading { padding-bottom: 18px; }
 .settings-content input, .settings-content select { border-radius: 10px; font-size: 14px; }
+.settings-modules-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding-top: 8px;
+}
+@media (min-width: 500px) {
+  .settings-modules-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 780px) {
+  .settings-modules-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@container settings-modal (min-width: 460px) {
+  .settings-modules-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container settings-modal (min-width: 700px) {
+  .settings-modules-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 .account-intro { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 23px; }
 .account-intro p { font-size: 14px; line-height: 1.8; color: var(--secondary); }
 .detail-modal.account-modal { width: min(520px, 100%); background: #f8faf8; }
