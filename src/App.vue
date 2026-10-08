@@ -5,6 +5,7 @@ import BrandLogo from './components/BrandLogo.vue'
 import HeaderHero from './components/HeaderHero.vue'
 import WeatherTimeline from './components/WeatherTimeline.vue'
 import LazyCard from './components/LazyCard.vue'
+import GardenScene from './components/scene/GardenScene.vue'
 const MonthCalendarCard = defineAsyncComponent(() => import('./components/MonthCalendarCard.vue'))
 const UpcomingTimeline = defineAsyncComponent(() => import('./components/UpcomingTimeline.vue'))
 const ChinaAttractionsCard = defineAsyncComponent(() => import('./components/ChinaAttractionsCard.vue'))
@@ -31,6 +32,7 @@ watch(() => account.user?.id, (userId) => {
 
 const weatherDays = ref<WeatherDay[]>([])
 const weatherLoading = ref(false)
+const todayWeather = computed(() => weatherDays.value.find(day => day.isToday) ?? null)
 const showSettings = ref(false)
 const showAccount = ref(false)
 const settingsTab = ref<'modules' | 'notification'>('modules')
@@ -62,17 +64,29 @@ function handleUpdatePreferences(newPrefs: UserPreferences) {
   if (account.user && JSON.stringify(previousCity) !== JSON.stringify(newPrefs.selectedCity)) void syncSelectedCity(newPrefs.selectedCity)
 }
 let weatherRequest = 0
-async function loadWeather() {
+let weatherLoadedAt = 0
+const WEATHER_REFRESH_MS = 30 * 60 * 1000
+/** silent：后台刷新实况，不清空卡片；离线时保留已有数据，不用示例数据覆盖 */
+async function loadWeather(silent = false) {
   const request = ++weatherRequest
-  weatherLoading.value = true
-  weatherDays.value = []
+  if (!silent) {
+    weatherLoading.value = true
+    weatherDays.value = []
+  }
   try {
     const result = await fetch7DayWeather(prefs.value.selectedCity)
-    if (request === weatherRequest) weatherDays.value = result
+    if (request !== weatherRequest) return
+    if (silent && result.some(day => day.dataSource === 'demo')) return
+    weatherDays.value = result
+    weatherLoadedAt = Date.now()
   } finally {
     if (request === weatherRequest) weatherLoading.value = false
   }
 }
+function refreshWeatherIfStale() {
+  if (!document.hidden && prefs.value.modules.weather && !weatherLoading.value && Date.now() - weatherLoadedAt >= WEATHER_REFRESH_MS) void loadWeather(true)
+}
+let weatherRefreshTimer: number | undefined
 function handleUpdateAttractionStatus(newMap: Record<string, AttractionStatusType>) {
   prefs.value = {
     ...prefs.value,
@@ -205,7 +219,7 @@ function syncDate() {
   checkBirthdayAlerts()
 }
 function handleSystemTheme() { if (prefs.value.theme === 'auto') applyTheme('auto') }
-function handleVisibility() { syncDate(); if (!document.hidden) void refreshCloud() }
+function handleVisibility() { syncDate(); refreshWeatherIfStale(); if (!document.hidden) void refreshCloud() }
 function handleOnline() { void refreshCloud() }
 function handlePrefsSynced(e: Event) {
   const custom = e as CustomEvent<{ userId: string; customEvents: LifeEvent[] }>
@@ -232,6 +246,7 @@ onMounted(() => {
   window.addEventListener('online', handleOnline)
   window.addEventListener('daygarden:prefs-synced', handlePrefsSynced)
   window.addEventListener('daygarden:city-synced', handleCitySynced)
+  weatherRefreshTimer = window.setInterval(refreshWeatherIfStale, 5 * 60 * 1000)
 })
 onUnmounted(() => {
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', handleSystemTheme)
@@ -239,12 +254,14 @@ onUnmounted(() => {
   window.removeEventListener('online', handleOnline)
   window.removeEventListener('daygarden:prefs-synced', handlePrefsSynced)
   window.removeEventListener('daygarden:city-synced', handleCitySynced)
+  window.clearInterval(weatherRefreshTimer)
 })
 </script>
 
 <template>
   <div id="today" class="garden-app">
     <div class="ambient-background" aria-hidden="true"><span class="ambient-sage"></span><span class="ambient-peach"></span><span class="ambient-lavender"></span><span class="ambient-sky"></span></div>
+    <GardenScene :weather="todayWeather" :lat="prefs.selectedCity.lat" />
     <div class="garden-shell">
       <HeaderHero
         :selected-city="prefs.selectedCity"
