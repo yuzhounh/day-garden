@@ -67,7 +67,8 @@
   button:disabled { cursor: default; }
   ::selection { background: #cce3d3; color: #163020; }
 }
-.garden-app { position: relative; min-height: 100vh; isolation: isolate; }
+/* 页底留出天气画卷的花园（草木与小动物）；GardenScene 按这里的留白决定花园高度 */
+.garden-app { position: relative; min-height: 100vh; isolation: isolate; padding-bottom: 284px; }
 .ambient-background {
   position: fixed;
   inset: 0;
@@ -1097,6 +1098,16 @@
   .month-calendar-card .cal-nav-btn { display: none !important; }
   .month-calendar-card .current-month-badge { display: none !important; }
 }
+/* 按月历卡片自身宽度调整数字与角标：卡片越窄格子越小 */
+@container cal-card (max-width: 440px) {
+  .month-calendar-card .cal-grid { --cal-badge: 14px; --cal-pad-top: calc(var(--cal-badge) - 1px); }
+  .month-calendar-card .cal-cell { justify-content: flex-start; }
+  .month-calendar-card .cell-solar-num { font-size: 16px; }
+}
+@container cal-card (max-width: 300px) {
+  .month-calendar-card .cal-grid { --cal-badge: 13px; --cal-pad-top: calc(var(--cal-badge) - 1px); }
+  .month-calendar-card .cell-solar-num { font-size: 15px; }
+}
 .cal-week-row {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -1116,6 +1127,8 @@
 .cal-week-cell.weekend { color: #2e7d55; }
 .dark .cal-week-cell.weekend { color: #4ade80; }
 .cal-grid {
+  --cal-badge: 16px;
+  --cal-pad-top: 4px;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 3px;
@@ -1133,7 +1146,8 @@
   border-radius: 10px;
   border: 1.5px solid transparent;
   background: transparent;
-  padding: 3px 1px 2px;
+  /* 宽卡片里角标与居中的数字横向错开；窄卡片（见下方容器查询）顶部留出角标高度，角标在上、日期在下 */
+  padding: var(--cal-pad-top) 1px 3px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1149,10 +1163,11 @@
 }
 .cell-solar-num {
   font-family: inherit;
-  font-size: 16.5px;
+  font-size: 17px;
   font-weight: 450;
   line-height: 1.1;
   color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 .cal-cell.is-weekend .cell-solar-num { color: #2e7d55; }
 .dark .cal-cell.is-weekend .cell-solar-num { color: #4ade80; }
@@ -1220,24 +1235,36 @@
   border-color: var(--accent);
   background: var(--sage-bg);
 }
+/* 休 / 班 / 今：圆形角标，压在格子右上角（参考手机日历），不与居中的日期数字重叠 */
+.month-calendar-card { --cal-badge-ring: #f7f8f7; }
+.dark .month-calendar-card { --cal-badge-ring: #1f2228; }
 .cell-badge {
   position: absolute;
-  top: 3px;
-  right: 3px;
-  font-size: 9px;
+  top: -3px;
+  right: -3px;
+  z-index: 2;
+  width: var(--cal-badge);
+  height: var(--cal-badge);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--cal-badge) * .64);
   line-height: 1;
-  padding: 1.5px 3.5px;
-  border-radius: 4px;
   font-weight: 600;
   color: #fff;
+  box-shadow: 0 0 0 1.5px var(--cal-badge-ring);
+  pointer-events: none;
 }
 .badge-rest { background: #2e7d55; }
 .badge-work { background: #e04b4b; }
 .badge-today { background: #3b82f6; }
 .cell-badge.mini {
   position: static;
+  width: 15px;
+  height: 15px;
   font-size: 9.5px;
-  padding: 1px 4px;
+  box-shadow: none;
 }
 .cell-event-slot {
   display: flex;
@@ -1640,6 +1667,8 @@
 .guidance-list strong { display: block; color: var(--ink); font-size: 15px; font-weight: 600; margin-bottom: 4px; }
 .modal-section-title { font-family: inherit; font-size: 20px; font-weight: 600; margin: 24px 0 18px; }
 .source-list { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--accent); padding-top: 16px; border-top: 1px solid var(--line); }
+/* 天气详情与“岁月里程”等内容弹窗同宽 */
+.detail-modal.weather-detail-modal { width: min(920px, 100%); }
 .weather-details { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .weather-details > div { background: var(--sage-bg); padding: 19px; border-radius: 15px; }
 .weather-details svg { color: var(--accent); margin-bottom: 13px; }
@@ -2240,7 +2269,7 @@
   .header-actions .header-audio-popover { position: fixed; top: 150px; left: 14px; right: 14px; width: auto; max-width: none; max-height: calc(100dvh - 164px); overflow-y: auto; overscroll-behavior: contain; }
   .month-calendar-card { padding-left: 14px; padding-right: 14px; }
   .month-calendar-card .cal-week-row, .month-calendar-card .cal-grid { gap: 2px; }
-  .cal-cell { min-height: 42px; aspect-ratio: auto; width: 100%; min-width: 0; padding: 2px 1px; }
+  .cal-cell { min-height: 42px; aspect-ratio: auto; width: 100%; min-width: 0; padding: var(--cal-pad-top) 1px 2px; }
   .cell-event-slot { height: 4px; margin-top: 1px; }
   .cell-event-dot { width: 3px; height: 3px; }
   .month-calendar-card .cal-footer {
@@ -2298,12 +2327,42 @@
   .hero-copy > .eyebrow { font-size: 11px; }
   .date-card { width: 100%; max-width: 100%; flex: 1 1 100%; }
   .dashboard-caption { display: none; }
-  .weather-panel { grid-template-columns: 1fr; gap: 16px; min-height: 420px; }
-  .weather-summary { border-right: 0; padding: 0; }
-  .today-content { margin: 12px 0; }
-  .today-hint { margin-top: 8px; }
-  .forecast-area { border-top: 1px solid var(--line); padding-top: 15px; }
+  /* 单栏天气卡片：左右两栏等宽，气温与天气在左栏居中，体感、紫外线/降水与出行提示在右栏；趋势图整体压低 */
+  .weather-panel { grid-template-columns: 1fr; gap: 12px; min-height: 0; padding-top: 16px; padding-bottom: 6px; }
+  .weather-summary {
+    border-right: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "head head" "main tags" "cond hint";
+    column-gap: 18px;
+    row-gap: 6px;
+  }
+  .summary-header { grid-area: head; margin-bottom: 4px; }
+  .today-content { display: contents; }
+  .today-main { grid-area: main; align-self: end; justify-content: center; gap: 10px; margin: 0; }
+  .today-temp { font-size: 46px; letter-spacing: -2px; }
+  .today-temp > span { font-size: 26px; }
+  .today-icon { width: 38px; height: 38px; }
+  .today-condition-bar { grid-area: cond; align-self: start; justify-content: center; flex-wrap: wrap; gap: 4px 6px; margin: 0; }
+  .today-condition-text { font-size: 14.5px; }
+  .today-range { font-size: 12.5px; }
+  .today-sub-tags { grid-area: tags; align-self: end; gap: 6px; }
+  .today-tag { padding: 5px 10px; font-size: 12px; }
+  .today-hint { grid-area: hint; align-self: start; margin: 0; padding: 7px 10px; font-size: 12px; line-height: 1.5; }
+  .weather-placeholder { grid-column: 1 / -1; padding: 8px 0; }
+  .weather-summary:has(.weather-placeholder) .today-hint { grid-column: 1 / -1; }
+  .forecast-area { border-top: 1px solid var(--line); padding-top: 10px; }
+  .forecast-heading { margin-bottom: 4px; }
   .forecast-heading small { display: inline; }
+  .trend-grid-wrapper { grid-template-rows: auto 96px auto; gap: 2px; }
+  .trend-cell-chart { height: 96px; }
+  .trend-cell-top { gap: 0; padding: 5px 2px 2px; }
+  .trend-icon { width: 20px; height: 20px; margin: 3px 0 1px; }
+  .trend-condition { font-size: 11.5px; }
+  .trend-cell-bot { padding: 2px 2px 6px; }
+  .forecast-grid .weather-skeleton { height: 200px; }
+  .forecast-grid .weather-skeleton:nth-child(n + 6) { display: none; }
   .dashboard-grid { gap: 16px; grid-template-columns: 1fr; }
   .dashboard-card { padding: 22px 22px 0; }
   .poetry-card { min-height: 285px; }
@@ -2316,6 +2375,7 @@
   .habit-list button { padding: 14px 12px; }
   .habit-list small { font-size: 12px; }
   .garden-footer { padding: 26px 0; flex-wrap: wrap; gap: 12px; }
+  .garden-app { padding-bottom: 214px; }
   .garden-footer > p { display: none; }
 }
 @media (max-width: 420px) {
@@ -2338,14 +2398,14 @@
   .date-card-secondary { font-size: 12.5px; }
   .date-card-term { font-size: 12px; padding: 7px 10px; }
   .month-calendar-card { padding-left: 10px; padding-right: 10px; }
-  .cal-cell { aspect-ratio: auto; min-height: 40px; width: 100%; min-width: 0; padding: 2px 1px; }
-  .cell-solar-num { font-size: 14px; }
+  .cal-cell { aspect-ratio: auto; min-height: 40px; width: 100%; min-width: 0; padding: var(--cal-pad-top) 1px 2px; }
   .cell-sub-text { font-size: 9.5px; }
   .cell-event-slot { height: 4px; margin-top: 1px; }
   .cell-event-dot { width: 3px; height: 3px; }
   .garden-tabs { width: 100%; justify-content: space-between; }
   .garden-tabs a { padding: 9px 12px; font-size: 12px; }
-  .weather-panel { padding: 18px 15px; min-height: 400px; }
+  .weather-panel { padding: 14px 14px 4px; }
+  .weather-summary { column-gap: 14px; }
   .forecast-heading > span:last-child { max-width: 140px; font-size: 11px; }
   .trend-grid-wrapper { min-width: 0; }
   .dashboard-card { padding: 20px 18px 0; }
