@@ -13,6 +13,58 @@ export interface WeatherDay {
   precipProb: number
   uvIndex?: number
   dataSource?: 'live' | 'cached' | 'demo'
+  /** 城市当地时间，如 2026-10-07T06:12 */
+  sunrise?: string
+  sunset?: string
+  /** 城市相对 UTC 的偏移，用于按当地时间判断昼夜 */
+  utcOffsetSeconds?: number
+  /** 全天累计降水（mm）、最大风速（km/h）与主导风向（度，风的来向） */
+  precipSum?: number
+  windSpeedMax?: number
+  windDirDominant?: number
+  /** 当天 24 小时的分时预报（城市当地时间） */
+  hours?: HourlyWeather[]
+  /** 仅今天：未来两小时每 15 分钟的降水量（模式预报） */
+  nowcast?: { time: string; precip: number }[]
+  /** 仅今天：请求时刻的实况 */
+  current?: CurrentWeather
+}
+
+export interface CurrentWeather {
+  weatherCode: number
+  /** km/h */
+  windSpeed: number
+  fetchedAt: number
+  /** 城市当地时间，如 2026-10-07T13:45 */
+  time?: string
+  temp?: number
+  apparent?: number
+  humidity?: number
+  /** 度，风的来向 */
+  windDir?: number
+  /** 海平面气压 hPa */
+  pressure?: number
+  uv?: number
+}
+
+export interface HourlyWeather {
+  /** 城市当地时间，如 2026-10-07T13:00 */
+  time: string
+  temp: number
+  apparent: number
+  humidity: number
+  precipProb: number
+  /** mm */
+  precip: number
+  code: number
+  /** km/h */
+  windSpeed: number
+  /** 度，风的来向 */
+  windDir: number
+  uv: number
+  /** 海平面气压 hPa */
+  pressure: number
+  isDay: boolean
 }
 
 export interface CityOption {

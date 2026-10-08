@@ -730,6 +730,24 @@ function onAccordionLeave(el: Element) {
   color: var(--accent);
 }
 
+/* 手机：卡片收紧；输入框平时两行高，输入时或有内容时展开；触屏不显示快捷键提示 */
+@media (max-width: 720px) {
+  .quick-note-card .card-heading { margin-bottom: 12px; }
+  .note-card-body { gap: 10px; }
+  .quick-input-box { padding: 8px 10px; }
+  .note-textarea { height: 50px; min-height: 0; line-height: 1.5; transition: height .2s ease; }
+  .note-textarea:focus,
+  .note-textarea:not(:placeholder-shown) { height: 92px; }
+  .quick-input-bar { justify-content: flex-end; padding-top: 5px; margin-top: 2px; }
+  .note-input-hint { display: none; }
+  .note-submit-btn { min-height: 32px; padding: 0 13px; }
+  .recent-notes-list { gap: 6px; }
+  .recent-note-item { padding: 4px 4px 8px 12px; gap: 0; }
+  .note-action-btn { width: 32px; height: 32px; min-width: 32px; min-height: 32px; }
+  .note-empty-state { padding: 14px 12px; }
+  .quick-note-card .card-footer { padding: 10px 0 16px; }
+}
+
 /* 空状态 */
 .note-empty-state {
   display: flex;

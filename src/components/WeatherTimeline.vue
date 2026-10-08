@@ -11,11 +11,12 @@ import {
   CloudDrizzle,
   Umbrella,
   Thermometer,
-  Wind,
   ArrowUpRight,
 } from 'lucide-vue-next'
 import type { WeatherDay } from '../types'
 import DetailModal from './DetailModal.vue'
+import WeatherDayDetail from './WeatherDayDetail.vue'
+import { uvLevel } from '../services/weatherInsights'
 
 const props = defineProps<{ days: WeatherDay[]; loading?: boolean; city: string }>()
 const selected = ref<WeatherDay | null>(null)
@@ -42,19 +43,6 @@ function icon(name: string) {
 }
 function shortDate(date: string) {
   return Number(date.slice(5, 7)) + '/' + Number(date.slice(8, 10))
-}
-function uvLevel(value?: number) {
-  return value === undefined
-    ? '暂无数据'
-    : value <= 2
-    ? '低'
-    : value <= 5
-    ? '中等'
-    : value <= 7
-    ? '高'
-    : value <= 10
-    ? '很高'
-    : '极高'
 }
 
 function getDayTitle(day: WeatherDay): string {
@@ -114,6 +102,13 @@ const containerWidth = ref(
 )
 
 let ro: ResizeObserver | null = null
+// 单栏（≤720px）时趋势图更矮，与 style.css 中 .trend-cell-chart 的高度保持一致
+const COMPACT_QUERY = '(max-width: 720px)'
+const compact = ref(typeof window !== 'undefined' && window.matchMedia(COMPACT_QUERY).matches)
+let compactQuery: MediaQueryList | null = null
+function onCompactChange(event: MediaQueryListEvent) {
+  compact.value = event.matches
+}
 
 function updateWidth() {
   const w = getAvailableForecastWidth()
@@ -126,6 +121,9 @@ onMounted(() => {
   updateWidth()
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', updateWidth, { passive: true })
+    compactQuery = window.matchMedia(COMPACT_QUERY)
+    compact.value = compactQuery.matches
+    compactQuery.addEventListener('change', onCompactChange)
   }
   if (typeof ResizeObserver !== 'undefined') {
     ro = new ResizeObserver(() => {
@@ -140,6 +138,7 @@ onUnmounted(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', updateWidth)
   }
+  compactQuery?.removeEventListener('change', onCompactChange)
   if (ro) {
     ro.disconnect()
     ro = null
@@ -231,8 +230,10 @@ const chartData = computed(() => {
   const currentDays = visibleDays.value
   if (!currentDays || currentDays.length === 0) return null
   const count = currentDays.length
-  const colWidth = 90
-  const totalWidth = count * colWidth
+  // 按实际像素宽度作图（与网格列一一对齐：左右各 2px 内边距、列间距 4px），文字不会被横向拉伸或压扁
+  const gridGap = 4
+  const totalWidth = Math.max(count * 40, Math.round(containerWidth.value - 4))
+  const colWidth = (totalWidth - (count - 1) * gridGap) / count
 
   const allMin = currentDays.map(d => d.tempMin)
   const allMax = currentDays.map(d => d.tempMax)
@@ -247,13 +248,13 @@ const chartData = computed(() => {
     maxTemp += pad
   }
 
-  const chartHeight = 130
-  const topPad = 32
-  const botPad = 32
+  const chartHeight = compact.value ? 96 : 130
+  const topPad = compact.value ? 24 : 32
+  const botPad = compact.value ? 24 : 32
   const availHeight = chartHeight - topPad - botPad
 
   const points: ChartPoint[] = currentDays.map((d, i) => {
-    const x = Math.round(i * colWidth + colWidth / 2)
+    const x = Math.round(i * (colWidth + gridGap) + colWidth / 2)
     const yMax = Math.round(topPad + ((maxTemp - d.tempMax) / (maxTemp - minTemp)) * availHeight)
     const yMin = Math.round(topPad + ((maxTemp - d.tempMin) / (maxTemp - minTemp)) * availHeight)
     return {
@@ -425,33 +426,13 @@ const chartData = computed(() => {
     <DetailModal
       v-if="selected"
       :title="selected.dayOfWeek + ' · ' + selected.weatherText"
-      :subtitle="city + ' / ' + selected.date + (selected.dataSource === 'demo' ? ' / 示例数据' : selected.dataSource === 'cached' ? ' / 缓存数据' : '')"
+      :subtitle="city + ' / ' + selected.date + ' / ' + selected.tempMin + '° ~ ' + selected.tempMax + '°' + (selected.dataSource === 'demo' ? ' / 示例数据' : selected.dataSource === 'cached' ? ' / 缓存数据' : '')"
+      class="weather-detail-modal"
       @close="selected = null"
     >
-      <div class="weather-details">
-        <div>
-          <Thermometer :size="20" />
-          <small>最高 / 最低温度</small>
-          <strong>{{ selected.tempMax }}° / {{ selected.tempMin }}°</strong>
-        </div>
-        <div>
-          <Wind :size="20" />
-          <small>最高 / 最低体感</small>
-          <strong>{{ selected.apparentTempMax }}° / {{ selected.apparentTempMin }}°</strong>
-        </div>
-        <div>
-          <Umbrella :size="20" />
-          <small>降水概率</small>
-          <strong>{{ selected.precipProb }}%</strong>
-        </div>
-        <div>
-          <Sun :size="20" />
-          <small>紫外线指数</small>
-          <strong>{{ selected.uvIndex ?? '—' }} · {{ uvLevel(selected.uvIndex) }}</strong>
-        </div>
-      </div>
+      <WeatherDayDetail :day="selected" :days="days" />
       <p class="content-footnote">
-        {{ selected.isPast ? '历史天气供回顾参考。' : '日级预报供出行参考，实际天气可能变化。' }}
+        {{ selected.isPast ? '历史天气供回顾参考。' : '预报供出行参考，实际天气可能变化；两小时降水为模式预报，并非雷达实测。出行建议由天气数据按规则推算。' }}
         {{ selected.dataSource === 'demo' ? '当前为示例数据，不能作为出行依据。' : '' }}
         气象数据源自
         <a

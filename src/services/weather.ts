@@ -1,4 +1,4 @@
-import type { CityOption, WeatherDay } from '../types'
+import type { CityOption, HourlyWeather, WeatherDay } from '../types'
 import { localDateKey } from './day'
 
 export const DEFAULT_CITIES: CityOption[] = [
@@ -117,16 +117,58 @@ export function getWeatherMeta(code: number): { text: string; icon: string } {
   if (code === 45 || code === 48) return { text: '有雾', icon: 'CloudFog' }
   if (code >= 51 && code <= 57) return { text: '毛毛雨', icon: 'CloudDrizzle' }
   if (code >= 61 && code <= 65) return { text: '降雨', icon: 'CloudRain' }
+  if (code === 66 || code === 67) return { text: '冻雨', icon: 'CloudRain' }
   if (code >= 71 && code <= 77) return { text: '降雪', icon: 'CloudSnow' }
-  if (code >= 80 && code <= 82) return { text: '阵雨', icon: 'CloudLightning' }
+  if (code >= 80 && code <= 82) return { text: '阵雨', icon: 'CloudRain' }
+  if (code === 85 || code === 86) return { text: '阵雪', icon: 'CloudSnow' }
   if (code >= 95) return { text: '雷暴', icon: 'CloudLightning' }
   return { text: '多云', icon: 'Cloud' }
 }
 
 const WEEK_DAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
 
+const HOURLY_FIELDS = 'temperature_2m,apparent_temperature,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,wind_direction_10m,uv_index,pressure_msl,is_day'
+const CURRENT_FIELDS = 'weather_code,temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_direction_10m,pressure_msl,uv_index'
+const num = (value: unknown, digits = 0): number => {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return 0
+  const f = 10 ** digits
+  return Math.round(n * f) / f
+}
+const optional = (value: unknown, digits = 0): number | undefined => (value === null || value === undefined || !Number.isFinite(Number(value)) ? undefined : num(value, digits))
+
+/** 把逐小时数据按日期（城市当地）分组 */
+function groupHours(hourly: Record<string, unknown[]> | undefined): Map<string, HourlyWeather[]> {
+  const byDate = new Map<string, HourlyWeather[]>()
+  const times = hourly?.time as string[] | undefined
+  if (!hourly || !Array.isArray(times)) return byDate
+  const col = (key: string) => (Array.isArray(hourly[key]) ? hourly[key] : []) as unknown[]
+  const [temp, apparent, humidity, prob, precip, code, wind, dir, uv, pressure, isDay] = ['temperature_2m', 'apparent_temperature', 'relative_humidity_2m', 'precipitation_probability', 'precipitation', 'weather_code', 'wind_speed_10m', 'wind_direction_10m', 'uv_index', 'pressure_msl', 'is_day'].map(col)
+  times.forEach((time, i) => {
+    if (typeof time !== 'string' || temp![i] === null || temp![i] === undefined) return
+    const hour: HourlyWeather = {
+      time,
+      temp: num(temp![i]),
+      apparent: num(apparent![i]),
+      humidity: num(humidity![i]),
+      precipProb: num(prob![i]),
+      precip: num(precip![i], 1),
+      code: num(code![i]),
+      windSpeed: num(wind![i], 1),
+      windDir: num(dir![i]),
+      uv: num(uv![i], 1),
+      pressure: num(pressure![i]),
+      isDay: Number(isDay![i]) === 1,
+    }
+    const date = time.slice(0, 10)
+    if (!byDate.has(date)) byDate.set(date, [])
+    byDate.get(date)!.push(hour)
+  })
+  return byDate
+}
+
 export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,uv_index_max&timezone=auto&past_days=2&forecast_days=8`
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,uv_index_max,sunrise,sunset,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&hourly=${HOURLY_FIELDS}&current=${CURRENT_FIELDS}&minutely_15=precipitation&past_minutely_15=0&forecast_minutely_15=8&timezone=auto&past_days=2&forecast_days=8`
 
   try {
     const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(10000) })
@@ -137,6 +179,12 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
     if (!daily || !daily.time) throw new Error('Invalid weather payload')
 
     const todayDateStr = localDateKey()
+    const hoursByDate = groupHours(data.hourly)
+    const minutely = data.minutely_15
+    const nowcast = Array.isArray(minutely?.time)
+      ? (minutely.time as string[]).map((time, i) => ({ time, precip: num(minutely.precipitation?.[i], 2) }))
+      : undefined
+    const current = data.current
 
     const list: WeatherDay[] = daily.time.map((timeStr: string, idx: number): WeatherDay => {
       const d = new Date(timeStr + 'T00:00:00')
@@ -161,6 +209,28 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
         precipProb: Math.round(daily.precipitation_probability_max[idx] || 0),
         uvIndex: daily.uv_index_max ? Math.round(daily.uv_index_max[idx]) : undefined,
         dataSource: 'live',
+        sunrise: daily.sunrise?.[idx] ?? undefined,
+        sunset: daily.sunset?.[idx] ?? undefined,
+        utcOffsetSeconds: typeof data.utc_offset_seconds === 'number' ? data.utc_offset_seconds : undefined,
+        precipSum: optional(daily.precipitation_sum?.[idx], 1),
+        windSpeedMax: optional(daily.wind_speed_10m_max?.[idx], 1),
+        windDirDominant: optional(daily.wind_direction_10m_dominant?.[idx]),
+        hours: hoursByDate.get(timeStr),
+        nowcast: isToday ? nowcast : undefined,
+        current: isToday && typeof current?.weather_code === 'number'
+          ? {
+              weatherCode: current.weather_code,
+              windSpeed: Number(current.wind_speed_10m) || 0,
+              fetchedAt: Date.now(),
+              time: typeof current.time === 'string' ? current.time : undefined,
+              temp: optional(current.temperature_2m),
+              apparent: optional(current.apparent_temperature),
+              humidity: optional(current.relative_humidity_2m),
+              windDir: optional(current.wind_direction_10m),
+              pressure: optional(current.pressure_msl),
+              uv: optional(current.uv_index, 1),
+            }
+          : undefined,
       }
     })
 

@@ -40,7 +40,7 @@ async function stopServer() {
   }
 }
 try {
-  await run(['--test', 'tests/regressions.test.mjs', 'tests/oauth.test.mjs'])
+  await run(['--test', 'tests/regressions.test.mjs', 'tests/oauth.test.mjs', 'tests/scene.test.mjs', 'tests/weather-insights.test.mjs'])
   const config = resolve(sandbox, 'wrangler.json')
   const databaseId = randomUUID()
   writeFileSync(config, JSON.stringify({ name: 'day-garden-test', pages_build_output_dir: resolve(root, 'dist'), compatibility_date: '2026-09-30', vars: { PASSWORD_PEPPER: 'isolated-test-pepper' }, d1_databases: [{ binding: 'DB', database_name: 'day-garden-test', database_id: databaseId, migrations_dir: resolve(root, 'worker/migrations') }] }, null, 2))
