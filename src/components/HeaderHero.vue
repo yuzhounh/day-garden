@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, useId } from 'vue'
 import {
   Sun,
   Moon,
@@ -144,6 +144,10 @@ function toggleAudioPopover() {
 }
 
 const showMobileDrawer = ref(false)
+const drawerPanel = ref<HTMLElement | null>(null)
+const drawerId = useId()
+let drawerPreviousFocus: HTMLElement | null = null
+let drawerPreviousOverflow = ''
 const showCitiesMobile = ref(false)
 const showAudioPopoverMobile = ref(false)
 const audioPopoverMobileRef = ref<HTMLElement | null>(null)
@@ -181,12 +185,27 @@ function closeCities(event: MouseEvent) {
 }
 
 function openDrawer() {
+  if (showMobileDrawer.value) return
   showAudioPopoverMobile.value = false
+  drawerPreviousFocus = document.activeElement as HTMLElement
+  drawerPreviousOverflow = document.body.style.overflow
+  document.body.style.overflow = 'hidden'
   showMobileDrawer.value = true
+  nextTick(() => {
+    if (!showMobileDrawer.value || !drawerPanel.value) return
+    drawerPanel.value.inert = false
+    drawerPanel.value.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true })
+  })
 }
 
 function closeDrawer() {
+  if (!showMobileDrawer.value) return
+  if (drawerPanel.value) drawerPanel.value.inert = true
   showMobileDrawer.value = false
+  document.body.style.overflow = drawerPreviousOverflow
+  if (drawerPreviousFocus?.isConnected && drawerPreviousFocus.getClientRects().length) {
+    drawerPreviousFocus.focus({ preventScroll: true })
+  }
 }
 
 function handleDrawerAction(action: 'city' | 'audio' | 'account' | 'sort' | 'settings') {
@@ -217,8 +236,17 @@ function handleDrawerAction(action: 'city' | 'audio' | 'account' | 'sort' | 'set
 }
 
 function onKey(event: KeyboardEvent) {
+  if (event.key === 'Tab' && showMobileDrawer.value && drawerPanel.value) {
+    const buttons = [...drawerPanel.value.querySelectorAll<HTMLButtonElement>('button')].filter(button => !button.disabled)
+    const first = buttons[0]
+    const last = buttons[buttons.length - 1]
+    if (!drawerPanel.value.contains(document.activeElement) || (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+      event.preventDefault()
+      ;(event.shiftKey ? last : first)?.focus()
+    }
+  }
   if (event.key === 'Escape') {
-    showMobileDrawer.value = false
+    closeDrawer()
     showCities.value = false
     showCitiesMobile.value = false
     showAudioPopover.value = false
@@ -273,7 +301,7 @@ function updateSystem(event: MediaQueryListEvent) {
 
 function onResize() {
   if (window.innerWidth > 768 && showMobileDrawer.value) {
-    showMobileDrawer.value = false
+    closeDrawer()
   }
 }
 
@@ -288,6 +316,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  closeDrawer()
   clearTimeout(searchTimer)
   window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', updateSystem)
   document.removeEventListener('click', closeCities)
@@ -330,6 +359,7 @@ onUnmounted(() => {
                 v-model="searchQuery"
                 type="text"
                 placeholder="搜索任意城市（如：苏州、三亚、青岛…）"
+                aria-label="搜索城市"
                 class="city-search-input"
                 @input="onSearchInput"
                 @keydown.enter="onSearchEnter"
@@ -597,6 +627,8 @@ onUnmounted(() => {
         <button
           class="icon-button hamburger-btn"
           aria-label="展开导航菜单"
+          :aria-expanded="showMobileDrawer"
+          :aria-controls="drawerId"
           title="展开导航菜单"
           @click="openDrawer"
         >
@@ -645,6 +677,8 @@ onUnmounted(() => {
     <Transition name="drawer-slide">
       <aside
         v-if="showMobileDrawer"
+        ref="drawerPanel"
+        :id="drawerId"
         class="garden-drawer-panel"
         role="dialog"
         aria-label="导航与功能菜单"
@@ -767,6 +801,7 @@ onUnmounted(() => {
           v-model="searchQuery"
           type="text"
           placeholder="搜索城市（如：杭州、拉萨、tokyo）"
+          aria-label="搜索城市"
           class="city-search-input"
           @input="onSearchInput"
           @keydown.enter="onSearchEnter"

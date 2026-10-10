@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, useId } from 'vue'
 import { Plus, Trash2, Pencil, Clock, Search, Heart, Cake, CalendarCheck } from 'lucide-vue-next'
 import type { LifeEvent } from '../types'
 import {
@@ -12,6 +12,9 @@ import {
   getEventCategory,
 } from '../services/calendar'
 import DetailModal from './DetailModal.vue'
+import CalendarTypeSelector from './CalendarTypeSelector.vue'
+import EventTypeSelector from './EventTypeSelector.vue'
+import EventFormFields from './EventFormFields.vue'
 import { validateLifeEvent, validateEventList, parseEventDate } from '../services/validation'
 
 const props = defineProps<{
@@ -32,8 +35,15 @@ const newEventType = ref<'birthday' | 'anniversary' | 'schedule'>('birthday')
 const newEventRole = ref('')
 const newEventAdvice = ref('')
 const newEventIsLunar = ref(false)
+const newEventTypeExplicit = ref(false)
+
+function markNewEventType() {
+  newEventTypeExplicit.value = true
+  clearFormError('add')
+}
 
 function onTitleChange(title: string) {
+  if (newEventTypeExplicit.value) return
   if (isAnniversaryEvent({ title })) {
     newEventType.value = 'anniversary'
   } else if (title.includes('生日') || title.includes('生辰') || title.includes('出生') || title.includes('诞辰')) {
@@ -58,6 +68,7 @@ function onTitleChange(title: string) {
 // 编辑事件表单
 const editingId = ref<string | null>(null)
 const eventsContent = ref<HTMLElement | null>(null)
+let savedCardId: string | null = null
 const editForm = ref<{
   title: string
   date: string
@@ -75,11 +86,50 @@ const editForm = ref<{
   isLunar: false,
   type: 'birthday',
 })
+const editDrafts = new Map<string, typeof editForm.value>()
+let originalEdit: typeof editForm.value | null = null
+
+function stashEditDraft() {
+  if (!editingId.value) return
+  if (JSON.stringify(editForm.value) !== JSON.stringify(originalEdit)) {
+    editDrafts.set(editingId.value, { ...editForm.value })
+  } else {
+    editDrafts.delete(editingId.value)
+  }
+}
+
+function revealActiveForm() {
+  const selector = showAddForm.value ? '.accordion-panel' : '.edit-card-panel'
+  eventsContent.value?.querySelector<HTMLElement>(selector)?.scrollIntoView({ behavior: 'instant', block: 'nearest' })
+}
+
+function openAddForm() {
+  savedCardId = null
+  stashEditDraft()
+  editingId.value = null
+  clearFormError('add')
+  clearFormError('edit')
+  showAddForm.value = true
+}
+
+function collapseAddForm() {
+  showAddForm.value = false
+  clearFormError('add')
+}
+
+function toggleAddForm() {
+  if (showAddForm.value) collapseAddForm()
+  else openAddForm()
+}
 
 async function startEdit(ev: LifeEvent) {
+  savedCardId = null
+  stashEditDraft()
   showAddForm.value = false
+  clearFormError('add')
+  clearFormError('edit')
   editingId.value = ev.id
-  editForm.value = {
+  originalEdit = {
     title: ev.title,
     date: ev.date,
     startDate: ev.startDate || '',
@@ -88,24 +138,21 @@ async function startEdit(ev: LifeEvent) {
     isLunar: !!ev.isLunar,
     type: getEventCategory(ev),
   }
+  editForm.value = { ...(editDrafts.get(ev.id) || originalEdit) }
 
   // Reveal the editor after its taller content updates the card layout.
   await nextTick()
-  eventsContent.value?.querySelector<HTMLElement>('.edit-card-panel')?.scrollIntoView({
-    behavior: 'instant',
-    block: 'nearest',
-  })
+  revealActiveForm()
 }
 
 function cancelEdit() {
+  if (editingId.value) editDrafts.delete(editingId.value)
   editingId.value = null
+  clearFormError('edit')
 }
 
 function saveEdit(id: string) {
-  if (!editForm.value.title.trim() || !editForm.value.date.trim()) return
-  const isAnniv = isAnniversaryEvent({ title: editForm.value.title, type: editForm.value.type })
-  const isSched = isScheduleEvent({ title: editForm.value.title, type: editForm.value.type })
-  const finalType = isAnniv ? 'anniversary' : isSched ? 'schedule' : editForm.value.type
+  const finalType = editForm.value.type
 
   const payload: LifeEvent = {
     id,
@@ -121,10 +168,10 @@ function saveEdit(id: string) {
   try {
     validateLifeEvent(payload)
   } catch (error) {
-    formError.value = (error as Error).message
+    void showFormError('edit', (error as Error).message)
     return
   }
-  formError.value = ''
+  clearFormError('edit')
 
   const updatedEvents = props.customEvents.map((ev) => {
     if (ev.id !== id) return ev
@@ -141,23 +188,37 @@ function saveEdit(id: string) {
   })
 
   emit('update:customEvents', sortEventsByDaysLeft(updatedEvents))
+  editDrafts.delete(id)
   editingId.value = null
+  revealSavedEvent(payload)
+  void nextTick(revealSavedCard)
 }
 
 const searchQuery = ref('')
 
-const sortedEvents = computed(() => {
-  const all = sortEventsByDaysLeft(props.customEvents || [])
+function matchesSearch(ev: LifeEvent) {
   const q = searchQuery.value.trim().toLowerCase()
-  if (!q) return all
-  return all.filter((ev) =>
-    ev.title.toLowerCase().includes(q) ||
+  return !q || ev.title.toLowerCase().includes(q) ||
     (ev.role && ev.role.toLowerCase().includes(q)) ||
     ev.date.includes(q) ||
     (ev.startDate && ev.startDate.includes(q)) ||
     (ev.giftAdvice && ev.giftAdvice.toLowerCase().includes(q))
-  )
-})
+}
+
+const sortedEvents = computed(() => sortEventsByDaysLeft(props.customEvents || []).filter(matchesSearch))
+
+function revealSavedEvent(event: LifeEvent) {
+  if (!matchesSearch(event)) searchQuery.value = ''
+  savedCardId = event.id
+}
+
+function revealSavedCard() {
+  if (!savedCardId) { revealActiveForm(); return }
+  const card = eventsContent.value?.querySelector<HTMLElement>(`[data-event-id="${savedCardId}"]`)
+  card?.scrollIntoView({ behavior: 'instant', block: 'nearest' })
+  card?.querySelector<HTMLButtonElement>('button[title="编辑"]')?.focus({ preventScroll: true })
+  savedCardId = null
+}
 
 function getEventCountdown(ev: LifeEvent) {
   try {
@@ -256,11 +317,7 @@ function getNextDateDisplay(ev: LifeEvent): string {
 }
 
 function addEvent() {
-  if (!newEventTitle.value.trim() || !newEventDate.value.trim()) return
-
-  const isAnniv = isAnniversaryEvent({ title: newEventTitle.value, type: newEventType.value })
-  const isSched = isScheduleEvent({ title: newEventTitle.value, type: newEventType.value })
-  const finalType = isAnniv ? 'anniversary' : isSched ? 'schedule' : newEventType.value
+  const finalType = newEventType.value
 
   const newEv: LifeEvent = {
     id: 'evt_' + crypto.randomUUID(),
@@ -277,13 +334,18 @@ function addEvent() {
     Object.assign(newEv, validateLifeEvent(newEv))
     validateEventList([newEv, ...props.customEvents])
   } catch (error) {
-    formError.value = (error as Error).message
+    void showFormError('add', (error as Error).message)
     return
   }
-  formError.value = ''
+  clearFormError('add')
   const updated = sortEventsByDaysLeft([newEv, ...props.customEvents])
   emit('update:customEvents', updated)
+  revealSavedEvent(newEv)
+  resetAddForm()
+  showAddForm.value = false
+}
 
+function resetAddForm() {
   newEventTitle.value = ''
   newEventDate.value = ''
   newEventStartDate.value = ''
@@ -291,6 +353,12 @@ function addEvent() {
   newEventAdvice.value = ''
   newEventType.value = 'birthday'
   newEventIsLunar.value = false
+  newEventTypeExplicit.value = false
+  clearFormError('add')
+}
+
+function cancelAddForm() {
+  resetAddForm()
   showAddForm.value = false
 }
 
@@ -299,7 +367,27 @@ function removeEvent(id: string) {
   emit('update:customEvents', updated)
 }
 
-const formError = ref('')
+const addError = ref('')
+const editError = ref('')
+const addInvalidField = ref<string | null>(null)
+const editInvalidField = ref<string | null>(null)
+const addErrorId = useId()
+const editErrorId = useId()
+
+function clearFormError(mode: 'add' | 'edit') {
+  if (mode === 'add') { addError.value = ''; addInvalidField.value = null }
+  else { editError.value = ''; editInvalidField.value = null }
+}
+
+async function showFormError(mode: 'add' | 'edit', message: string) {
+  const field = message.includes('起始') ? 'startDate' : message.includes('日期') ? 'date' : message.includes('标题') ? 'title' : null
+  if (mode === 'add') { addError.value = message; addInvalidField.value = field }
+  else { editError.value = message; editInvalidField.value = field }
+  await nextTick()
+  const panel = eventsContent.value?.querySelector<HTMLElement>(mode === 'add' ? '.accordion-panel' : '.edit-card-panel')
+  panel?.querySelector<HTMLElement>('[role="alert"]')?.scrollIntoView({ behavior: 'instant', block: 'nearest' })
+  panel?.querySelector<HTMLInputElement>('[aria-invalid="true"]')?.focus({ preventScroll: true })
+}
 
 function onAccordionEnter(el: Element) {
   const element = el as HTMLElement
@@ -323,10 +411,12 @@ function onAccordionAfterEnter(el: Element) {
   element.style.height = 'auto'
   element.style.overflow = 'visible'
   element.style.transition = ''
+  if (showAddForm.value) revealActiveForm()
 }
 
 function onAccordionLeave(el: Element) {
   const element = el as HTMLElement
+  element.inert = true
   element.style.height = `${element.scrollHeight}px`
   element.style.overflow = 'hidden'
   element.offsetHeight // trigger reflow
@@ -353,14 +443,13 @@ function onAccordionLeave(el: Element) {
         :class="{ active: showAddForm }"
         :title="showAddForm ? '收起新增面板' : '添加日程、生日或纪念日'"
         :aria-label="showAddForm ? '收起新增面板' : '添加日程、生日或纪念日'"
-        @click="showAddForm = !showAddForm"
+        @click="toggleAddForm"
       >
         <Plus :size="18" class="plus-icon" />
       </button>
     </template>
 
     <div ref="eventsContent" class="p-6 overflow-y-auto grow space-y-4">
-      <p v-if="formError" class="account-error" role="alert">{{ formError }}</p>
       <p class="text-xs text-slate-500">农历日程按常规月份计算；当年没有三十日时取廿九，不在闰月重复提醒。公历 2 月 29 日在下一闰年提醒。</p>
 
       <!-- Add Event Form -->
@@ -369,8 +458,9 @@ function onAccordionLeave(el: Element) {
         @enter="onAccordionEnter"
         @after-enter="onAccordionAfterEnter"
         @leave="onAccordionLeave"
+        @after-leave="revealSavedCard"
       >
-        <div v-if="showAddForm" class="accordion-panel">
+        <div v-if="showAddForm" class="accordion-panel" @input="clearFormError('add')">
           <div
             class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60 space-y-3"
           >
@@ -380,7 +470,7 @@ function onAccordionLeave(el: Element) {
             </div>
             <button
               type="button"
-              @click="showAddForm = false"
+              @click="collapseAddForm"
               class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
             >
               收起
@@ -388,82 +478,19 @@ function onAccordionLeave(el: Element) {
           </div>
 
           <!-- 类型选择 -->
-          <div class="flex items-center gap-2">
-            <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs">
-              <button
-                type="button"
-                class="px-2.5 py-1 rounded-md transition"
-                :class="newEventType === 'birthday' ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-                @click="newEventType = 'birthday'"
-              >
-                🎂 生日
-              </button>
-              <button
-                type="button"
-                class="px-2.5 py-1 rounded-md transition"
-                :class="newEventType === 'anniversary' ? 'bg-white dark:bg-slate-800 text-rose-700 dark:text-rose-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-                @click="newEventType = 'anniversary'"
-              >
-                💖 纪念日
-              </button>
-              <button
-                type="button"
-                class="px-2.5 py-1 rounded-md transition"
-                :class="newEventType === 'schedule' ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'"
-                @click="newEventType = 'schedule'"
-              >
-                📅 日程计划
-              </button>
-            </div>
-            <label v-if="newEventType !== 'schedule'" class="flex items-center gap-1.5 text-xs text-slate-500 cursor-pointer ml-auto">
-              <input type="checkbox" v-model="newEventIsLunar" class="rounded text-emerald-600" />
-              <span>农历</span>
-            </label>
+          <div class="flex flex-wrap items-center gap-2">
+            <EventTypeSelector v-model="newEventType" @update:model-value="markNewEventType" />
+            <CalendarTypeSelector v-if="newEventType !== 'schedule'" v-model="newEventIsLunar" />
           </div>
 
-          <div class="grid grid-cols-2 gap-2.5">
-            <input
-              v-model="newEventTitle"
-              type="text"
-              :placeholder="newEventType === 'schedule' ? '日程事项 (如: 车辆年检到期 / 考试)' : newEventType === 'anniversary' ? '纪念事件 (如: 结婚纪念日)' : '寿星姓名/事件 (如: 妈妈生日)'"
-              class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-              @input="onTitleChange(newEventTitle)"
-            />
-            <input
-              v-model="newEventDate"
-              type="text"
-              :placeholder="newEventType === 'schedule' ? '截止/到期日期 MM-DD 或 YYYY-MM-DD' : '日期 MM-DD 或 YYYY-MM-DD'"
-              class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-            />
-          </div>
-
-          <div class="grid grid-cols-2 gap-2.5">
-            <input
-              v-if="newEventType === 'schedule'"
-              v-model="newEventStartDate"
-              type="text"
-              placeholder="创建/起始日期 (选填，如: 10-01)"
-              class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-            />
-            <input
-              v-else
-              v-model="newEventRole"
-              type="text"
-              placeholder="角色备注 (选填，如: 母亲 / 伴侣)"
-              class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-            />
-            <input
-              v-model="newEventAdvice"
-              type="text"
-              :placeholder="newEventType === 'birthday' ? '备礼/心愿建议 (选填，如: 订花)' : '事项备忘 (选填，如: 提前比价)'"
-              class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm"
-            />
-          </div>
+          <EventFormFields v-model:title="newEventTitle" v-model:date="newEventDate" v-model:start-date="newEventStartDate" v-model:role="newEventRole" v-model:advice="newEventAdvice"
+            :type="newEventType" :is-lunar="newEventIsLunar" :error="addError" :error-id="addErrorId" :invalid-field="addInvalidField" @update:title="onTitleChange" />
+          <p v-if="addError" :id="addErrorId" class="account-error" role="alert">{{ addError }}</p>
 
           <div class="flex items-center justify-end gap-2 pt-1">
             <button
               type="button"
-              @click="showAddForm = false"
+              @click="cancelAddForm"
               class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs sm:text-sm transition"
             >
               取消
@@ -488,6 +515,7 @@ function onAccordionLeave(el: Element) {
             v-model="searchQuery"
             type="text"
             placeholder="搜索日程、纪念日、姓名或日期..."
+            aria-label="搜索重要日子与日程"
             class="attraction-search-input"
           />
         </div>
@@ -499,7 +527,7 @@ function onAccordionLeave(el: Element) {
           v-if="!searchQuery"
           type="button"
           class="inline-flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
-          @click="showAddForm = true"
+          @click="openAddForm"
         >
           <Plus :size="13" />
           <span>立即添加第一项日程或纪念日</span>
@@ -514,90 +542,18 @@ function onAccordionLeave(el: Element) {
             v-if="editingId === ev.id"
             role="group"
             :aria-label="`编辑${ev.title}`"
+            @input="clearFormError('edit')"
             class="p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition edit-card-panel"
           >
             <!-- 编辑类型切换 -->
             <div class="flex flex-wrap items-center gap-2">
-              <div class="inline-flex shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs">
-                <button
-                  type="button"
-                  class="px-2 py-0.5 rounded-md transition"
-                  :class="editForm.type === 'birthday' ? 'bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
-                  @click="editForm.type = 'birthday'"
-                >
-                  🎂 生日
-                </button>
-                <button
-                  type="button"
-                  class="px-2 py-0.5 rounded-md transition"
-                  :class="editForm.type === 'anniversary' ? 'bg-white dark:bg-slate-800 text-rose-700 dark:text-rose-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
-                  @click="editForm.type = 'anniversary'"
-                >
-                  💖 纪念日
-                </button>
-                <button
-                  type="button"
-                  class="px-2 py-0.5 rounded-md transition"
-                  :class="editForm.type === 'schedule' ? 'bg-white dark:bg-slate-800 text-teal-700 dark:text-teal-400 font-medium shadow-xs' : 'text-slate-500 hover:text-slate-800'"
-                  @click="editForm.type = 'schedule'"
-                >
-                  📅 日程计划
-                </button>
-              </div>
-              <div
-                v-if="editForm.type !== 'schedule'"
-                role="radiogroup"
-                aria-label="历法"
-                class="inline-flex shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs"
-              >
-                <label class="cursor-pointer">
-                  <input v-model="editForm.isLunar" type="radio" :name="`event-calendar-${ev.id}`" :value="false" class="sr-only peer" />
-                  <span class="block px-2 py-0.5 rounded-md text-slate-500 peer-checked:bg-white dark:peer-checked:bg-slate-800 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 peer-checked:font-medium peer-checked:shadow-xs peer-focus-visible:outline-2 peer-focus-visible:outline-emerald-500">公历</span>
-                </label>
-                <label class="cursor-pointer">
-                  <input v-model="editForm.isLunar" type="radio" :name="`event-calendar-${ev.id}`" :value="true" class="sr-only peer" />
-                  <span class="block px-2 py-0.5 rounded-md text-slate-500 peer-checked:bg-white dark:peer-checked:bg-slate-800 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 peer-checked:font-medium peer-checked:shadow-xs peer-focus-visible:outline-2 peer-focus-visible:outline-emerald-500">农历</span>
-                </label>
-              </div>
+              <EventTypeSelector v-model="editForm.type" @update:model-value="clearFormError('edit')" />
+              <CalendarTypeSelector v-if="editForm.type !== 'schedule'" v-model="editForm.isLunar" />
             </div>
 
-            <div class="grid grid-cols-2 gap-2.5">
-              <input
-                v-model="editForm.title"
-                type="text"
-                placeholder="事件名"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              />
-              <input
-                v-model="editForm.date"
-                type="text"
-                :placeholder="editForm.type === 'schedule' ? '截止/到期日期' : '日期 (如: 1990-10-08)'"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              />
-            </div>
-
-            <div class="grid grid-cols-2 gap-2.5">
-              <input
-                v-if="editForm.type === 'schedule'"
-                v-model="editForm.startDate"
-                type="text"
-                placeholder="创建/起始日期 (选填)"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              />
-              <input
-                v-else
-                v-model="editForm.role"
-                type="text"
-                placeholder="角色备注 (选填)"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              />
-              <input
-                v-model="editForm.giftAdvice"
-                type="text"
-                :placeholder="editForm.type === 'birthday' ? '备礼建议 (选填)' : '事项备忘 (选填)'"
-                class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs sm:text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              />
-            </div>
+            <EventFormFields v-model:title="editForm.title" v-model:date="editForm.date" v-model:start-date="editForm.startDate" v-model:role="editForm.role" v-model:advice="editForm.giftAdvice"
+              editing :type="editForm.type" :is-lunar="editForm.isLunar" :error="editError" :error-id="editErrorId" :invalid-field="editInvalidField" />
+            <p v-if="editError" :id="editErrorId" class="account-error" role="alert">{{ editError }}</p>
 
             <div class="flex items-center justify-end gap-2 pt-1">
               <button
@@ -618,6 +574,7 @@ function onAccordionLeave(el: Element) {
           <!-- Normal Event Card Display -->
           <div
             v-else
+            :data-event-id="ev.id"
             class="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-xs hover:border-emerald-300 dark:hover:border-emerald-700 transition flex flex-col justify-between space-y-3.5 relative group"
           >
             <!-- Card Header: Title + Role + Action Buttons -->
@@ -647,17 +604,17 @@ function onAccordionLeave(el: Element) {
                   日程
                 </span>
               </div>
-              <div class="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+              <div class="flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                 <button
                   @click="startEdit(ev)"
-                  class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
+                  class="min-h-10 min-w-10 p-1.5 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
                   title="编辑"
                 >
                   <Pencil class="w-3.5 h-3.5" />
                 </button>
                 <button
                   @click="removeEvent(ev.id)"
-                  class="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
+                  class="min-h-10 min-w-10 p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-slate-700/60 transition"
                   title="删除"
                 >
                   <Trash2 class="w-3.5 h-3.5" />
@@ -747,6 +704,8 @@ function onAccordionLeave(el: Element) {
 .accordion-panel {
   will-change: height, opacity, transform;
 }
+
+.accordion-panel button, .edit-card-panel button { min-height: 40px; min-width: 40px; }
 
 .icon-button {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
