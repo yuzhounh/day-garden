@@ -2539,6 +2539,12 @@
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.22);
 }
 
+@media (max-width: 768px) {
+  .header-actions-desktop { display: none !important; }
+  .header-actions-mobile { display: flex !important; align-items: center; gap: 8px; }
+  .header-actions-mobile .icon-button { width: 40px; height: 40px; }
+}
+
 @media (min-width: 769px) {
   .header-actions-desktop { display: flex !important; }
   .header-actions-mobile { display: none !important; }

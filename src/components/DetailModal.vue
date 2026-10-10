@@ -13,7 +13,7 @@ let previousOverflow = ''
 function handleKey(event: KeyboardEvent) {
   if (event.key === 'Escape') emit('close')
   if (event.key !== 'Tab' || !panel.value) return
-  const items = [...panel.value.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex="0"]')].filter(el => el.getClientRects().length)
+  const items = [...panel.value.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex="0"]')].filter(el => !el.matches(':disabled') && el.tabIndex >= 0 && el.getClientRects().length)
   const first = items[0]
   const last = items[items.length - 1]
   if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus() }
@@ -30,7 +30,7 @@ onMounted(() => {
 onUnmounted(() => {
   document.body.style.overflow = previousOverflow
   document.removeEventListener('keydown', handleKey)
-  previousFocus?.focus()
+  if (previousFocus?.isConnected && previousFocus.getClientRects().length) previousFocus.focus({ preventScroll: true })
 })
 </script>
 
