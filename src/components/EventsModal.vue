@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { Plus, Trash2, Pencil, Clock, Search, Heart, Cake, CalendarCheck } from 'lucide-vue-next'
 import type { LifeEvent } from '../types'
 import {
@@ -57,6 +57,7 @@ function onTitleChange(title: string) {
 
 // 编辑事件表单
 const editingId = ref<string | null>(null)
+const eventsContent = ref<HTMLElement | null>(null)
 const editForm = ref<{
   title: string
   date: string
@@ -75,7 +76,7 @@ const editForm = ref<{
   type: 'birthday',
 })
 
-function startEdit(ev: LifeEvent) {
+async function startEdit(ev: LifeEvent) {
   showAddForm.value = false
   editingId.value = ev.id
   editForm.value = {
@@ -87,6 +88,13 @@ function startEdit(ev: LifeEvent) {
     isLunar: !!ev.isLunar,
     type: getEventCategory(ev),
   }
+
+  // The full-width editor can move to a new grid row; reveal it after layout updates.
+  await nextTick()
+  eventsContent.value?.querySelector<HTMLElement>('.edit-card-panel')?.scrollIntoView({
+    behavior: 'instant',
+    block: 'nearest',
+  })
 }
 
 function cancelEdit() {
@@ -351,7 +359,7 @@ function onAccordionLeave(el: Element) {
       </button>
     </template>
 
-    <div class="p-6 overflow-y-auto grow space-y-4">
+    <div ref="eventsContent" class="p-6 overflow-y-auto grow space-y-4">
       <p v-if="formError" class="account-error" role="alert">{{ formError }}</p>
       <p class="text-xs text-slate-500">农历日程按常规月份计算；当年没有三十日时取廿九，不在闰月重复提醒。公历 2 月 29 日在下一闰年提醒。</p>
 
@@ -748,6 +756,7 @@ function onAccordionLeave(el: Element) {
 }
 
 .edit-card-panel {
+  scroll-margin-block: 12px;
   animation: editFadeSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
