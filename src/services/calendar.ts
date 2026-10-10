@@ -139,11 +139,11 @@ export type EventCategory = 'birthday' | 'anniversary' | 'schedule'
 export function isAnniversaryEvent(ev?: { type?: string; title?: string } | null): boolean {
   if (!ev) return false
   if (ev.type === 'schedule' || ev.type === 'birthday') return false
+  if (ev.type === 'anniversary') return true
   const title = (ev.title || '').trim().toLowerCase()
   if (title.includes('到期') || title.includes('年检') || title.includes('保险') || title.includes('行程') || title.includes('计划') || title.includes('待办') || title.includes('还款')) {
     return false
   }
-  if (ev.type === 'anniversary') return true
   if (
     title.includes('纪念') ||
     title.includes('周年') ||

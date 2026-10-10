@@ -124,6 +124,17 @@ test('Offline city changes coalesce and survive reload; stale cloud responses ca
   assert.equal(reloaded.storage.loadUserPreferences(user.id).selectedCity.name, '上海')
 })
 
+test('Explicit event types take precedence over conflicting title keywords', async () => {
+  const { calendar } = await loadApp()
+  const title = '保险续费纪念计划'
+  assert.equal(calendar.isAnniversaryEvent({ type: 'anniversary', title }), true)
+  assert.equal(calendar.getEventCategory({ type: 'anniversary', title }), 'anniversary')
+  assert.equal(calendar.isScheduleEvent({ type: 'anniversary', title }), false)
+  assert.equal(calendar.isAnniversaryEvent({ type: 'birthday', title }), false)
+  assert.equal(calendar.isAnniversaryEvent({ type: 'schedule', title }), false)
+  assert.equal(calendar.isAnniversaryEvent({ title }), false)
+})
+
 test('Gregorian validation rejects normalization; lunar and leap-day recurrence agree with the calendar', async () => {
   const { validation: v, calendar: c, day } = await loadApp()
   for (const date of ['2026-02-30', '2026-02-29', '13-01', '02-31']) assert.equal(v.parseEventDate(date), null)
