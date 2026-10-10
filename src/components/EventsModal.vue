@@ -89,7 +89,7 @@ async function startEdit(ev: LifeEvent) {
     type: getEventCategory(ev),
   }
 
-  // The full-width editor can move to a new grid row; reveal it after layout updates.
+  // Reveal the editor after its taller content updates the card layout.
   await nextTick()
   eventsContent.value?.querySelector<HTMLElement>('.edit-card-panel')?.scrollIntoView({
     behavior: 'instant',
@@ -509,22 +509,16 @@ function onAccordionLeave(el: Element) {
       <!-- Existing List in 2-Column Responsive Grid -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <template v-for="ev in sortedEvents" :key="ev.id">
-          <!-- Inline Edit Form (spans 2 columns if in grid) -->
+          <!-- Edit form replaces the original card in the same grid cell. -->
           <div
             v-if="editingId === ev.id"
-            class="sm:col-span-2 p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition edit-card-panel"
+            role="group"
+            :aria-label="`编辑${ev.title}`"
+            class="p-3.5 sm:p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700/60 space-y-3 text-xs sm:text-sm transition edit-card-panel"
           >
-            <div class="flex items-center justify-between text-xs font-semibold text-emerald-800 dark:text-emerald-300">
-              <span class="flex items-center gap-1.5">
-                <Pencil class="w-4 h-4" />
-                <span>编辑{{ getEventCategory(ev) === 'schedule' ? '日程计划' : getEventCategory(ev) === 'anniversary' ? '纪念日' : '生日' }}</span>
-              </span>
-              <span class="text-slate-400 font-mono text-[11px]">{{ ev.id }}</span>
-            </div>
-
             <!-- 编辑类型切换 -->
-            <div class="flex items-center gap-2">
-              <div class="inline-flex rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs">
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="inline-flex shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs">
                 <button
                   type="button"
                   class="px-2 py-0.5 rounded-md transition"
@@ -550,10 +544,21 @@ function onAccordionLeave(el: Element) {
                   📅 日程计划
                 </button>
               </div>
-              <label v-if="editForm.type !== 'schedule'" class="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300 cursor-pointer ml-auto">
-                <input type="checkbox" v-model="editForm.isLunar" class="rounded text-emerald-600 focus:ring-emerald-500" />
-                <span>农历</span>
-              </label>
+              <div
+                v-if="editForm.type !== 'schedule'"
+                role="radiogroup"
+                aria-label="历法"
+                class="inline-flex shrink-0 rounded-lg border border-slate-200 dark:border-slate-700 p-0.5 bg-slate-100 dark:bg-slate-900/60 text-xs"
+              >
+                <label class="cursor-pointer">
+                  <input v-model="editForm.isLunar" type="radio" :name="`event-calendar-${ev.id}`" :value="false" class="sr-only peer" />
+                  <span class="block px-2 py-0.5 rounded-md text-slate-500 peer-checked:bg-white dark:peer-checked:bg-slate-800 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 peer-checked:font-medium peer-checked:shadow-xs peer-focus-visible:outline-2 peer-focus-visible:outline-emerald-500">公历</span>
+                </label>
+                <label class="cursor-pointer">
+                  <input v-model="editForm.isLunar" type="radio" :name="`event-calendar-${ev.id}`" :value="true" class="sr-only peer" />
+                  <span class="block px-2 py-0.5 rounded-md text-slate-500 peer-checked:bg-white dark:peer-checked:bg-slate-800 peer-checked:text-emerald-700 dark:peer-checked:text-emerald-400 peer-checked:font-medium peer-checked:shadow-xs peer-focus-visible:outline-2 peer-focus-visible:outline-emerald-500">农历</span>
+                </label>
+              </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
