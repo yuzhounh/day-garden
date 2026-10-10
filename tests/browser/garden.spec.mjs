@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { enableSorting, expectSelectedCity, openAccount, openCityPicker, openSettings, selectCity } from './navigation.mjs'
 
 const city = { name: '上海', province: '上海', lat: 31.23, lon: 121.47 }
 test.afterEach(async ({ page }, info) => {
@@ -38,7 +39,7 @@ test('Keyboard and touch sorting persists after reload, and lazy cards display w
   expect(response.headers()['referrer-policy']).toBe('no-referrer')
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
-  await page.getByRole('button', { name: '开启排序模式' }).click()
+  await enableSorting(page)
   const move = page.getByRole('button', { name: '下移月历', exact: true })
   if (isMobile) await move.tap()
   else { await move.focus(); await page.keyboard.press('Enter') }
@@ -46,7 +47,7 @@ test('Keyboard and touch sorting persists after reload, and lazy cards display w
   await page.reload()
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('daygarden_guest_preferences_v1')).cardOrder[0])).toBe('quickNotes')
   await expect(page.getByRole('article', { name: '月历', exact: true })).toBeVisible()
-  await page.getByRole('button', { name: '开启排序模式' }).click()
+  await enableSorting(page)
   await expect(page.getByRole('button', { name: '下移月历', exact: true })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
   expect(errors).toEqual([])
@@ -54,7 +55,7 @@ test('Keyboard and touch sorting persists after reload, and lazy cards display w
 
 test('Invalid imports and impossible dates leave existing preferences intact; valid imports apply immediately', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: '布置我的花园 · 设置与个性化' }).click()
+  await openSettings(page)
   await page.getByRole('button', { name: '提醒与数据备份', exact: true }).click()
   const before = await page.evaluate(() => localStorage.getItem('daygarden_guest_preferences_v1'))
   const dialog = page.waitForEvent('dialog')
@@ -70,7 +71,7 @@ test('Invalid imports and impossible dates leave existing preferences intact; va
 
 test('Mock sign-in changes account theme and city together; event creation queues offline and synchronizes after reconnect', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
+  await openAccount(page)
   await page.getByRole('button', { name: '使用 Google 账户登录', exact: true }).click()
   await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= visualViewport.width + 1)).toBe(true)
@@ -83,9 +84,9 @@ test('Mock sign-in changes account theme and city together; event creation queue
   await page.request.put('/api/city', { data: city, headers: { Origin: new URL(page.url()).origin } })
   await page.reload()
   await expect(page.locator('html')).toHaveClass(/dark/)
-  await expect(page.getByRole('button', { name: '选择或搜索城市' })).toContainText('上海')
+  await expectSelectedCity(page, '上海')
   await expect(page.locator('.weather-panel')).toContainText('25')
-  await page.locator('.dashboard-card-wrapper').nth(1).scrollIntoViewIfNeeded()
+  await page.locator('.lazy-card', { hasText: '岁月里程' }).scrollIntoViewIfNeeded()
   await page.getByRole('button', { name: '添加重要日子与日程' }).click()
   const addBtn = page.getByRole('button', { name: '添加日程、生日或纪念日' })
   await expect(addBtn).toBeVisible()
@@ -110,12 +111,12 @@ test('Mock sign-in changes account theme and city together; event creation queue
   await expect.poll(async () => (await (await page.request.get('/api/state')).json()).customEvents.some(event => event.title === '浏览器回归生日'), { timeout: 15000 }).toBe(true)
   await expect.poll(() => page.evaluate(id => JSON.parse(localStorage.getItem('daygarden_account_' + id)).pending.length, user.id), { timeout: 15000 }).toBe(0)
   await page.getByRole('button', { name: '关闭', exact: true }).click()
-  await page.getByRole('button', { name: '云端已同步' }).click()
+  await openAccount(page, { synced: true })
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
   await expect(page.getByRole('button', { name: '使用 Google 账户登录', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(page.locator('html')).not.toHaveClass(/dark/)
-  await expect(page.getByRole('button', { name: '选择或搜索城市' })).toContainText('北京')
+  await expectSelectedCity(page, '北京')
   await expect(page.locator('.weather-panel')).toContainText('18')
 })
 
@@ -127,7 +128,7 @@ test('Disabled modules do not load their content libraries; loaded poetry remain
   await page.locator('.garden-footer').scrollIntoViewIfNeeded()
   await expect(page.getByRole('button', { name: '换一首诗词' })).toHaveCount(0)
   expect(libraries).toEqual([])
-  await page.getByRole('button', { name: '布置我的花园 · 设置与个性化' }).click()
+  await openSettings(page)
   await page.getByRole('button', { name: '提醒与数据备份', exact: true }).click()
   const imported = page.waitForEvent('dialog')
   await page.locator('input[type=file]').setInputFiles({ name: 'enable.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ modules: { dailyPoetry: true } })) })
@@ -176,7 +177,7 @@ test('Favorite controls stay hidden for guests and appear after login', async ({
   await expect(poem.locator('.full-poem')).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   expect(await page.evaluate(() => localStorage.getItem('daygarden_guest_data'))).toBe(guest)
-  await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
+  await openAccount(page)
   await page.getByRole('button', { name: '使用 Google 账户登录', exact: true }).click()
   await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
@@ -196,7 +197,7 @@ test('Favorite controls stay hidden for guests and appear after login', async ({
   await expect(poem).toHaveCount(1)
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   expect(await page.evaluate(() => document.body.style.overflow)).toBe('')
-  await page.getByRole('button', { name: '云端已同步', exact: true }).click()
+  await openAccount(page, { synced: true })
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
   await expect(page.getByRole('button', { name: '使用 Google 账户登录', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
@@ -208,12 +209,10 @@ test('Favorite controls stay hidden for guests and appear after login', async ({
 
 test('Account city defaults to Beijing, adopts the guest choice and restores from cloud after cache removal', async ({ page }, testInfo) => {
   await page.goto('/')
-  const cityPicker = page.getByRole('button', { name: '选择或搜索城市' })
-  await expect(cityPicker).toContainText('北京')
-  await cityPicker.click()
-  await page.locator('#city-options').getByRole('button', { name: '上海', exact: true }).first().click()
-  await expect(cityPicker).toContainText('上海')
-  await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
+  await expectSelectedCity(page, '北京')
+  await selectCity(page, '上海')
+  await expectSelectedCity(page, '上海')
+  await openAccount(page)
   await page.getByRole('button', { name: '邮箱与密码', exact: true }).click()
   const email = 'city' + testInfo.project.name + '@example.com'
   const password = 'GardenBrowserTest2026'
@@ -226,33 +225,31 @@ test('Account city defaults to Beijing, adopts the guest choice and restores fro
   await expect.poll(async () => (await (await page.request.get('/api/state')).json()).selectedCity?.name).toBe('上海')
   const user = (await (await page.request.get('/api/session')).json()).user
   await page.getByRole('button', { name: '关闭', exact: true }).click()
-  await expect(cityPicker).toContainText('上海')
-  await cityPicker.click()
-  await page.locator('#city-options').getByRole('button', { name: '广州', exact: true }).first().click()
+  await expectSelectedCity(page, '上海')
+  await selectCity(page, '广州')
   await expect.poll(async () => (await (await page.request.get('/api/state')).json()).selectedCity?.name).toBe('广州')
-  await page.getByRole('button', { name: '云端已同步', exact: true }).click()
+  await openAccount(page, { synced: true })
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
   await expect(page.getByRole('button', { name: '使用 Google 账户登录', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
-  await expect(cityPicker).toContainText('上海')
-  await cityPicker.click()
-  await page.locator('#city-options').getByRole('button', { name: '北京', exact: true }).first().click()
+  await expectSelectedCity(page, '上海')
+  await selectCity(page, '北京')
   await page.evaluate(id => { localStorage.removeItem('daygarden_user_prefs_' + id); localStorage.removeItem('daygarden_account_' + id) }, user.id)
   await page.reload()
-  await expect(cityPicker).toContainText('北京')
-  await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
+  await expectSelectedCity(page, '北京')
+  await openAccount(page)
   await page.getByRole('button', { name: '邮箱与密码', exact: true }).click()
   await page.locator('#garden-username').fill(email)
   await page.locator('#garden-password').fill(password)
   await page.getByRole('button', { name: '登录并同步', exact: true }).click()
   await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
-  await expect(cityPicker).toContainText('广州')
+  await expectSelectedCity(page, '广州')
 })
 
 test('Login methods separate Google from email registration and password login', async ({ page }, testInfo) => {
   await page.goto('/')
-  await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
+  await openAccount(page)
   await expect(page.getByText('无需单独注册，首次登录会自动创建账户。')).toBeVisible()
   await expect(page.locator('#garden-username')).toHaveCount(0)
   await expect(page.getByRole('button', { name: /GitHub/ })).toHaveCount(0)
@@ -298,7 +295,7 @@ test('Two accounts and guest apply their own city, weather and theme; an upgrade
     localStorage.setItem('daygarden_user_prefs_' + accounts[0].id, JSON.stringify({ theme: 'dark', selectedCity: city, customEvents: [{ id: legacyId, title: '旧本机日程', date: '10-09', type: 'birthday' }] }))
     localStorage.setItem('daygarden_user_prefs_' + accounts[1].id, JSON.stringify({ theme: 'light', selectedCity: { name: '北京', province: '北京', lat: 39.9, lon: 116.4 }, customEvents: [] }))
   }, { accounts, city, legacyId })
-  await page.getByRole('button', { name: '我的花园 · 账户与云端同步' }).click()
+  await openAccount(page)
   await expect(page.getByRole('button', { name: /GitHub/ })).toHaveCount(0)
   await page.getByRole('button', { name: '使用 Google 账户登录', exact: true }).click()
   await expect(page.getByRole('button', { name: '合并旧本机日程', exact: true })).toBeVisible()
@@ -307,9 +304,9 @@ test('Two accounts and guest apply their own city, weather and theme; an upgrade
   await expect.poll(async () => (await (await page.request.get('/api/state')).json()).customEvents.some(event => event.id === legacyId)).toBe(true)
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(page.locator('html')).toHaveClass(/dark/)
-  await expect(page.getByRole('button', { name: '选择或搜索城市' })).toContainText('上海')
+  await expectSelectedCity(page, '上海')
   await expect(page.locator('.weather-panel')).toContainText('25')
-  await page.getByRole('button', { name: '云端已同步' }).click()
+  await openAccount(page, { synced: true })
   await page.getByRole('button', { name: '退出账户', exact: true }).click()
   await page.getByRole('button', { name: '邮箱与密码', exact: true }).click()
   await page.locator('#garden-username').fill(passwordUsername)
@@ -318,7 +315,7 @@ test('Two accounts and guest apply their own city, weather and theme; an upgrade
   await expect(page.getByRole('button', { name: '退出账户', exact: true })).toBeVisible()
   await page.getByRole('button', { name: '关闭', exact: true }).click()
   await expect(page.locator('html')).not.toHaveClass(/dark/)
-  await expect(page.getByRole('button', { name: '选择或搜索城市' })).toContainText('北京')
+  await expectSelectedCity(page, '北京')
   await expect(page.locator('.weather-panel')).toContainText('18')
 })
 
@@ -344,8 +341,8 @@ test('Production CSP permits overseas geocoding, provider avatars and all radio 
   // the public URL and its verified final host separately with valid audio.
   await page.route('https://listen.reyfm.de/**', route => route.fulfill({ contentType: 'audio/wav', body: wav }))
   await page.goto('/')
-  await page.getByRole('button', { name: '选择或搜索城市' }).click()
-  await page.getByPlaceholder('搜索任意城市（如：苏州、三亚、青岛…）').fill('Paris')
+  const cityPicker = await openCityPicker(page)
+  await cityPicker.getByRole('textbox').fill('Paris')
   await expect(page.getByRole('button', { name: /Paris/ })).toBeVisible()
   const results = await page.evaluate(async () => {
     const urls = ['https://lh3.googleusercontent.com/test.png', 'https://avatars.githubusercontent.com/test.png', 'https://images.unsplash.com/test.png', 'https://listen.reyfm.de/lofi_320kbps.mp3', 'https://reyfm.stream17.radiohost.de/reyfm-lofi', 'https://ice1.somafm.com/dronezone-128-mp3', 'https://ice1.somafm.com/groovesalad-128-mp3']
@@ -360,8 +357,9 @@ test('Production CSP permits overseas geocoding, provider avatars and all radio 
   expect(await page.evaluate(() => window.cspViolations)).toEqual([])
 })
 
-test('Calendar legend displays side-by-side on desktop and stacked into two lines on mobile without character breaks', async ({ page, isMobile }) => {
+test('Calendar legend stays side-by-side without clipping or overlap on desktop and mobile', async ({ page }) => {
   await page.goto('/')
+  await page.locator('.lazy-card', { hasText: '月历' }).scrollIntoViewIfNeeded()
   const legendItems = page.locator('.cal-legend .legend-item')
   await expect(legendItems).toHaveCount(2)
   await expect(legendItems.nth(0)).toContainText('放假')
@@ -374,28 +372,25 @@ test('Calendar legend displays side-by-side on desktop and stacked into two line
   expect(boxes[0]).not.toBeNull()
   expect(boxes[1]).not.toBeNull()
 
-  if (isMobile) {
-    // On mobile, items are stacked vertically into two lines
-    expect(boxes[1].y).toBeGreaterThan(boxes[0].y + 10)
-  } else {
-    // On desktop, items are laid out horizontally
-    expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThan(5)
-    expect(boxes[1].x).toBeGreaterThan(boxes[0].x + 30)
+  expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThan(5)
+  expect(boxes[1].x).toBeGreaterThanOrEqual(boxes[0].x + boxes[0].width)
+  const card = await page.locator('.month-calendar-card').boundingBox()
+  for (const box of boxes) {
+    expect(box.x).toBeGreaterThanOrEqual(card.x)
+    expect(box.x + box.width).toBeLessThanOrEqual(card.x + card.width)
   }
 })
 
-test('Calendar footer displays solar and lunar on the same line, and holiday extra with legend on the next line on tablet', async ({ page, isMobile }) => {
-  if (isMobile) return
-  await page.goto('/')
+test('Calendar footer hides the holiday in a narrow card and restores it when the card widens', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-10-04T12:00:00+08:00') })
   await page.setViewportSize({ width: 820, height: 1180 })
+  await page.goto('/')
   const calendarCard = page.locator('.month-calendar-card')
+  await page.locator('.lazy-card', { hasText: '月历' }).scrollIntoViewIfNeeded()
   await calendarCard.scrollIntoViewIfNeeded()
 
-  // Click on a cell with holiday/rest status (like Oct 4 National Day)
-  const restCell = calendarCard.locator('.cal-cell.is-rest').first()
-  if (await restCell.count() > 0) {
-    await restCell.click()
-  }
+  // Fix both the date and selected cell so the test does not depend on the CI month.
+  await calendarCard.locator('.cal-cell:not(.other-month)').filter({ has: page.locator('.cell-solar-num', { hasText: /^4$/ }) }).click()
 
   const solar = calendarCard.locator('.detail-solar')
   const lunar = calendarCard.locator('.detail-lunar')
@@ -404,27 +399,26 @@ test('Calendar footer displays solar and lunar on the same line, and holiday ext
 
   await expect(solar).toBeVisible()
   await expect(lunar).toBeVisible()
-  await expect(extra).toBeVisible()
+  await expect(solar).toHaveText('2026年10月4日')
+  await expect(extra).toHaveText('国庆节 (放假)')
+  await expect(legendItems).toHaveCount(2)
 
-  const [solarBox, lunarBox, extraBox, legendBox0, legendBox1] = await Promise.all([
-    solar.boundingBox(),
-    lunar.boundingBox(),
-    extra.boundingBox(),
-    legendItems.nth(0).boundingBox(),
-    legendItems.nth(1).boundingBox(),
-  ])
-
-  // 1. 公历和农历放到同一行
-  expect(Math.abs(solarBox.y - lunarBox.y)).toBeLessThan(5)
-  expect(lunarBox.x).toBeGreaterThan(solarBox.x + 20)
-
-  // 2. 下一行放国庆节 (extra 在 solar 下方)
-  expect(extraBox.y).toBeGreaterThan(solarBox.y + 12)
-
-  // 3. 放假和调休可以跟国庆节放同一行
-  expect(Math.abs(extraBox.y - legendBox0.y)).toBeLessThan(6)
-  expect(Math.abs(legendBox0.y - legendBox1.y)).toBeLessThan(5)
-  expect(legendBox0.x).toBeGreaterThan(extraBox.x + 20)
+  for (const width of [820, 1440, 820]) {
+    await page.setViewportSize({ width, height: 1180 })
+    if (width === 820) await expect(extra).toBeHidden()
+    else await expect(extra).toBeVisible()
+    await expect(solar).toBeVisible()
+    await expect(lunar).toBeVisible()
+    await expect(legendItems.nth(0)).toBeVisible()
+    await expect(legendItems.nth(1)).toBeVisible()
+    await expect.poll(() => calendarCard.locator('.cal-footer').evaluate(footer => {
+      const bounds = footer.getBoundingClientRect()
+      const items = [...footer.querySelectorAll('.detail-solar, .detail-lunar, .detail-extra, .legend-item')]
+        .filter(item => item.getClientRects().length).map(item => item.getBoundingClientRect())
+      return items.every((item, index) => item.left >= bounds.left - 1 && item.right <= bounds.right + 1 &&
+        Math.abs(item.y - items[0].y) < 6 && (!index || item.left >= items[index - 1].right - 1))
+    })).toBe(true)
+  }
 })
 
 test('Attractions status buttons display side-by-side on wide desktop and stacked into two lines on mobile and tablet', async ({ page, isMobile }) => {
