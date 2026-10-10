@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-test('Every birthday edits in its original grid cell with a visible calendar choice', async ({ page }) => {
+for (const range of [{ name: 'lower rows', first: 15, last: 8 }, { name: 'upper rows', first: 7, last: 0 }]) {
+test(`Every birthday edits in its original grid cell with a visible calendar choice (${range.name})`, async ({ page }) => {
   const events = Array.from({ length: 16 }, (_, index) => ({
     id: `edit-visibility-${index}`,
     title: `可视区域回归${index}生日`,
@@ -25,33 +26,36 @@ test('Every birthday edits in its original grid cell with a visible calendar cho
   const pageScroll = await page.evaluate(() => window.scrollY)
 
   // Start with the last right-hand card, then exercise both columns and every row.
-  for (let index = events.length - 1; index >= 0; index--) {
+  for (let index = range.first; index >= range.last; index--) {
     const card = grid.locator(':scope > div').nth(index)
-    const title = (await card.locator('span.font-bold').textContent()).trim()
     await card.scrollIntoViewIfNeeded()
-    const originalBounds = await card.boundingBox()
+    const original = await card.evaluate(element => {
+      const bounds = element.getBoundingClientRect()
+      return { title: element.querySelector('span.font-bold').textContent.trim(), x: bounds.x, width: bounds.width }
+    })
+    const title = original.title
     await card.getByRole('button', { name: '编辑', exact: true }).click()
-    await expect(editor.getByPlaceholder('事件名', { exact: true })).toHaveValue(title)
-    await expect(grid.locator(':scope > div').nth(index)).toHaveClass(/edit-card-panel/)
     const event = events.find(event => event.title === title)
-    await expect(editor).not.toContainText(event.id)
     const calendar = editor.getByRole('radiogroup', { name: '历法' })
-    await expect(calendar.getByRole('radio', { name: event.isLunar ? '农历' : '公历', exact: true })).toBeChecked()
 
     // Measure without scrolling the editor through Playwright: the app must reveal it.
-    await expect.poll(() => editor.evaluate((element, original) => {
+    await expect.poll(() => editor.evaluate((element, expected) => {
       const bounds = element.getBoundingClientRect()
       const visible = element.closest('.modal-content').getBoundingClientRect()
       return {
         top: bounds.top, bottom: bounds.bottom, visibleTop: visible.top, visibleBottom: visible.bottom,
         topVisible: bounds.top >= Math.max(0, visible.top) - 1,
         bottomVisible: bounds.bottom <= Math.min(window.innerHeight, visible.bottom) + 1,
-        sameColumn: Math.abs(bounds.x - original.x) < 1,
-        sameWidth: Math.abs(bounds.width - original.width) < 1,
+        sameColumn: Math.abs(bounds.x - expected.original.x) < 1,
+        sameWidth: Math.abs(bounds.width - expected.original.width) < 1,
         noOverflow: element.scrollWidth <= element.clientWidth + 1,
+        correctTitle: element.querySelector('input[placeholder="事件名"]').value === expected.original.title,
+        correctCalendar: element.querySelector('[role="radiogroup"] input:checked')?.value === String(expected.event.isLunar),
+        internalIdHidden: !element.textContent.includes(expected.event.id),
+        sameCell: [...element.parentElement.children].indexOf(element) === expected.index,
+        pageScrollUnchanged: window.scrollY === expected.pageScroll,
       }
-    }, originalBounds), { message: `Editor for card ${index} must stay visible in its original column` }).toMatchObject({ topVisible: true, bottomVisible: true, sameColumn: true, sameWidth: true, noOverflow: true })
-    expect(await page.evaluate(() => window.scrollY)).toBe(pageScroll)
+    }, { original, event, index, pageScroll }), { message: `Editor for card ${index} must stay visible in its original cell with the correct event` }).toMatchObject({ topVisible: true, bottomVisible: true, sameColumn: true, sameWidth: true, noOverflow: true, correctTitle: true, correctCalendar: true, internalIdHidden: true, sameCell: true, pageScrollUnchanged: true })
 
     if (index === 0) {
       const selected = calendar.getByRole('radio', { name: event.isLunar ? '农历' : '公历', exact: true })
@@ -79,3 +83,4 @@ test('Every birthday edits in its original grid cell with a visible calendar cho
     await expect(editor).toHaveCount(0)
   }
 })
+}
