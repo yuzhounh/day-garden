@@ -479,7 +479,7 @@ function onAccordionLeave(el: Element) {
 
           <!-- 类型选择 -->
           <div class="flex flex-wrap items-center gap-2">
-            <EventTypeSelector v-model="newEventType" @update:model-value="markNewEventType" />
+            <EventTypeSelector v-model="newEventType" @select="markNewEventType" />
             <CalendarTypeSelector v-if="newEventType !== 'schedule'" v-model="newEventIsLunar" />
           </div>
 

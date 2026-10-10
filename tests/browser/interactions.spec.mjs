@@ -43,6 +43,10 @@ test('New event panels stay visible and mode changes preserve drafts and explici
   }
   await modal.getByRole('button', { name: '添加日程、生日或纪念日', exact: true }).click()
   const types = form.getByRole('group', { name: '事件类型' })
+  await types.getByRole('button', { name: '🎂 生日', exact: true }).click()
+  await form.getByLabel('名称（必填）', { exact: true }).fill('结婚纪念日')
+  await expect(types.getByRole('button', { name: '🎂 生日', exact: true })).toHaveAttribute('aria-pressed', 'true')
+  await form.getByLabel('名称（必填）', { exact: true }).fill('')
   await form.getByRole('button', { name: '确认添加', exact: true }).click()
   await expect(form.getByRole('alert')).toContainText('标题')
   await expect(form.getByLabel('名称（必填）', { exact: true })).toBeFocused()
