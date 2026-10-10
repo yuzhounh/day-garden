@@ -359,7 +359,7 @@ test('Production CSP permits overseas geocoding, provider avatars and all radio 
 
 test('Calendar legend stays side-by-side without clipping or overlap on desktop and mobile', async ({ page }) => {
   await page.goto('/')
-  await page.locator('.lazy-card', { hasText: '月历' }).scrollIntoViewIfNeeded()
+  await page.locator('.lazy-card').filter({ has: page.locator('.month-calendar-card, [aria-label="月历"]') }).scrollIntoViewIfNeeded()
   const legendItems = page.locator('.cal-legend .legend-item')
   await expect(legendItems).toHaveCount(2)
   await expect(legendItems.nth(0)).toContainText('放假')
@@ -386,7 +386,7 @@ test('Calendar footer hides the holiday in a narrow card and restores it when th
   await page.setViewportSize({ width: 820, height: 1180 })
   await page.goto('/')
   const calendarCard = page.locator('.month-calendar-card')
-  await page.locator('.lazy-card', { hasText: '月历' }).scrollIntoViewIfNeeded()
+  await page.locator('.lazy-card').filter({ has: page.locator('.month-calendar-card, [aria-label="月历"]') }).scrollIntoViewIfNeeded()
   await calendarCard.scrollIntoViewIfNeeded()
 
   // Fix both the date and selected cell so the test does not depend on the CI month.
