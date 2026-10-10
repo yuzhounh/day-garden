@@ -262,6 +262,10 @@ function onAccordionAfterEnter(el: Element) {
   element.style.height = 'auto'
   element.style.overflow = 'visible'
   element.style.transition = ''
+  if (showModalInput.value) {
+    element.scrollIntoView({ behavior: 'instant', block: 'nearest' })
+    modalTextareaRef.value?.focus({ preventScroll: true })
+  }
 }
 
 function onAccordionLeave(el: Element) {
@@ -426,6 +430,7 @@ function onAccordionLeave(el: Element) {
           <div class="modal-input-wrap">
             <textarea
               ref="modalTextareaRef"
+              aria-label="新增随笔"
               v-model="draft"
               rows="3"
               class="modal-textarea"
@@ -465,6 +470,7 @@ function onAccordionLeave(el: Element) {
             v-model="searchQuery"
             type="text"
             placeholder="搜索随笔内容..."
+            aria-label="搜索随笔"
             class="attraction-search-input"
           />
         </div>
