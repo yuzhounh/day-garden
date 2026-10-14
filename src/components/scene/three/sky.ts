@@ -3,6 +3,7 @@ import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometr
 import type { SceneEvent, SceneState } from '../../../services/scene'
 import { createLoop, createRenderer, disposeTree, isLowPower, jitter, radialTexture, seeded, streakTexture } from './common'
 import { CLOUD_PLAN, lighting } from './environment'
+import moonSurfaceUrl from '../../../assets/moon-lroc-1k.jpg'
 
 export interface SkyWorld {
   setState(state: SceneState, dark: boolean): void
@@ -40,19 +41,19 @@ function cloudGeometry(seed: number): THREE.BufferGeometry {
   return jitter(mergeVertices(merged), 0.06, seed)
 }
 
-/** 月相着色：被月相角度的光照亮的部分不透明，背光面几乎透明（只留一点“地照”） */
-function moonMaterial(): THREE.ShaderMaterial {
+/** 月相使用观察空间光照，背光面只保留微弱地照，不叠出一整块灰色圆盘。 */
+function moonMaterial(surface: THREE.Texture): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    vertexColors: true,
-    uniforms: { uLight: { value: new THREE.Vector3(1, 0, 0) }, uOpacity: { value: 1 }, uTint: { value: new THREE.Color(0xfff6df) } },
+    uniforms: { uLight: { value: new THREE.Vector3(1, 0, 0) }, uOpacity: { value: 1 }, uTint: { value: new THREE.Color(0xfff8ed) }, uSurface: { value: surface }, uMapReady: { value: 0 } },
     vertexShader: `
       varying vec3 vNormal;
-      varying vec3 vColor;
+      varying vec2 vUv;
       void main() {
-        vNormal = normalize(mat3(modelMatrix) * normal);
-        vColor = color;
+        // 月球局部正面始终朝向相机，月相不受其在画面中的偏心位置影响。
+        vNormal = normal;
+        vUv = vec2(fract(uv.x + 0.25), uv.y);
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }`,
     fragmentShader: `
@@ -60,37 +61,22 @@ function moonMaterial(): THREE.ShaderMaterial {
       uniform float uOpacity;
       uniform vec3 uTint;
       varying vec3 vNormal;
-      varying vec3 vColor;
+      uniform sampler2D uSurface;
+      uniform float uMapReady;
+      varying vec2 vUv;
       void main() {
         float lit = dot(normalize(vNormal), normalize(uLight));
-        float day = smoothstep(-0.06, 0.18, lit);
-        vec3 col = vColor * uTint * (0.72 + 0.32 * max(lit, 0.0));
-        gl_FragColor = vec4(col, mix(0.1, 1.0, day) * uOpacity);
+        float day = smoothstep(-0.015, 0.035, lit);
+        vec3 surface = mix(vec3(0.72), texture2D(uSurface, vUv).rgb * 1.5, uMapReady);
+        vec3 col = surface * uTint * (0.65 + 0.35 * sqrt(max(lit, 0.0)));
+        gl_FragColor = vec4(col, mix(0.006, 1.0, day) * uOpacity);
         #include <colorspace_fragment>
       }`,
   })
 }
 
-/** 月球：细分二十面体，顶点颜色做出明暗斑驳的月海 */
-function moonGeometry(): THREE.BufferGeometry {
-  const g = new THREE.IcosahedronGeometry(1, 4)
-  const pos = g.getAttribute('position') as THREE.BufferAttribute
-  const colors = new Float32Array(pos.count * 3)
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i)
-    const y = pos.getY(i)
-    const z = pos.getZ(i)
-    const mare = Math.max(0, Math.sin(x * 4.1 + 1) * Math.cos(y * 3.3) + Math.sin(z * 5.2 + x * 2) * 0.6)
-    const shade = 0.96 - mare * 0.14
-    colors[i * 3] = shade
-    colors[i * 3 + 1] = shade * 0.98
-    colors[i * 3 + 2] = shade * 0.92
-  }
-  g.setAttribute('color', new THREE.BufferAttribute(colors, 3))
-  return g
-}
-
 export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
+  let disposed = false
   const lowPower = isLowPower()
   const renderer = createRenderer(canvas, lowPower, THREE.NoToneMapping)
   renderer.autoClear = false
@@ -113,23 +99,41 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
   scene.add(sunGroup)
 
   /* —— 月亮（单独场景，由月相角度的平行光照亮） —— */
-  const moonShader = moonMaterial()
-  const moon = new THREE.Mesh(moonGeometry(), moonShader)
+  const moonSurface = new THREE.TextureLoader().load(moonSurfaceUrl, () => {
+    if (disposed) return
+    moonShader.uniforms.uMapReady!.value = 1
+    loop.renderOnce()
+  })
+  moonSurface.colorSpace = THREE.SRGBColorSpace
+  const moonShader = moonMaterial(moonSurface)
+  const moon = new THREE.Mesh(new THREE.SphereGeometry(1, 64, 48), moonShader)
   const moonGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: radialTexture([[0, 'rgba(225,232,255,0.5)'], [0.4, 'rgba(210,220,255,0.15)'], [1, 'rgba(200,210,255,0)']]), transparent: true, depthWrite: false }))
   moonScene.add(moonGlow, moon)
 
   /* —— 星星 —— */
   const starRand = seeded(97)
+  let starOpacity = 0.14
   const starSets = [0, 1].map(k => {
-    const positions = new Float32Array(90 * 3)
-    for (let i = 0; i < 90; i++) {
+    const count = lowPower ? (k ? 6 : 10) : (k ? 12 : 20)
+    const positions = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
       positions[i * 3] = (starRand() - 0.5) * 160
       positions[i * 3 + 1] = (starRand() - 0.1) * 40
       positions[i * 3 + 2] = -60
     }
     const g = new THREE.BufferGeometry()
     g.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-    const points = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: k ? 2.2 : 1.6, sizeAttenuation: false, transparent: true, opacity: 0.8, depthWrite: false }))
+    const points = new THREE.Points(g, new THREE.PointsMaterial({
+      map: radialTexture([[0, 'rgba(255,255,255,0.95)'], [0.18, 'rgba(255,255,255,0.65)'], [0.45, 'rgba(255,255,255,0.18)'], [1, 'rgba(255,255,255,0)']], 32),
+      color: 0xfffbf3,
+      size: k ? 4.5 : 3,
+      sizeAttenuation: false,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      opacity: starOpacity,
+      depthWrite: false,
+    }))
+    points.renderOrder = -1
     moonScene.add(points)
     return points
   })
@@ -139,7 +143,9 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
     const mesh = new THREE.Mesh(cloudGeometry(i * 13 + 5), new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, depthWrite: true, flatShading: false }))
     mesh.visible = false
     scene.add(mesh)
-    return { mesh, speed: 0, depth: 0, scale: 1 }
+    mesh.geometry.computeBoundingSphere()
+    const bounds = mesh.geometry.boundingSphere!
+    return { mesh, speed: 0, depth: 0, scale: 1, radius: bounds.radius + bounds.center.length() }
   })
 
   /* —— 雨 —— */
@@ -187,7 +193,6 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
   let width = 1
   let height = 1
   let current: SceneState | null = null
-  let dark = false
   let reduced = false
   let active = false
   let rainCount = 0
@@ -197,6 +202,7 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
   let windSpeed = 0
   let hemiBase = 1.6
   let cloudBaseColor = new THREE.Color(0xffffff)
+  let cloudFill = 0.42
   const body = { x: 0, y: 0, r: 20 }
 
   /** 某一深度上可见区域的半宽、半高 */
@@ -220,6 +226,7 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
     sunCore.scale.setScalar(r)
     sunGlow.scale.setScalar(r * 7.5)
     moon.position.copy(p)
+    moon.lookAt(camera.position)
     moon.scale.setScalar(r * 0.85)
     moonGlow.position.copy(p)
     moonGlow.scale.setScalar(r * 5)
@@ -227,11 +234,12 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
     sunLight.target.position.set(0, 0, -10)
   }
 
-  function layoutClouds(state: SceneState) {
+  function layoutClouds(state: SceneState, aspectRatio = 1) {
     const plan = CLOUD_PLAN[state.sky]
     const rand = seeded(plan.count * 31 + (state.sky.length * 7))
     const count = Math.min(cloudPool.length, Math.max(1, Math.round(plan.count * (width < 600 ? 0.6 : 1))))
     cloudPool.forEach((cloud, i) => {
+      const wasVisible = cloud.mesh.visible
       cloud.mesh.visible = i < count
       if (i >= count) return
       cloud.depth = -2 - rand() * 18
@@ -239,7 +247,10 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
       cloud.scale = (plan.scale[0] + rand() * (plan.scale[1] - plan.scale[0])) * (width < 600 ? 0.85 : 1.25)
       cloud.mesh.scale.set(cloud.scale, cloud.scale * 0.85, cloud.scale)
       const frac = plan.band[0] + rand() * (plan.band[1] - plan.band[0])
-      cloud.mesh.position.set((rand() * 2 - 1) * half.w, -half.h + frac * 2 * half.h, cloud.depth)
+      const initialX = (rand() * 2 - 1) * half.w
+      if (wasVisible) cloud.mesh.position.x *= aspectRatio
+      else cloud.mesh.position.set(initialX, -half.h + frac * 2 * half.h, cloud.depth)
+      cloud.mesh.position.z = cloud.depth
       cloud.speed = (0.18 + rand() * 0.2) * (1 - cloud.depth / 60)
       const material = cloud.mesh.material as THREE.MeshLambertMaterial
       material.opacity = plan.opacity
@@ -267,7 +278,6 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
   function applyState(state: SceneState, isDark: boolean) {
     const skyChanged = !current || current.sky !== state.sky
     current = state
-    dark = isDark
     const night = state.phase === 'night'
     const sky = state.sky
     const light = lighting(state, isDark)
@@ -286,12 +296,14 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
     moon.visible = moonGlow.visible = moonVisible
     // 光源方向：朔（0）在月球背后，上弦（0.25）在右，望（0.5）在正前方，下弦（0.75）在左
     const a = state.moon * Math.PI * 2
-    moonShader.uniforms.uLight!.value.set(Math.sin(a), 0.08, -Math.cos(a))
-    ;(moonGlow.material as THREE.SpriteMaterial).opacity = moonVisible ? (sky === 'clear' || sky === 'partly' ? 0.9 : 0.4) : 0
+    moonShader.uniforms.uLight!.value.set(Math.sin(a), 0, -Math.cos(a))
+    const illuminated = (1 - Math.cos(a)) / 2
+    ;(moonGlow.material as THREE.SpriteMaterial).opacity = moonVisible ? illuminated * (sky === 'clear' || sky === 'partly' ? 0.28 : 0.12) : 0
     moonShader.uniforms.uOpacity!.value = sky === 'clear' || sky === 'partly' ? 1 : 0.5
-    ;(moonShader.uniforms.uTint!.value as THREE.Color).setHex(isDark ? 0xfff6df : 0xf3dc9a)
+    ;(moonShader.uniforms.uTint!.value as THREE.Color).setHex(0xfff8ed)
+    starOpacity = isDark ? 0.5 : 0.14
     starSets.forEach(points => { points.visible = night && (sky === 'clear' || sky === 'partly') })
-    starSets.forEach(points => { (points.material as THREE.PointsMaterial).color.setHex(isDark ? 0xffffff : 0x8e9ac2) })
+    starSets.forEach(points => { points.material.opacity = starOpacity })
 
     // 光照：云的明暗跟着太阳/月光走
     sunLight.color.setHex(light.sunColor)
@@ -301,13 +313,16 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
     hemiBase = (night ? 0.9 : 1.7) * (isDark ? 0.75 : 1)
     hemi.intensity = hemiBase
 
-    // 云色：随天气变灰，深色主题下整体压暗，避免在暗背景上发白刺眼
+    // 夜间保留柔和的银白云层；阴影由补光托起，避免主题与月光重复压暗。
     const plan = CLOUD_PLAN[sky]
-    cloudBaseColor = new THREE.Color(plan.shade).multiplyScalar(isDark ? 0.42 : night ? 0.7 : 1)
+    cloudBaseColor = new THREE.Color(plan.shade)
+    if (night) cloudBaseColor.lerp(new THREE.Color(0xdce5f3), 0.25)
+    cloudBaseColor.multiplyScalar(isDark ? 0.7 : night ? 0.9 : 1)
+    cloudFill = night ? (isDark ? 0.6 : 0.78) : isDark ? 0.5 : 0.42
     cloudPool.forEach(cloud => {
       const material = cloud.mesh.material as THREE.MeshLambertMaterial
       material.color.copy(cloudBaseColor)
-      material.emissive.copy(cloudBaseColor).multiplyScalar(isDark ? 0.1 : 0.42)
+      material.emissive.copy(cloudBaseColor).multiplyScalar(cloudFill)
     })
     if (skyChanged || !cloudPool.some(c => c.mesh.visible)) layoutClouds(state)
 
@@ -365,15 +380,16 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
       for (const cloud of cloudPool) {
         if (!cloud.mesh.visible) continue
         cloud.mesh.position.x += cloud.speed * windFactor * dt
-        const half = halfAt(cloud.depth)
-        if (cloud.mesh.position.x > half.w + cloud.scale * 3) cloud.mesh.position.x = -half.w - cloud.scale * 3
+        // 球形包围体包含整朵云及其旋转；在最远深度也完全离开视锥后才循环。
+        const radius = cloud.radius * cloud.scale
+        const edge = halfAt(cloud.depth - radius).w + radius
+        if (cloud.mesh.position.x > edge) cloud.mesh.position.x -= edge * 2
         cloud.mesh.rotation.y = Math.sin(time * 0.05 + cloud.depth) * 0.08
       }
       // 太阳呼吸
       const breath = 1 + Math.sin(time * 0.4) * 0.05
       sunGlow.scale.setScalar(sunCore.scale.x * 7.5 * breath)
-      starSets[0]!.material.opacity = 0.55 + Math.sin(time * 1.3) * 0.3
-      starSets[1]!.material.opacity = 0.55 + Math.sin(time * 0.9 + 2) * 0.3
+      starSets.forEach((points, i) => { points.material.opacity = starOpacity * (0.88 + Math.sin(time * 0.45 + i * 2) * 0.12) })
       // 雨：斜着落下，落到底部后回到顶部
       const slant = 0.12 + windSpeed * 0.18
       for (let i = 0; i < RAIN_MAX; i++) {
@@ -433,7 +449,7 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
         const flash = u < 0.08 ? 1 : u < 0.2 ? 0.15 : u < 0.32 ? 0.8 : Math.max(0, 1 - (u - 0.32) * 1.6)
         boltMaterial.opacity = u < 0.45 ? flash : 0
         hemi.intensity = hemiBase + flash * 3
-        cloudPool.forEach(cloud => { (cloud.mesh.material as THREE.MeshLambertMaterial).emissive.copy(cloudBaseColor).multiplyScalar((dark ? 0.1 : 0.42) + flash * 0.6) })
+        cloudPool.forEach(cloud => { (cloud.mesh.material as THREE.MeshLambertMaterial).emissive.copy(cloudBaseColor).multiplyScalar(cloudFill + flash * 0.6) })
         if (u >= 1) {
           lightningT = -1
           hemi.intensity = hemiBase
@@ -461,14 +477,18 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
     setState: applyState,
     setLayout(w, h, next) {
       if (w < 2 || h < 2) return
+      const resized = width !== w || height !== h
+      const previousAspect = camera.aspect
       width = w
       height = h
-      renderer.setSize(w, h, false)
-      camera.aspect = w / h
-      camera.updateProjectionMatrix()
+      if (resized) {
+        renderer.setSize(w, h, false)
+        camera.aspect = w / h
+        camera.updateProjectionMatrix()
+      }
       Object.assign(body, next)
       placeBodies()
-      if (current) { layoutClouds(current); seedPrecipitation(); applyState(current, dark) }
+      if (current && resized) { layoutClouds(current, camera.aspect / previousAspect); seedPrecipitation() }
       loop.renderOnce()
     },
     setActive(next) {
@@ -492,7 +512,9 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
       }
     },
     dispose() {
+      disposed = true
       loop.stop()
+      moonSurface.dispose()
       if (bolt) bolt.geometry.dispose()
       disposeTree(scene)
       disposeTree(moonScene)
