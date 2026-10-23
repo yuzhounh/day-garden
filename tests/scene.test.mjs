@@ -56,6 +56,30 @@ test('Fresh observations drive the scene; stale observations and demo data fall 
   assert.equal(scene.deriveScene(now, day({ weatherCode: 95 })).wind, 1, 'thunderstorms always bring at least a breeze')
 })
 
+test('Twilight keeps its colours but cannot draw a sun below the city horizon', async () => {
+  const { scene } = await load()
+  // Xinyang's Open-Meteo sunrise/sunset for the reported date, in UTC+8.
+  const weather = day({ sunrise: '2026-10-23T06:33', sunset: '2026-10-23T17:42', utcOffsetSeconds: 28800 })
+  const stateAt = (hour, minute) => scene.deriveScene(new Date(Date.UTC(2026, 9, 23, hour - 8, minute)), weather)
+  assert.equal(scene.sunAboveHorizon(stateAt(6, 20)), false, 'pre-sunrise dawn has no sun')
+  assert.equal(scene.sunAboveHorizon(stateAt(6, 33)), true)
+  assert.equal(scene.sunAboveHorizon(stateAt(17, 41)), true)
+  const twilight = stateAt(18, 4)
+  assert.equal(twilight.phase, 'dusk', 'the existing thirty-minute twilight remains')
+  assert.equal(scene.sunAboveHorizon(twilight), false, 'sunset, not the later night phase, hides the sun')
+  assert.equal(stateAt(18, 12).phase, 'night')
+  const lateSunset = { ...weather, sunset: '2026-10-23T19:15' }
+  assert.equal(scene.sunAboveHorizon(scene.deriveScene(new Date(Date.UTC(2026, 9, 23, 10, 4)), lateSunset)), true, '18:00 alone is not a sunset rule')
+  for (const phase of ['dawn', 'day', 'dusk']) {
+    assert.equal(scene.sunAboveHorizon({ phase, dayProgress: { dawn: 0.04, day: 0.42, dusk: 0.96 }[phase] }), true, 'explicit scene previews retain their sun')
+  }
+  assert.equal(scene.sunAboveHorizon({ phase: 'night', dayProgress: null }), false)
+  const { readFile } = await import('node:fs/promises')
+  for (const path of ['src/components/scene/SceneSky.vue', 'src/components/scene/three/sky.ts']) {
+    assert.match(await readFile(`${root}/${path}`, 'utf8'), /!sunAboveHorizon\((?:s\.value|state)\)/)
+  }
+})
+
 test('Seasons flip south of the equator and the moon follows the lunar day', async () => {
   const { scene } = await load()
   const october = new Date(2026, 9, 7)

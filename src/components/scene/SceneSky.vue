@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 import type { SceneEvent, SceneState, SkyKind } from '../../services/scene'
+import { sunAboveHorizon } from '../../services/scene'
 import { seeded, type SunAnchor } from './geometry'
 
 const props = defineProps<{
@@ -73,7 +74,7 @@ const body = computed(() => ({
 }))
 
 const sunMode = computed<'bright' | 'veiled' | 'hazy' | null>(() => {
-  if (night.value) return null
+  if (!sunAboveHorizon(s.value)) return null
   const sky = s.value.sky
   return sky === 'clear' ? 'bright' : sky === 'partly' ? 'veiled' : sky === 'overcast' || sky === 'fog' || sky === 'snow' ? 'hazy' : null
 })
