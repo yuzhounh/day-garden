@@ -1,0 +1,4 @@
+*
+!vercel.json
+!dist_pages
+!dist_pages/**

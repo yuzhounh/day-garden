@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import {
   Sun,
   Cloud,
@@ -12,6 +12,8 @@ import {
   Umbrella,
   Thermometer,
   ArrowUpRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-vue-next'
 import type { WeatherDay } from '../types'
 import DetailModal from './DetailModal.vue'
@@ -58,9 +60,37 @@ function getDayTitle(day: WeatherDay): string {
   return day.dayOfWeek
 }
 
-// 动态根据天气卡片宽度自适应列数，杜绝横向挤压与横向滚动条
+// 动态保持每列舒展；额外日期通过同一条天气曲线横向滚动。
 const weatherPanelRef = ref<HTMLElement | null>(null)
 const forecastAreaRef = ref<HTMLElement | null>(null)
+const forecastScrollRef = ref<HTMLElement | null>(null)
+const canScrollLeft = ref(false)
+const canScrollRight = ref(false)
+
+function updateScrollBounds() {
+  const el = forecastScrollRef.value
+  canScrollLeft.value = Boolean(el && el.scrollLeft > 1)
+  canScrollRight.value = Boolean(el && el.scrollLeft + el.clientWidth < el.scrollWidth - 1)
+}
+
+function scrollForecast(direction: -1 | 1) {
+  const el = forecastScrollRef.value
+  if (!el) return
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  el.scrollBy({ left: direction * el.clientWidth * 0.8, behavior: reduced ? 'instant' : 'smooth' })
+}
+
+async function resetForecastScroll() {
+  await nextTick()
+  const el = forecastScrollRef.value
+  if (!el) return
+  const todayIndex = Math.max(0, props.days.findIndex(day => day.isToday))
+  const pastColumns = visibleCount.value >= 10 ? 2 : visibleCount.value >= 4 ? 1 : 0
+  const start = Math.max(0, todayIndex - pastColumns)
+  const step = (forecastWidth.value - 4 + gridGap.value) / Math.max(1, props.days.length)
+  el.scrollLeft = start * step
+  updateScrollBounds()
+}
 
 function getAvailableForecastWidth(): number {
   if (forecastAreaRef.value) {
@@ -119,6 +149,7 @@ function updateWidth() {
 
 onMounted(() => {
   updateWidth()
+  void resetForecastScroll()
   if (typeof window !== 'undefined') {
     window.addEventListener('resize', updateWidth, { passive: true })
     compactQuery = window.matchMedia(COMPACT_QUERY)
@@ -153,41 +184,19 @@ const visibleCount = computed(() => {
   return Math.min(total, desired)
 })
 
-const visibleDays = computed(() => {
-  if (!props.days || props.days.length === 0) return []
-  const count = visibleCount.value
-  if (count >= props.days.length) return props.days
-
-  const todayIdx = props.days.findIndex(d => d.isToday)
-  if (todayIdx === -1) {
-    return props.days.slice(0, count)
-  }
-
-  // 保证包含“今天”；列数充裕时保留“昨天”或“前天”，其余空间留给未来预报
-  let pastDaysWanted = 0
-  if (count >= 10 && todayIdx >= 2) {
-    pastDaysWanted = 2
-  } else if (count >= 4 && todayIdx >= 1) {
-    pastDaysWanted = 1
-  }
-
-  const actualPast = Math.min(pastDaysWanted, todayIdx)
-  const startIdx = todayIdx - actualPast
-  let endIdx = startIdx + count
-
-  if (endIdx > props.days.length) {
-    endIdx = props.days.length
-    const adjustedStart = Math.max(0, endIdx - count)
-    return props.days.slice(adjustedStart, endIdx)
-  }
-
-  return props.days.slice(startIdx, endIdx)
+const gridGap = computed(() => compact.value ? 2 : 4)
+const forecastWidth = computed(() => {
+  const columns = Math.max(1, visibleCount.value)
+  const columnWidth = Math.max(40, (containerWidth.value - 4 - (columns - 1) * gridGap.value) / columns)
+  return Math.max(containerWidth.value, props.days.length * (columnWidth + gridGap.value) - gridGap.value + 4)
 })
+watch(() => `${props.city}|${props.days.map(day => day.date).join(',')}`, () => { void resetForecastScroll() })
+watch(forecastWidth, async () => { await nextTick(); updateScrollBounds() })
 
 const forecastSubtitle = computed(() => {
-  if (!visibleDays.value.length) return ''
-  const pastDays = visibleDays.value.filter(d => d.isPast).length
-  const futureDays = visibleDays.value.filter(d => !d.isPast && !d.isToday).length
+  if (!props.days.length) return ''
+  const pastDays = props.days.filter(d => d.isPast).length
+  const futureDays = props.days.filter(d => !d.isPast && !d.isToday).length
   const parts: string[] = []
   if (pastDays >= 2) parts.push('前两天')
   else if (pastDays === 1) parts.push('昨天')
@@ -227,13 +236,13 @@ function buildSpline(points: { x: number; y: number }[]): string {
 }
 
 const chartData = computed(() => {
-  const currentDays = visibleDays.value
+  const currentDays = props.days
   if (!currentDays || currentDays.length === 0) return null
   const count = currentDays.length
   // 按实际像素宽度作图（与网格列一一对齐：左右各 2px 内边距、列间距 4px），文字不会被横向拉伸或压扁
-  const gridGap = 4
-  const totalWidth = Math.max(count * 40, Math.round(containerWidth.value - 4))
-  const colWidth = (totalWidth - (count - 1) * gridGap) / count
+  const gap = gridGap.value
+  const totalWidth = forecastWidth.value - 4
+  const colWidth = (totalWidth - (count - 1) * gap) / count
 
   const allMin = currentDays.map(d => d.tempMin)
   const allMax = currentDays.map(d => d.tempMax)
@@ -254,7 +263,7 @@ const chartData = computed(() => {
   const availHeight = chartHeight - topPad - botPad
 
   const points: ChartPoint[] = currentDays.map((d, i) => {
-    const x = Math.round(i * (colWidth + gridGap) + colWidth / 2)
+    const x = Math.round(i * (colWidth + gap) + colWidth / 2)
     const yMax = Math.round(topPad + ((maxTemp - d.tempMax) / (maxTemp - minTemp)) * availHeight)
     const yMin = Math.round(topPad + ((maxTemp - d.tempMin) / (maxTemp - minTemp)) * availHeight)
     return {
@@ -283,7 +292,7 @@ const chartData = computed(() => {
 </script>
 
 <template>
-  <section ref="weatherPanelRef" class="glass-panel weather-panel" aria-label="七日天气">
+  <section ref="weatherPanelRef" class="glass-panel weather-panel" aria-label="天气趋势">
     <div class="weather-summary">
       <div class="summary-header">
         <span class="eyebrow">天气 · 刚刚好</span>
@@ -345,11 +354,12 @@ const chartData = computed(() => {
         </div>
       </div>
 
-      <div v-else-if="chartData" class="trend-scroll-container">
-        <div class="trend-grid-wrapper" :style="{ gridTemplateColumns: `repeat(${visibleDays.length}, minmax(0, 1fr))` }">
+      <div v-else-if="chartData" class="forecast-scroll-shell">
+        <div ref="forecastScrollRef" class="trend-scroll-container" tabindex="0" aria-label="左右滚动查看全部日期的天气" @scroll.passive="updateScrollBounds">
+        <div class="trend-grid-wrapper" :style="{ width: `${forecastWidth}px`, gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }">
           <!-- background clickable columns spanning full height -->
           <button
-            v-for="(day, idx) in visibleDays"
+            v-for="(day, idx) in days"
             :key="'card-' + day.date"
             class="trend-col-card"
             :class="{ today: day.isToday, past: day.isPast }"
@@ -360,7 +370,7 @@ const chartData = computed(() => {
 
           <!-- Row 1: Day header, date, weather icon and condition text -->
           <div
-            v-for="(day, idx) in visibleDays"
+            v-for="(day, idx) in days"
             :key="'top-' + day.date"
             class="trend-cell-top"
             :style="{ gridColumn: idx + 1 }"
@@ -406,7 +416,7 @@ const chartData = computed(() => {
 
           <!-- Row 3: Bottom info (precipitation chance) -->
           <div
-            v-for="(day, idx) in visibleDays"
+            v-for="(day, idx) in days"
             :key="'bot-' + day.date"
             class="trend-cell-bot"
             :style="{ gridColumn: idx + 1 }"
@@ -419,6 +429,9 @@ const chartData = computed(() => {
             </span>
           </div>
         </div>
+        </div>
+        <button v-if="canScrollLeft" class="forecast-scroll-button previous" type="button" aria-label="查看更早的天气" @click="scrollForecast(-1)"><ChevronsLeft :size="22" :stroke-width="1.5" /></button>
+        <button v-if="canScrollRight" class="forecast-scroll-button next" type="button" aria-label="查看更晚的天气" @click="scrollForecast(1)"><ChevronsRight :size="22" :stroke-width="1.5" /></button>
       </div>
     </div>
 
