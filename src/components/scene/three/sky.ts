@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import type { SceneEvent, SceneState } from '../../../services/scene'
+import { sunAboveHorizon } from '../../../services/scene'
 import { createLoop, createRenderer, disposeTree, isLowPower, jitter, radialTexture, seeded, streakTexture } from './common'
 import { CLOUD_PLAN, lighting } from './environment'
 import moonSurfaceUrl from '../../../assets/moon-lroc-1k.jpg'
@@ -283,7 +284,7 @@ export function createSkyWorld(canvas: HTMLCanvasElement): SkyWorld {
     const light = lighting(state, isDark)
 
     // 太阳：晴天明亮、多云半遮、阴雾朦胧；雨雪天藏在云后
-    const sunMode = night ? 'none' : sky === 'clear' || sky === 'partly' ? 'bright' : sky === 'overcast' || sky === 'fog' || sky === 'snow' ? 'hazy' : 'none'
+    const sunMode = !sunAboveHorizon(state) ? 'none' : sky === 'clear' || sky === 'partly' ? 'bright' : sky === 'overcast' || sky === 'fog' || sky === 'snow' ? 'hazy' : 'none'
     sunGroup.visible = sunMode !== 'none'
     const warm = state.phase === 'dawn' || state.phase === 'dusk'
     ;(sunCore.material as THREE.MeshBasicMaterial).color.setHex(warm ? 0xffb27a : 0xffe2a0)

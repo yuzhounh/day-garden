@@ -91,6 +91,11 @@ export function seasonOf(date: Date, lat = 30): Season {
   return seasons[month]!
 }
 
+/** 暮光配色可以延续到日落后；太阳本身只在日出至日落之间显示。 */
+export function sunAboveHorizon(state: Pick<SceneState, 'phase' | 'dayProgress'>): boolean {
+  return state.phase !== 'night' && state.dayProgress !== null
+}
+
 /** 由农历日推算月相，初一为朔、十五前后为望 */
 export function moonPhase(date: Date): number {
   try {
