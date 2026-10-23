@@ -148,7 +148,7 @@ test('The garden keeps its trees, fence and puddle apart and inside the page', a
 test('Weather fetch keeps sunrise, sunset, the city offset and today’s observation', async () => {
   const pad = n => String(n).padStart(2, '0')
   const key = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
-  const dates = Array.from({ length: 10 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() + i - 2); return key(d) })
+  const dates = Array.from({ length: 18 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() + i - 2); return key(d) })
   let requested = ''
   const fetch = async url => {
     requested = url
@@ -167,6 +167,8 @@ test('Weather fetch keeps sunrise, sunset, the city offset and today’s observa
   }
   const { weather } = await load({ fetch, localStorage: memoryStorage() })
   const list = await weather.fetch7DayWeather({ name: '北京', province: '北京', lat: 39.9, lon: 116.4 })
+  assert.match(requested, /past_days=2&forecast_days=16/)
+  assert.equal(list.length, 18)
   assert.match(requested, /current=weather_code,[^&]*wind_speed_10m/)
   assert.match(requested, /sunrise,sunset/)
   const today = list.find(d => d.isToday)
@@ -178,6 +180,16 @@ test('Weather fetch keeps sunrise, sunset, the city offset and today’s observa
   assert.equal(list[3].weatherText, '冻雨')
   assert.equal(weather.getWeatherMeta(85).text, '阵雪')
   assert.equal(weather.getWeatherMeta(81).icon, 'CloudRain')
+})
+
+test('Offline demo covers the same eighteen dates without fabricating cached observations', async () => {
+  const { weather } = await load({ fetch: async () => { throw new Error('offline') }, localStorage: memoryStorage(), console: { ...console, warn() {} } })
+  const list = await weather.fetch7DayWeather({ name: '北京', province: '北京', lat: 39.9, lon: 116.4 })
+  assert.equal(list.length, 18)
+  assert.equal(list.filter(day => day.isPast).length, 2)
+  assert.equal(list.filter(day => day.isToday).length, 1)
+  assert.equal(list.filter(day => !day.isPast && !day.isToday).length, 15)
+  assert.ok(list.every(day => day.dataSource === 'demo'))
 })
 
 test('3D environment: day progress drives the sun side, seasons drive colours, and the camera frames every screen', async () => {

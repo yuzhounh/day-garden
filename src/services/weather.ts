@@ -168,7 +168,7 @@ function groupHours(hourly: Record<string, unknown[]> | undefined): Map<string, 
 }
 
 export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,uv_index_max,sunrise,sunset,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&hourly=${HOURLY_FIELDS}&current=${CURRENT_FIELDS}&minutely_15=precipitation&past_minutely_15=0&forecast_minutely_15=8&timezone=auto&past_days=2&forecast_days=8`
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,uv_index_max,sunrise,sunset,precipitation_sum,wind_speed_10m_max,wind_direction_10m_dominant&hourly=${HOURLY_FIELDS}&current=${CURRENT_FIELDS}&minutely_15=precipitation&past_minutely_15=0&forecast_minutely_15=8&timezone=auto&past_days=2&forecast_days=16`
 
   try {
     const res = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(10000) })
@@ -258,7 +258,7 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
       // ignore
     }
 
-    // 兜底返回模拟数据（前两天 + 今天 + 后七天）
+    // 兜底返回模拟数据（前两天 + 今天 + 后十五天）
     return generateFallbackWeather()
   }
 }
@@ -266,7 +266,7 @@ export async function fetch7DayWeather(city: CityOption): Promise<WeatherDay[]> 
 function generateFallbackWeather(): WeatherDay[] {
   const now = new Date()
   const list: WeatherDay[] = []
-  for (let offset = -2; offset <= 7; offset++) {
+  for (let offset = -2; offset <= 15; offset++) {
     const cur = new Date(now)
     cur.setDate(now.getDate() + offset)
     const timeStr = localDateKey(cur)
