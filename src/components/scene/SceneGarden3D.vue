@@ -21,7 +21,8 @@ const world = shallowRef<GardenWorld | null>(null)
 const ready = ref(false)
 let disposed = false
 let loading = false
-let idleHandle = 0
+let nearViewport = false
+let visibilityObserver: IntersectionObserver | null = null
 let motionQuery: MediaQueryList | null = null
 
 const stateKey = computed(() => {
@@ -31,13 +32,13 @@ const stateKey = computed(() => {
 
 function onMotion(event: MediaQueryListEvent) { world.value?.setReducedMotion(event.matches) }
 
-/** 首屏之后空闲时预载；滚到页底时若还没载好则立即加载 */
+/** 接近页底才预载；隐藏页面不创建 WebGL 资源。 */
 async function load() {
-  if (loading || world.value || disposed) return
+  if (loading || world.value || disposed || document.hidden) return
   loading = true
   try {
     const { createGardenWorld } = await import('./three/garden')
-    if (disposed || !canvas.value) return
+    if (disposed || !canvas.value || document.hidden) return
     const instance = createGardenWorld(canvas.value)
     world.value = instance
     motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -45,23 +46,42 @@ async function load() {
     instance.setReducedMotion(motionQuery.matches)
     instance.resize(props.width, props.height)
     instance.setState(props.state, props.dark)
-    instance.setActive(props.active)
+    instance.setActive(props.active && !document.hidden)
     ready.value = true
+    visibilityObserver?.disconnect()
   } catch (error) {
-    console.warn('3D garden unavailable, falling back to 2D:', error)
-    emit('failed')
+    if (!disposed) {
+      console.warn('3D garden unavailable, falling back to 2D:', error)
+      emit('failed')
+    }
+  } finally {
+    loading = false
   }
 }
 
+function onVisibilityChange() {
+  if (!document.hidden && (nearViewport || props.active)) void load()
+  world.value?.setActive(props.active && !document.hidden)
+}
+
 onMounted(() => {
+  document.addEventListener('visibilitychange', onVisibilityChange)
+  if ('IntersectionObserver' in window && canvas.value) {
+    visibilityObserver = new IntersectionObserver(entries => {
+      nearViewport = entries.some(entry => entry.isIntersecting)
+      if (nearViewport) void load()
+    }, { rootMargin: '240px 0px' })
+    visibilityObserver.observe(canvas.value)
+  } else {
+    nearViewport = true
+    void load()
+  }
   if (props.active) void load()
-  else if (typeof window.requestIdleCallback === 'function') idleHandle = window.requestIdleCallback(() => void load(), { timeout: 5000 })
-  else idleHandle = window.setTimeout(() => void load(), 3000)
 })
 
 watch(() => props.active, active => {
   if (active) void load()
-  world.value?.setActive(active)
+  world.value?.setActive(active && !document.hidden)
 })
 watch(() => [props.width, props.height], () => world.value?.resize(props.width, props.height))
 watch(stateKey, () => world.value?.setState(props.state, props.dark))
@@ -71,8 +91,8 @@ for (const kind of GARDEN_EVENTS) {
 
 onUnmounted(() => {
   disposed = true
-  if (typeof window.cancelIdleCallback === 'function') window.cancelIdleCallback(idleHandle)
-  window.clearTimeout(idleHandle)
+  visibilityObserver?.disconnect()
+  document.removeEventListener('visibilitychange', onVisibilityChange)
   motionQuery?.removeEventListener('change', onMotion)
   world.value?.dispose()
   world.value = null

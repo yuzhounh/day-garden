@@ -4,3 +4,6 @@
   X-Frame-Options: DENY
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.googleusercontent.com https://avatars.githubusercontent.com https://images.unsplash.com; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com; media-src 'self' https://listen.reyfm.de https://*.radiohost.de https://ice1.somafm.com; font-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
