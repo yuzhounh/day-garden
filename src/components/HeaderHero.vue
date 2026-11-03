@@ -27,6 +27,7 @@ import {
 } from 'lucide-vue-next'
 import BrandLogo from './BrandLogo.vue'
 import DetailModal from './DetailModal.vue'
+import { getLang, setLang } from '../i18n'
 import { getTodayCalendarInfo } from '../services/calendar'
 import { useCurrentTime } from '../services/day'
 import {
@@ -86,6 +87,16 @@ const greeting = computed(() => {
 
 const isDark = computed(() => props.theme === 'dark' || (props.theme === 'auto' && systemDark.value))
 const systemDark = ref(false)
+const currentLang = ref<'zh' | 'en'>(getLang())
+function toggleLang() {
+  const next = currentLang.value === 'zh' ? 'en' : 'zh'
+  setLang(next)
+  currentLang.value = next
+}
+function onLangChanged(e: Event) {
+  currentLang.value = (e as CustomEvent<'zh' | 'en'>).detail || getLang()
+}
+
 
 const showCities = ref(false)
 const cityMenu = ref<HTMLElement | null>(null)
@@ -313,6 +324,7 @@ onMounted(() => {
   document.addEventListener('click', closeAudioPopover)
   document.addEventListener('keydown', onKey)
   window.addEventListener('resize', onResize)
+  window.addEventListener('daygarden:lang-changed', onLangChanged)
 })
 
 onUnmounted(() => {
@@ -323,6 +335,7 @@ onUnmounted(() => {
   document.removeEventListener('click', closeAudioPopover)
   document.removeEventListener('keydown', onKey)
   window.removeEventListener('resize', onResize)
+  window.removeEventListener('daygarden:lang-changed', onLangChanged)
 })
 </script>
 
@@ -586,6 +599,18 @@ onUnmounted(() => {
           <Moon v-else :size="17" />
         </button>
 
+        <!-- 2.1 语言切换：中/EN 1-Click Toggle -->
+        <button
+          class="icon-button lang-toggle-btn"
+          :aria-label="currentLang === 'zh' ? '切换为英文 / Switch to English' : '切换为中文 / Switch to Chinese'"
+          :title="currentLang === 'zh' ? 'Switch to English' : '切换为中文'"
+          @click="toggleLang"
+        >
+          <span class="text-xs font-bold leading-none select-none tracking-tight">
+            {{ currentLang === 'zh' ? '中' : 'EN' }}
+          </span>
+        </button>
+
         <!-- 3. 同步：账户同步按钮 -->
         <button
           class="icon-button account-button"
@@ -779,6 +804,19 @@ onUnmounted(() => {
             >
               <Sun v-if="isDark" :size="18" />
               <Moon v-else :size="18" />
+            </button>
+          </div>
+          <div class="drawer-theme-row drawer-lang-row">
+            <span class="drawer-theme-label">界面语言</span>
+            <button
+              class="icon-button lang-toggle-btn"
+              :aria-label="currentLang === 'zh' ? '切换为英文 / Switch to English' : '切换为中文 / Switch to Chinese'"
+              :title="currentLang === 'zh' ? 'Switch to English' : '切换为中文'"
+              @click="toggleLang"
+            >
+              <span class="text-xs font-bold leading-none select-none tracking-tight">
+                {{ currentLang === 'zh' ? '中' : 'EN' }}
+              </span>
             </button>
           </div>
         </div>
