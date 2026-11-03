@@ -4,6 +4,8 @@
 
 <h1 align="center">Day Garden · 每日花园</h1>
 
+<p align="center">简体中文 · <a href="README.en.md">English</a></p>
+
 <p align="center"><strong>天气、诗词、四季与日常提醒，组成一个轻盈安静的生活首页。</strong></p>
 
 <p align="center">
