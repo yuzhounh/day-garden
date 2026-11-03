@@ -6,6 +6,7 @@ import { requestNotificationPermission, sendDesktopNotification } from '../servi
 import { importPreferences, DEFAULT_CARD_ORDER } from '../services/storage'
 import { localDateKey } from '../services/day'
 import DetailModal from './DetailModal.vue'
+import { getLang, setLang } from '../i18n'
 
 const props = defineProps<{
   preferences: UserPreferences
@@ -20,6 +21,12 @@ const emit = defineEmits<{
 const currentTab = ref<'modules' | 'notification'>(
   props.initialTab === 'notification' ? 'notification' : 'modules'
 )
+const lang = ref<'zh' | 'en'>(getLang())
+function onLangChange(event: Event) {
+  const value = (event.target as HTMLSelectElement).value === 'en' ? 'en' : 'zh'
+  setLang(value)
+  lang.value = value
+}
 
 watch(() => props.initialTab, (newTab) => {
   if (newTab === 'notification' || newTab === 'modules') {
@@ -120,6 +127,13 @@ function importData(e: Event) {
       <Transition name="tab-fade" mode="out-in">
         <!-- 1. 模块开关 -->
         <div v-if="currentTab === 'modules'" key="modules" class="space-y-3">
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60">
+          <span class="text-xs font-medium text-slate-800 dark:text-slate-200 select-none">语言 / Language</span>
+          <select :value="lang" @change="onLangChange" class="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2 py-1 text-xs text-slate-700 dark:text-slate-200">
+            <option value="zh">简体中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
         <p class="text-xs text-slate-500 leading-relaxed">
           极简原则：建议首页启用不超过 6 个模块，确保每天 30 秒内扫视完毕，绝不变成让人刷屏的信息流。
         </p>
