@@ -607,7 +607,7 @@ onUnmounted(() => {
           @click="toggleLang"
         >
           <span class="text-xs font-bold leading-none select-none tracking-tight">
-            {{ currentLang === 'zh' ? '中' : 'EN' }}
+            {{ currentLang === 'zh' ? 'EN' : '中' }}
           </span>
         </button>
 
@@ -815,7 +815,7 @@ onUnmounted(() => {
               @click="toggleLang"
             >
               <span class="text-xs font-bold leading-none select-none tracking-tight">
-                {{ currentLang === 'zh' ? '中' : 'EN' }}
+                {{ currentLang === 'zh' ? 'EN' : '中' }}
               </span>
             </button>
           </div>
