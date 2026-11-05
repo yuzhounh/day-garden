@@ -608,4 +608,15 @@ test('Vinyl record displays adaptive obsidian black disc in light mode and porce
   const ring1Border = await ring1.evaluate((el) => window.getComputedStyle(el).borderColor)
   expect(ring1Border).not.toBe('rgb(255, 255, 255)')
 })
-
+test('Bilingual i18n loads cleanly when English is configured without freezing or mutation loops', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('day_garden_lang', 'en')
+  })
+  await page.goto('/')
+  const app = page.locator('#app')
+  await expect(app).toBeVisible()
+  const heroCopy = page.locator('.hero-copy')
+  await expect(heroCopy).toBeVisible()
+  const text = await heroCopy.innerText()
+  expect(text.length).toBeGreaterThan(0)
+})

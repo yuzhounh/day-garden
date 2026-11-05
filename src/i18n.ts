@@ -242,21 +242,29 @@ function processText(node: Text, en: boolean) {
   }
   if (origText.has(node)) {
     const original = origText.get(node) as string;
-    if (en) {
-      const key = original.trim();
-      if (Object.prototype.hasOwnProperty.call(DICT, key)) node.nodeValue = pad(original, DICT[key]);
-    } else {
-      node.nodeValue = original;
+    const target = en && Object.prototype.hasOwnProperty.call(DICT, original.trim())
+      ? pad(original, DICT[original.trim()])
+      : original;
+    if (node.nodeValue === (en ? target : original)) return;
+    if (node.nodeValue !== target && node.nodeValue !== original) {
       origText.delete(node);
+    } else {
+      if (en) {
+        if (node.nodeValue !== target) node.nodeValue = target;
+      } else {
+        if (node.nodeValue !== original) node.nodeValue = original;
+        origText.delete(node);
+      }
+      return;
     }
-    return;
   }
   if (!en) return;
   const current = node.nodeValue;
   const key = current ? current.trim() : '';
   if (!key || !Object.prototype.hasOwnProperty.call(DICT, key)) return;
   origText.set(node, current as string);
-  node.nodeValue = pad(current as string, DICT[key]);
+  const next = pad(current as string, DICT[key]);
+  if (node.nodeValue !== next) node.nodeValue = next;
 }
 
 function processAttr(el: Element, en: boolean) {
@@ -270,8 +278,13 @@ function processAttr(el: Element, en: boolean) {
     if (!map.has(attr)) map.set(attr, el.getAttribute(attr) || '');
     const original = map.get(attr) || '';
     const key = original.trim();
-    if (en && Object.prototype.hasOwnProperty.call(DICT, key)) el.setAttribute(attr, DICT[key]);
-    else el.setAttribute(attr, original);
+    const currentAttr = el.getAttribute(attr);
+    if (en && Object.prototype.hasOwnProperty.call(DICT, key)) {
+      const target = DICT[key];
+      if (currentAttr !== target) el.setAttribute(attr, target);
+    } else {
+      if (currentAttr !== original) el.setAttribute(attr, original);
+    }
   });
 }
 
