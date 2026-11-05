@@ -802,8 +802,8 @@ onUnmounted(() => {
               :title="isDark ? '切换浅色模式' : '切换深色模式'"
               @click="emit('toggle-theme')"
             >
-              <Sun v-if="isDark" :size="18" />
-              <Moon v-else :size="18" />
+              <Moon v-if="isDark" :size="18" />
+              <Sun v-else :size="18" />
             </button>
           </div>
           <div class="drawer-theme-row drawer-lang-row">
@@ -815,7 +815,7 @@ onUnmounted(() => {
               @click="toggleLang"
             >
               <span class="text-xs font-bold leading-none select-none tracking-tight">
-                {{ currentLang === 'zh' ? 'EN' : '中' }}
+                {{ currentLang === 'zh' ? '中' : 'EN' }}
               </span>
             </button>
           </div>
